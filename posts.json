@@ -1,0 +1,12 @@
+[
+  {
+    "title": "US Domestic Gross Box Office - Deneb Remake",
+    "date": "2025-05-15",
+        "content": "<p>Inspired by a chart in <a href='https://www.trendlineHQ.com'>www.trendlineHQ.com</a>, I recreated the visual using Vega-Lite inside a Deneb custom visual in Power BI.</p><img src='/images/USDomesticBoxOffice_Original.png' alt='Original Visualisation' '><br><img src='/images/USDomesticBoxOffice_Remake.png' alt='Vega-Lite Remake' style='width:1000px'><h3>Tools Used</h3><ul><li>Power BI</li><li>Vega-Lite</li><li>Deneb custom visual</li><li>HTML5 custom visual</li></ul><p>Notes</p><p>Inspiration?</p><ul><li>What learned?</li><li>Any challenges</li><li>Certain design choices</li><li>Reflections</li></ul><p>Interesting and impactful visual showing the effect of COVID-19 on cinemas.</p><p>Nice, straightforward visual to remake to start with.</p><p>Used a bar mark to create column chart</p><p>Point marks used for left arrow and down arrow</p><p>Filtered the data *within* the visual to only show for years from 2000</p><p>Limitations</p><p>Deneb visual doesn't allow independent formatting of substrings so couldn't colour specific words. (Neither does Power BI native visuals). Had to use HTML5 custom visual to display narrative with red / green txt emphasis.Could only have one title and one subtitle within Deneb so main title is a separate card.</p>"
+  },
+  {
+    "title": "Unemployment Maps with Leaflet.js",
+    "date": "2025-05-15",
+    "content": "Using Leaflet, I built a choropleth map that visualizes unemployment data by region. It’s fully interactive and integrates live data from an API."
+  }
+]
