@@ -15,10 +15,10 @@ Inspired by a chart in *www.trendlineHQ.com* I recreated the visual using Vega-L
   </tr>
   <tr>
     <td style="text-align: center;">
-      <img src="/images/USDomesticBoxOffice_Original.png" alt="Original Visualisation" style="width: 300px;"><br>
+      <img src="/dataviz-portfolio/images/USDomesticBoxOffice_Original.png" alt="Original Visualisation" style="width: 300px;"><br>
     </td>
     <td style="text-align: center;">
-      <img src="/images/USDomesticBoxOffice_Remake.png" alt="Vega-Lite Remake" style="width: 525px;"><br>
+      <img src="/dataviz-portfolio/images/USDomesticBoxOffice_Remake.png" alt="Vega-Lite Remake" style="width: 525px;"><br>
     </td>
   </tr>
 </table>
