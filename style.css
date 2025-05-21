@@ -29,3 +29,13 @@ time {
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
+
+img {
+  padding: 0;
+  margin: 0
+}
+
+figcaption {
+  font-size: 12px;
+  font-style: italic;
+}
