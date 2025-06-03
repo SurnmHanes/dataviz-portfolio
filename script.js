@@ -4,7 +4,7 @@ fetch('posts.json')
     const container = document.getElementById('blog-posts');
 
     // Optional: sort posts by date (latest last)
-    posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     posts.forEach(post => {
       const article = document.createElement('article');
