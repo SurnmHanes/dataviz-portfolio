@@ -46,3 +46,8 @@ pre {
   background-color: #fdf6e3;
   display: block;
 }
+
+.monospace {
+  font-family: monospace;
+
+}
