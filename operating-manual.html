@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Data Viz Blog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="about.html">About</a> |
+      <a href="how-i-work.html">How I Work</a> |
+      <a href="operating-manual.html">Operating Manual</a>
+    </nav>
+    <h1>Operating Manual for the Empathetic Data Viz Engineer</h1>
+    <p><i>A guide to thoughtful design, maintainable code, strong communication and data experiences that resonate</i></p>
+  </header>
+  <main>
+    <h2>Engineer for Empathy</h2>
+    <ol>
+      <li>Treat every visual and every DAX expression as a conversation with a human.
+        <p>The context might be understood now but will you or a colleague still understand it in six months time? Clarity now prevents confusion (and therefore time) in the future. Every measure, label and visual should anticipate questions a user will ask. Assume they're smart, not psychic.</p>
+      </li>
+      <li>Build for trust, clarity and continuity.
+        <p>Perfect numbers don't matter if nobody trusts them. A fast report is useless if it breaks when the user changes something or when you're on leave. In my experience robustness trumps accuracy and if the report breaks more often than not, you lose user engagement. </p>
+        
+        <p>Accuracy is the baseline but what builds trust is when your work is obvious, intuitive and stable especially when you're not around to explain it. </p>
+      </li>
+      <li>See yourself as a translator between data and human insight.
+        <p>The dataset might be messy, contradictory or partial. Our role is to interpret that raw input into something meaningful and actionable. Translation means knowing when to simplify when to state the assumptions made and when not to show something.</p>
+        
+        <p>It's not dumbing down, it's being selective for the good of understanding.</p>
+      </li>
+      <li>Talk like a teammate, not a textbook
+        <p>Although textbook speak is technically correct, the goal is to be understood and therefore to meet others at their level intellectually and contextually. </p>
+        <p>It's not about showing off how much jargon you understand or how impressive you think you sound. Team dynamics may prevent others from asking for simpler explanations which could lead to meaning being lost. If the words cause confusion, it really doesn't matter that they were the correct technical terms.</p>
+        <p>It's not about big words, it's about conveying meaning.</p>
+      </li>
+    </ol>
+    <h2>Write DAX like a UX Designer</h2>
+    <ol>
+      <li>Every measure is an event. Make it clear, stable and understandable.
+        <p>Explain yourself and the logic when writing a measure, especially when it's a multi-step measure. Your future self and your colleagues will thank you.</p>
+      </li>
+      <li>Comment generously
+        <p>If there are no comments, each and every time a developer looks at the measure, they have to spend a certain amount of energy to understand what it is doing. Avoid this additional cognitive load and time drain as much as possible by using comments in the measure to communicate what it is doing and why.</p>
+      </li>
+      <li>Use the <code class="monospace">Description</code> box to capture intent and meaning.
+        <p>This description box is a perfect place to record what the measure is for. The advantage of the description box is two fold: </p>
+        <p>Firstly, the text recorded there can be exported from Power BI using the DAX INFO functions and then used as lightweight documentation for the semantic model. </p>
+        <p>Secondly, any description added to a measure appears when hovering over a measure in the Power BI UI which speeds up future dev because it is immediately obvious what the measure is.</p>
+      </li>
+      <li>Structure measures into folders and subfolders to prevent overwhelm and help navigation
+        <p>The number of measures in a semantic model can grow extremely quickly and two measures may look similar but differ very slightly. For these reasons, it is best to organise similar measures into folders and subfolders to help future developers find the measure they need.</p>
+      </li>
+      <li>Avoid cleverness for its own sake - keep it simple stupid!
+        <p>Often the best solutions are the simplest solution. When writing a measure to return a certain metric, my approach is to get it to work for one case. Then expand it to work for all cases and for all user interactions. Then I look at it and wonder if I can simplify the DAX somehow. Sometimes I can't and that's fine. But often I can and my future self is always grateful when re-reading a measure further down the line.</p>
+      </li>
+    </ol>
+    <h2>Semantic Layer</h2>
+    <ol>
+      <li>Model should reflect how users think, not just how data is stored.
+        <p>Use business-friendly naming for columns and measures. Name the entities using human-understandable language rather than <code class="monospace">Factxxxx</code> or <code class="monospace">tbl_xxx</code>. The model should speak the language of the user, not the backend. </p>
+        <p>Less is more, show only what's needed in the reporting layer. Hide ID and key columns, hide helper columns and intermediate tables to reduce overwhelm at the report layer. </p>
+      </li>
+      <li>Group facts and dimensions conceptually.
+        <p>Use display folders to group similar metrics together in a way that would make sense for the user. So for example, put all Customer metrics in one place. Or all measures related to time intelligence.</p>
+      </li>
+      <li>Use naming conventions that reflect mental models, not table joins.
+        <p>A user shouldn't have to understand the star schema to understand the model. Choose names that reflect how users talk about the business eg. use "Total Customers" rather than "Customer Count".</p>
+      </li>
+    </ol>
+    <h2>Visual Design</h2>
+    <ol>
+      <li>Alignment
+        <p>If you do nothing else, use alignment. Where possible, align everything with everything else.</p>
+      </li>
+      <li>Colour = Meaning
+        <p>Less is more when it comes to colour and usage should be deliberate and with purpose, not just because "it looks nice". The best use of colour is to emphasize or de-emphasize. </p>
+        <p>Always consider accessibility (users who may have colour vision deficiencies) and so never use colour alone to stress something. Use icons, labels or position to support the message. </p>
+        <p>Be thoughtful about saturation. Too high and the colour will hurt the users' eyes should they have to use the report for any length of time.</p>
+        <p>Choose colours based on association - red naturally has negative connotations (risk, danger, failure) so don't use it to indicate positives (success, growth, pass rate).</p>
+      </li>
+      <li>Whitespace
+        <p>Group and organise objects together if they are related. But don't put too many objects on a page at once. It will feel cluttered and overwhelming. Allow the report pages to breathe by making use of whitespace / negative space. This helps the user to identify objects that are related and conversely objects that are unrelated.</p>
+      </li>
+      <li>Hierarchy and Typography
+        <p>Use font size to draw the user's attention. Titles should be big and noticeable. They should be bigger than subtitles which themselves should be bigger than normal text. Use consistent font to create a consistent report. Inconsistent font is jarring and is noticed surprising quickly by the eye.</p>
+      </li>
+      <li>UX instruments, not cosmetics
+        <p>Design isn't about making things pretty, it's about making them useful. Where possible, every element on the page should serve a purpose, to guide, inform or clarify. Often we're handcuffed by stakeholders' requirements but we should be asking ourselves questions like: Does this visual add value? Does the layout have a natural flow? Could a user pick up this report without needing a guided walkthrough?</p>
+        <p>Don't over-design but do design intentionally and with purpose.</p>
+        <p>Simpler is often better.</p>
+      </li>
+
+      <li>Dark theme?</li>
+        <p>I have nothing against dark themes. However my mantra here would be, much like colour, use with intentionality not just because "it looks edgy".</p>
+      <li>Always test.</li>
+        <p>When the design is completed or even as you go along, check that it still looks good and is robust. Click a few buttons, change a few slicers does the design stand up to this scrutiny or does something strange happen?</p>
+      <li>Avoid semantic ambiguity.</li>
+        <p>Be clear in labelling and be specific. Don't give the user scope for misinterpretation. For example "Last 12 Months" - is that the last 12 completed calendar months before (and excluding) the current month? Is it the last 365 days? Is it 12 months back from today?</p>
+    </ol>
+    <h2>Empathy Test Loop</h2>
+      <p>Before delivering a new report or even new development on an existing report, ask:</p>
+      <ul>
+        <li>Can a new user understand in under 15 seconds?</li>
+        <li>Is there a point where the numbers look "wrong"?</li>
+        <li>Does every interaction feel responsive and predictable?</li>
+        <li>What would I think if I saw this for the first time?</li>
+      </ul>
+    <h2>My Toolkit</h2>
+      <ul>
+        <li>Power BI</li>
+        <li>Vega-Lite code inside a Deneb custom visual</li>
+        <li>DAX Studio</li>
+        <li>Tabular Editor</li>
+        <li>Measure Killer</li>
+        <li>Own lived experience as report consumer as well as report builder.</li>
+      </ul>
+  </main>
+
+
+
+
+
+</body>
+</html>

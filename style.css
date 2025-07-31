@@ -1,9 +1,27 @@
 body {
   font-family: system-ui, sans-serif;
-  margin: 0;
-  padding: 2rem;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 800px;
   background: #fdf6e3;
   color: #333;
+}
+
+nav {
+      margin-bottom: 2rem;
+    }
+    nav a {
+      /* The left / right margin values ensure there is space between the text and the pipes */
+      margin: 0 0.5rem 0 0.5rem;
+      text-decoration: none;
+    }
+
+blockquote {
+  font-style: italic;
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #999;
+  color: #555;
 }
 
 header {
@@ -49,5 +67,5 @@ pre {
 
 .monospace {
   font-family: monospace;
-
+  background-color: whitesmoke;
 }

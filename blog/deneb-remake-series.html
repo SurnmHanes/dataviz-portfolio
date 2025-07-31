@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vega-Lite in Deneb Remake Series </title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Vega-Lite Remake Series</h1>
+    <p>A mini series of posts where I remake and reflect on various visualisations using Vega-Lite within a Deneb custom visual in Power BI.</p>
+    <section>
+      <h2>Jump to a Post</h2>
+    <ul>
+        <li><a href="#post1">01 US Domestic Gross Box Office</a></li>
+        <li><a href="#post2">02 Game of Thrones Episode Ratings</a></li>
+        <li><a href="#post3">03 Digital Nomads: Where Should You Go?</a></li>
+        <li><a href="#post4">04 Men Speak Most in Best Picture Winning Films</a></li>
+        <li><a href="#post5">05 World 4G Coverage</a></li>
+        <li><a href="#post6">06 Bringing it All Together</a></li>
+    </ul>
+    </section>
+
+    <hr class="section-divider">
+
+    <section id="post1">
+      <h2>US Domestic Gross Box Office - Deneb Remake #1</h2>
+        <p>16-04-2025</p>
+      
+      <h2>Summary</h2>
+    
+        <p>I recreated a visual showing the effects of Covid-19 on US cinema-goers using Vega-Lite in a Deneb custom visual in Power BI.</p>
+      
+      <h2>Inspiration & Background</h2>
+        
+        <p>Inspired by a chart in <a href='https://www.trendlineHQ.com'>www.trendlineHQ.com</a>, I recreated the following visual using Vega-Lite inside a Deneb custom visual in Power BI. The underlying data combines annual US Box Office receipts from 1977 onwards, sourced from Box Office Mojo.</p>
+
+        <figure><img src='../images/USDomesticBoxOffice_Original.png' alt='Original Visualisation' style='max-width:100%; height:auto;'><figcaption>Original Visualisation – Source: TrendlineHQ (data from BoxOfficeMojo.com)</figcaption></figure>
+        
+        <br>
+        
+        <p>This was an interesting visual to me and showed simply the stark effect of COVID-19 on cinema-goers in the US. I also thought it was a nice simple remake to start with.</p>
+      
+        <p>I felt the little caption / narrative emphasising the change from 2019 would be the tricky part and I wanted to investigate whether this was possible in Deneb.</p>
+      
+      <h2>Methodology</h2>
+        
+        <h3>Design Notes</h3>
+        
+          <p>A measure was created in Power BI to sum up the total Box Office Gross value.</p>
+          
+          <p>A bar mark was then used within Vega-Lite to create the column chart. This was encoded with the measure for the y-axis and the year for the x-axis.</p>
+          
+          <p>A parameter was used in the config to hold the hex colour for the columns. This choice was made to aid flexibility: If I want to switch colours in future, this only needs changing in the configuration, I don't need to go through the specification. This was then referenced in the mark.</p>
+          
+          <p>By default the x-axis labels were displayed at 45 degrees to the horizontal. I changed this angle to 0 degrees to aid readability as I'm not a fan of having to tilt my head to read these!</p>
+        
+        <h3>Challenges</h3>
+          
+          <p>Since the dataset began in 1977, a <span class='monospace'>transform.filter</span> was used to ensure the x-axis began with the year 2000 to mimic the original.</p>
+          
+          <p>A title was added as well as a subtitle. The value of these were strings.</p>
+          
+          <p>The formatting of the y-axis needed to reflect the fact that it was a currency and, in addition, was quoted in billions. This was achieved using a label expression in the axisY property in the config. This expression said if the label value is zero, return that value, otherwise append '$' to the formatted value.</p>
+          
+          <p>The last thing was the arrows which are made using point marks and certain styles I defined in the config. We created two styles (<span class='monospace'> _arrowdown </span> and <span class='monospace'> _arrowleft </span>) and then in the specification, layered two point marks with the bar mark. The point marks would then reference each of the styles created.</p>
+      
+      <h2>Compromises</h2>
+        
+        <p>There were a couple of things outside the scope of Deneb. It is only possible to have one title and one subtitle per visual so I was unable to create the three lines of titling as per the original. Or rather I was unable to format three lines in three different ways. Hence the headline is actually a Power BI card.</p>
+        
+        <p>The narrative on the right hand side was also not possible in Deneb. It is not possible to format a substring in a different way to the rest of the string. This is also not possible in native Power BI. To achieve this with the red and green text colouring I used another custom visual called HTML Content which allows you to write in HTML with inline CSS styling and positioned this above the Deneb visual.</p>
+      
+      <h2>Outcome</h2>
+      
+        <figure><img src='../images/USDomesticBoxOffice_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake</figcaption></figure>
+      
+      <h2>Vega-Lite Code & Config</h2>
+        
+        <p>You can view the full Vega-Lite config and specification below:</p>
+      
+        <a href='https://gist.github.com/SurnmHanes/805f2c93c6c60c7e3351db609e4f55e6'>US Domestic Box Office Collection - Vega-Lite Config</a>
+      
+      <br><br>
+      
+        <a href='https://gist.github.com/SurnmHanes/2deea32f5e7c794b0981df689826ba4f'>US Domestic Box Office Collection - Vega-Lite Specification</a>
+    </section>
+    
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+    
+    <hr class="section-divider">
+
+    <section id="post2">
+      <h2>Game of Thrones Episode Ratings - Deneb Remake #2</h2>
+        <p>27-05-2025</p>
+      
+      <h2>Summary</h2>
+        <p>A heatmap seen on Threads displaying the ratings for every episode of every series was recreated using Vega-Lite inside a Deneb custom visual in Power BI.</p>
+      
+      <h2>Inspiration & Background</h2>
+        
+        <p>I found this chart (<a href='https://www.threads.com/@infobeautiful/post/DHMu4q4sJhq/the-sudden-collapse-of-westeros-the-sudden-death-of-a-tv-show'>Game Of Thrones</a>) on the Information is Beautiful Twitter / X page showing the ratings for each episode of every season of Game Of Thrones in heat map form. Although I'm not a Game Of Thrones fan, the visual intrigued me and having little experience of building heat maps, I thought this would make an interesting task to re-create using Vega-Lite inside a Deneb custom visual in Power BI.</p>
+        
+        <figure><img src='../images/GameOfThrones_Original.png' alt='Original Visualisation'><figcaption>Original visualisation by <a href='https://informationisbeautiful.net/' target='_blank'>Information is Beautiful</a>, shared via <a href='https://www.threads.com/@infobeautiful/post/DHMu4q4sJhq/the-sudden-collapse-of-westeros-the-sudden-death-of-a-tv-show' target='_blank'>Threads</a>.</figcaption></figure>
+  
+        <p>The visual is a two-dimensional chart (episodes on y-axis, series' on x-axis) displaying a rating out of 10 for each series/episode combination. Additionally the ratings are 'bucketed' and colour-coded based on their rating category. The image also has a cover image and title on the left hand side but this doesn't form part of this remake.</p>
+        
+      <h2>Methodology</h2>
+        
+        <p>My first step was creating the raw data manually since I couldn't access the original source of the data. As part of the import process I then used Power Query to unpivot the data to provide 3 columns of data: Series, Episode and Rating which I could then use in the visual.</p>
+        
+        <p>The remake required layering two charts to give the appearance of one, a very common technique in Vega-Lite inside Deneb: one to create the heat map rectangles and then another to overlay the rating labels in each rectangle.</p>
+        
+        <h3>Design Notes</h3>
+          
+          <p>The first thing to do was to create the heat map shapes. This was done using a rect mark. I then used a text mark to display the text for the ratings in each rectangle, the two marks being layered together in the code and sharing the x and y co-ordinate encodings.</p>
+          
+          <p>I then used conditional formatting to colour the rectangles according to the buckets and also to colour the text black or white according to the rating.</p>
+          
+        <h3>Challenges</h3>
+          
+          <h4>Y Axis</h4>
+            
+            <p>One of the first challenges I encountered was two-fold and involved the y axis. Firstly how do I prefix the axis labels to show the 'E'? And secondly, once I'd achieved that, how could I sort them into the correct order given they are no longer purely numeric labels?</p>
+            
+            <p>The solution is fairly straightforward in Vega-Lite, once you know how! We create a <span class='monospace'>transform.calculate</span> expression to solve the first part. A <span class='monospace'>transform.calculate</span> is similar to a calculated column in Power BI: this idea of deriving a new column in the dataset using a calculation based on an existing column or columns.</p><p>So in this case, we create a new 'calculated column' called YAxisLabel which is the character 'E' prefixed on the episode number.</p>
+            
+            <p>This YAxisLabel calculated column is then used in the y-axis encoding which brings us to our second problem. By default this will then have the incorrect sort order because, for example, Vega-Lite thinks that 'E10' and 'E11' come before 'E2'.</p>
+            
+            <p>To resolve this issue, we can use the sort property of the y encoding. This allows us to sort by the Episode field (which is purely numeric) in an ascending order. Pretty neat!</p>
+            
+          <h4>Colour Legend</h4>
+          
+            <p>The next challenge came in colouring the rectangle shapes based on the episode rating. The first step here was to understand the thresholds for the various categories. For instance identifying that an episode was considered 'Awesome' if it had a rating over 9 or a 'Bad' episode garnered a rating of between 5 and 6, for example.</p>
+            
+            <p>Once the thresholds were understood, another <span class='monospace'>transform.calculate</span> was used to create a new 'calculated column' called 'Rating Category'. In Power BI language, the Rating Category was essentially a SWITCH statement (or a series of IF statements) which returns the category depending on the rating score.</p><p>This Rating Category column was then used in the color encoding channel of the rect mark.</p>
+            
+          <h4>Font Colour</h4>
+          
+            <p>Now that we have coloured all the rectangles according to the episode rating, this meant that some of the text displaying the rating on the rectangle became hard to read. Dark colour on a dark background or conversely a light colour on a light background. To resolve this, I would need to introduce some conditional logic that says: if the rectangle colour is dark, then use white for the text, otherwise use black.</p>
+            
+            <p>I introduced this logic in the color encoding of the text mark by using a condition / test expression where I said if the rating was less than 6 or above 9, then use white text otherwise use black text.</p>
+            
+      <h2>Compromises</h2>
+      
+        <p>There were no real compromises that needed to be made to achieve a decent reproduction of the original visual. I was very pleased with how straightforward the task turned out to be and with how close to the original the end result was.</p>
+        
+      <h2>Outcome</h2>
+      
+        <figure><img src='../images/GameOfThrones_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake</figcaption></figure>
+      
+      <h2>Vega-Lite Code & Config</h2>
+      
+        <p>You can view the full Vega-Lite config and specification below:</p>
+        
+          <a href='https://gist.github.com/SurnmHanes/0d02326420713f8235f7253ce9de6553'>Game Of Thrones Episode Ratings - Vega-Lite Config</a>
+          <br><br>
+          <a href='https://gist.github.com/SurnmHanes/ea57f8ff4dc43cfe7c7b18922fb17e9f'>Game Of Thrones Episode Ratings - Vega-Lite Specification</a>
+    
+    </section>
+
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+
+    <hr class="section-divider">
+
+    <section id="post3">
+      <h2>Digital Nomads: Where Should You Go? - Deneb Remake #3</h2>
+        <p>05-06-2025</p>
+
+      <h2>Summary</h2>
+        
+        <p>A scatterplot seen on trendlineHQ displaying, for a number of countries which offer a Digital Nomad visa, the Cost of Living Index vs Fixed Internet Speed was recreated using Vega-Lite inside a Deneb custom visual in Power BI.</p>
+        
+      <h2>Inspiration & Background</h2>
+        
+        <p>I found this chart (<a href='https://www.trendlinehq.com/p/best-countries-for-digital-nomads'>Best Countries for Digital Nomads</a>) on the TrendlineHQ website showing the Cost of Living Index vs the Fixed Internet Speed for a selection of countries which offer a Digital Nomad visa. A Digital Nomad is a term I was familiar with and essentially represents someone who can work from anywhere only requiring an internet connection. So this chart was, in my view, ranking the attractiveness of countries which offer such a visa to foreigners. High internet connection with a low cost of living being the ideal.</p>
+        
+        <p>I have always been an avid traveller and pre-kids and pre-mortgage the idea of being a Digital Nomad and living in another culture had its appeal for me, hence the interest in this chart!</p><figure><img src='../images/DigitalNomads_Original.png' alt='Original Visualisation'><figcaption>Original visualisation by <a href='https://www.trendlinehq.com' target='_blank'>Trendline</a></figcaption></figure><p>The visual is a two-dimensional chart (fixed Internet speed on y-axis, Cost of Living Index value on the x-axis) with each point identifying where a specific country (which offers the Digital Nomad visa) sits in relation to the other countries. Additionally the ratings are grouped and colour-coded according to the continent that they belong to. The visual has a large heading used to attract interest and a smaller subheading detailing what the visual is displaying.</p>
+        
+      <h2>Methodology</h2>
+      
+        <p>The raw data for this came from two different sources. I used Power Query to merge (or join) the datasets together based on the country.</p>
+        
+        <p>The main visual was again made up of two marks in Vega-Lite: one for the points and another overlaid for the country labels.</p>
+        
+        <h3>Design Notes</h3>
+      
+          <h4>Point mark</h4>
+          
+            <p>I began with the point mark which defined both axes and each country's position. By default the points were hollow so I ensured they were more true to the original by, in the config, setting the filled property for all point marks to true.</p>
+            
+            <p>I then ensured they were grouped by continent by setting the colour encoding channel to be determined by the Continent field. However these colours are arbitrarily chosen by Vega-Lite and I wanted to ensure they matched the original. To do this, within the colour encoding channel, I used the scale property. The scale property used in this way allows us to map a domain of values (which comes from the source data) to a range (which appears in the visual). It is a very handy way to map data categories to visual categories and maintain control over what appears in the visual. In this case our domain is the list of continents and our range is the list of colours that we want these continents to be.</p>
+          
+          <h4>Text marks</h4>
+          
+            <p>At this point, we have a visual with points representing countries grouped in colour based on their continent. However there are no labels so we do not know which point represents which country. So I now layered a text mark with the text encoding to be the Country field (for a select number of points). This provides the user with the name of the country in the visual. Having a label for all countries would overwhelm the visual (and the user) and would achieve the opposite of what is desired. This mark has an x encoding of Cost of Living and a y encoding of Internet Speed (together with a small y offset) so it appears next to the point it represents. I had a hard time finding a nice elegant way to include only select countries in this mark. In the end I created a <span class='monospace'>transform.calculate</span> field which compared the current value of the Country field (datum.Country) against a list of country strings and returned true if it matched one or false otherwise. I then filtered by this field in the mark to only return a country name if this calculated field was true.</p>
+            
+            <p>Three supplementary text marks were also used for the chart title, the subtitle and the Source details at the bottom. Since none of these marks is dependent on the data, we used a blank dataset as the data source within each of these marks.</p>
+            
+          <h4>Tooltip</h4>
+          
+            <p>While I was building this visual I found myself wondering which country each point represented so, in order to make this easier for the user, I added a tooltip to the visual. This was added as an encoding to the original point mark and is made up of the 3 fields: Country, Cost of Living and Internet Speed with the latter two formatted such that the Cost of Living has one decimal place and the Internet Speed as a whole. 
+            
+              <div style='display: flex; align-items: flex-end'> 
+                <figure><img src='../images/DigitalNomad_tooltip.png' alt='Visual Tooltip' style='max-width:100%; height:auto;'><figcaption>Example Tooltip</figcaption></figure>
+                <figure><img src='../images/DigitalNomads_tooltip_back.png' alt='Visual Tooltip Code' style='max-width:100%; height:auto; '><figcaption>Tooltip Code</figcaption></figure>
+              </div>
+            </p>
+      
+        <h3>Challenges</h3>
+      
+          <h4>Country List</h4>
+          
+            <p>Identifying the list of countries in the raw data and replicating all of these was difficult since the original visual only had labels for certain countries! In addition the article was from 2 years ago, and the data I used was more recent and therefore the values for both Cost of Living and in particular Internet Speed will have been different.</p>
+            
+          <h4>Selective Labelling</h4>
+          
+            <p>The next issue I had was the selective labelling. Could I find an elegant way to identify the countries that should have a label and those that shouldn't? I solved this problem but in rather a brute-force kind of way as the code will show. I'm sure there must be a better way to do this.</p>
+            
+          <h4>X Axis</h4>
+        
+            <p>The X Axis for the original visual started from 20 rather than from 0. I'd never encountered this before so had to do some reading of the documentation to understand how to resolve.</p>
+            
+            <p>The solution is again using the scale property in the x encoding for the point mark. We set the domain to be [20, 100] and the range is defined as 'width'. What this is doing is saying we want the width of the x axis to cover x values from the data ranging from 20 to 100 only.</p>
+            
+      <h2>Compromises</h2>
+      
+        <h3>Label Positioning</h3>
+      
+          <p>The main compromise in the report is the fact that the country labels all appear in the same position relative to the point (i.e. above the point). This compares with the original visual where, for example, the Bahamas label is below the point but Namibia is to the right of the point.</p>
+      
+      <h2>Outcome</h2>
+    
+        <figure><img src='../images/DigitalNomads_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake</figcaption></figure>
+    
+      <h2>Vega-Lite Code & Config</h2>
+    
+        <p>You can view the full Vega-Lite config and specification below:</p>
+      
+        <a href='https://gist.github.com/SurnmHanes/2339c0f19ed40a95a5a1af8ef5449d7a'>Digital Nomads: Where Should You Go? - Vega-Lite Config</a>
+        <br><br>
+        <a href='https://gist.github.com/SurnmHanes/14608d1e66d594d9477de823c02154de'>Digital Nomads: Where Should You Go? - Vega-Lite Specification</a>
+
+    </section>
+
+      <br><br>
+      <a href="#top">Back to top of page</a>
+      <br><br>
+
+      <hr class="section-divider">
+      
+    <section id="post4">
+
+      <h2>Men Speak Most in Best Picture Winning Films - Deneb Remake #4</h2>
+        <p>09-06-2025</p>
+      
+      <h2>Summary</h2>
+      
+        <p>A bar chart displaying the proportion of words spoken between males and females in Best Picture winning films was recreated using Vega-Lite inside a Deneb custom visual in Power BI.</p>
+        
+      <h2>Inspiration & Background</h2>
+      
+        <p>I came across this chart and was immediately struck by the powerful message it conveyed. The fact that the film considered the Best Picture year after year had substantially more dialogue from male actors than female ones was both fascinating but from a sociological point of view a bit troubling.</p>
+        
+        <figure><img src='../images/BestPicDialogue_Original.png' alt='Original Visualisation'><figcaption>Original visualisation by <a href='https://pudding.cool/author/hanah-anderson/' target='_blank'>Hanah Anderson, The Pudding</a> (<a href='https://www.facebook.com/photo.php?fbid=1649419568458660&id=126283397438959&set=a.446362148764414' target='_blank'>Men Speak Most</a>)</figcaption></figure>
+        
+        <p>The visual is a divergent bar chart showing, for each winning film, the percentage of all dialogue spoken by females and spoken by males considering only characters who spoke more than 100 words. The visual has an attention-grabbing title and a smaller subheading detailing what the visual is displaying.</p>
+        
+        <p>The technical makeup of the divergent bar chart piqued my interest, particularly the gap between the origin of each of the bars and also the coloured legend above the visual.</p>
+        
+      <h2>Methodology</h2>
+      
+        <p>The raw data for this came from two different CSVs. One held the character information (name, gender, age and which film they were in) and the second the film information (title, year, whether it won best picture and a link to the character info). I enhanced the films raw data in two main ways:</p>
+        <ul>
+          <li>Filtering out all films which did not win Best Picture.</li>
+          <li>Adding an index column starting from 1 and incrementing 1 for each row of data.</li>
+        </ul>
+        
+        <p>The main visual was made up of three marks layered in Vega-Lite: one bar mark for the bars, one rect mark for the alternate horizontal grey shading and one rule mark at x=0 to create the 'gap' between the male and female bars.</p>
+        
+        <h3>Design Notes</h3>
+        
+          <h4>Divergent Bars</h4>
+          
+          <p>I began with a bar mark which had the percentage of words spoken on the x axis and the film title on the y axis. A <span class='monospace'>transform.calculate</span> was used so that when the gender was female, the values would be negative. This allowed me to plot the genders in opposite directions, thereby creating a divergent bar chart.</p>
+          
+          <p>I used <span class='monospace'>encoding.color</span> based on gender to give the bars relating to each gender a different colour. The size of the bars was also adjusted (thereby increasing the space between them) using <span class='monospace'>encoding.size</span> to give a similar look to the original.</p>
+          
+          <h4>Gap Between Bars at x=0</h4>
+          
+          <p>The original visualisation has a gap between the starting point for each of the gender bars. To create this illusion, I layered a rule mark on top of the bar mark. This rule took a value of x=0 and a colour of white and was given a broad strokeWidth. This results in a vertical white line at x=0 giving the illusion of spacing or a gap between the gender bars.</p>
+          
+          <h4>Headline and Subheadline</h4>
+          
+          <p>These were done as text marks in the layer with fixed encodings for both x and y position. And a fixed text encoding to return the text shown in the relevant colour.</p>
+          
+          <p>This mark was part of the layer but does not depend upon the dataset. This means it will always show in the same position on the page regardless of the data which is perfect for headline text.</p>
+          
+          <h4>Attribution</h4>
+          
+          <p>A similar approach was taken for the source text at the bottom of the visual. A text mark with fixed x and y encodings was used for the text with a rule mark with fixed x and y for the horizontal line.</p>
+          
+        <h3>Challenges</h3>
+        
+          <h4>Percentage Bars</h4>
+          
+          <p>The length of the bars represent the <i>proportion</i> for that gender of all words per film rather than a total count which is what the Power BI measure computed.</p>
+          
+          <p> Remember that each film has two rows in the dataset, one for each gender so my thinking here was that we have the number of words per film for each gender in each row but not the total words per film. To achieve this I needed to add the total words per film into the data and then divide one by the other on a row by row basis to get the female and male proportions. In Vega-Lite the way I did this was to use a <span class='monospace'>joinaggregate</span> to add a new column to the dataset which would calculate the total words per film. Then use a <span class='monospace'>transform.calculate</span> in the mark to divide the number of words per gender with this total words per film. And use this calculation on the x encoding as the field making sure to set the axis format to percentage.</p>
+          
+          <h4>Y Axis</h4>
+          
+          <p>The fact that the Y axis was a combination of two fields and was sorted in a certain order proved to be a challenge to get right.</p>
+          
+          <p> The concatenation of two fields into one is something we've done in a previous remake. The approach is to use a <span class='monospace'>transform.calculate</span> to combine the year_best_picture, a comma and the film title to create the y-axis label. This was then used as the y-axis label on the y encoding however it still needed to be ordered in a certain way to match the original visual.</p>
+          
+          <p>The way this was achieved was to sort this calculated field based on the year field (which is numeric) in a descending order. Because we're sorting one categorical field based on a numeric column Vega-Lite has a quirk where we need to tell it how to aggregate that numeric column. It doesn't assume that there will only be one value per category so it wants to be told how to aggregate them in case there's more than one. This happens in a fair few situations in DAX measures too so not an unfamiliar concept. I chose to use the operation 'max' which is usually my go-to in DAX as well.</p>
+          
+          <h4>Legend</h4>
+          
+          <p>This chart has an interesting legend which is essentially a title at the top of the chart using the same colour as the gender bars below to help the user identify the different genders.</p>
+          
+          <p>I could not find an elegant way to add a legend or a title in this position. The solution therefore became the usual approach: adding a new text mark and setting the x and y encodings to be static values independent of the dataset. We could then apply bold styling and the colour to match the bar beneath.</p>
+          
+          <h4>Alternate Shading</h4>
+          
+          <p>Yet another challenge was the alternate shading and, to be honest, I wasn't even sure it was possible with Vega-Lite initially.</p>
+          
+          <p>The solution required both Power Query and Vega-Lite. The idea is that you create a grey rect mark <i>behind</i> the existing divergent bar chart but only for alternate rows. The y encoding will be the films just like the divergent bar chart but the x encoding would just be the width of the chart, using a static value for x and another static value for x2.</p>
+          
+          <p>So the first step is to add an Index column in Power Query to the film table (an Index column starts with 0 or 1 in the first row and increments by a value of 1 for each row). This then gives us a way to identify alternate rows.</p>
+          
+          <p>This way is by using the <b>modulo</b> operator. This operator returns the remainder when a value is divided by another (specified) value. So if we take a value and apply modulo 2 to it, the result will be the remainder when that value is divided by 2. This allows us to distinguish between odd and even values.</p>
+          
+          <p>Within the Vega-Lite code I added a new mark with a <span class='monospace'>transform.calculate</span> used to identify the odd rows as opposed to the even rows. This is then used in the calculation to filter the dataset within the mark so now the dataset consists of only the odd rows that we are interested in. At this point I then add the rect mark with low opacity so it blends more into the background.</p>
+      
+      <h2>Compromises</h2>
+      
+        <h3>BBC Logo Facsimile</h3>
+        
+          <p>The original chart featured a prominent BBC logo. I wanted to capture the same visual appearance, so I recreated a stylised version using three rect marks in Vega-Lite to represent the iconic BBC blocks and another three to represent the text within. While the font and proportions aren’t exact, this approach conveys the same design intent without relying on external images or assets. Since this is a personal project and non-commercial in nature, I felt comfortable including a close reproduction for illustrative purposes. A short disclaimer has been added to the visual for clarity.</p>
+          
+      <h2>Outcome</h2>
+        
+        <figure><img src='../images/BestPicDialogue_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake. Recreated using Deneb & Vega-Lite inside Power BI. All elements — bars, shading, legend, and even the BBC facsimile — are constructed using code.</figcaption></figure>
+        
+      <h2>Vega-Lite Code & Config</h2>
+      
+        <p>You can view the full Vega-Lite config and specification below:</p>
+        
+        <a href='https://gist.github.com/SurnmHanes/25dc66cea605d810669c0f6358509844'>Men Speak Most in Best Picture Winning Films - Vega-Lite Config</a>
+        <br><br>
+        <a href='https://gist.github.com/SurnmHanes/32a9c46d9b93fd499aec7e1dc3f03d58'>Men Speak Most in Best Picture Winning Films - Vega-Lite Specification</a>
+        
+          <p style='font-size:smaller; color:#888;'>Disclaimer: A stylised version of the BBC logo is used above for illustrative, non-commercial purposes. This project is not affiliated with or endorsed by the BBC.</p>
+    </section>
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    
+    <hr class="section-divider">
+    
+    <section id="post5">
+      <h2>World 4G Coverage - Deneb Remake #5</h2>
+        <p>26-06-2025</p>  
+
+      <h2>Summary</h2>
+      
+        <p>A slope graph comparing the proportion of the world's population (grouped into geographical regions) who live within range of a 4G network in 2015 and 2023 was recreated using Vega-Lite inside a Deneb custom visual in Power BI.</p>
+        
+      <h2>Inspiration & Background</h2>
+      
+        <p>I recently bought a new phone which has 5G capability so this got me thinking about network coverage. When I came across this visual I was instantly interested. As a Western European I think we can take for granted how 'connected' we are and it was grounding to see it wasn't necessarily the case world-wide. Having said that it was uplifting to also see the technological advances we, as a population, have made over a short time span.</p>
+        
+        <figure><img src='../images/World4GCoverage_Original.png' alt='Original Visualisation'><figcaption>Original visualisation by <a href='https://ourworldindata.org/grapher/share-with-4g-mobile-network-coverage?tab=slope' target='_blank'>Our World In Data</a></figcaption></figure>
+        
+      <h2>Methodology</h2>
+      
+        <p>The raw data for this chart came from a single CSV file which other than some nominal cleaning in Power Query was good to go.</p>
+        
+        <p>The main visual is made up of two marks in Vega-Lite: one line mark for the slope graph and one rule mark for the grey vertical lines at 2015 and 2023.</p>
+        
+      <h3>Design Notes</h3>
+      
+        <h4>Line Mark</h4>
+        
+          <p>The main slope visual is plotted using a line mark. The dataset is first filtered down to only include data where year is 2015 or year is 2023. I also added a filled point to this line which I made larger than the default so the ends of the line are indicated with a grey circle.</p>
+          
+          <p>The original chart had all the lines in grey with the "World" line contrasting in a red colour. To replicate this, I used the colour encoding channel with a condition which basically said "if the entity is <i>World</i> set the colour to red otherwise grey."</p>
+          
+        <h4>Multi Series Line Chart</h4>
+        
+          <p>The standard way to tell Vega-Lite to plot separate lines is to use the <span class='monospace'>encoding.color</span> channel which then plots multiple lines and attributes a different colour to each line. However in this case since the lines are mostly all grey I had to use a different approach. So I used the <span class='monospace'>encoding.detail</span> channel to tell Vega-Lite to plot a separate line per entity (i.e. geographic region).</p>
+        
+        <h4>Headline</h4>
+          
+          <p>The headline text was created using a text mark within the layer based on an empty dataset. An approach I have used in other remakes. Using a blank dataset like this allows the text mark to be completely independent of the underlying data, making it perfect for fixed-position text. It is then a case of hardcoding the x and y position for this text and also hardcoding the value of the text.</p>
+          
+      <h3>Challenges</h3>
+      
+        <h4>Vertical Lines at 2015 & 2023</h4>
+        
+          <p>As well as the slope graph between 2015 and 2023, I also needed to create vertical lines at x=2015 and x=2023. This was more difficult than I first imagined!</p>
+          
+          <p>The solution / trick I came up with is to add a rule mark to the same layer but rather than use the original dataset or even use a <span class='monospace'>transform.filter</span> we actually set the dataset explicitly as only years 2015 and 2023 by using an array within the <span class='monospace'>dataset.values</span> property.</p>
+          
+        <h4>Notes Beneath Visual</h4>
+        
+          <p>Again these notes beneath the visual were not as straightforward to construct as I initially thought. The reason for this is the different font weight - I don't believe it's possible in a single text mark to have some of the text in bold font and some of it in normal font.</p>
+          
+          <p>So I split out the text into different text marks: The word "Note" was in one text mark that I made bold and then the sentence "Being in range of a network does not mean someone accesses it" was in a separate text mark. And then these two text marks were aligned on the page in such a way to look like one. This approach was then repeated for the second line beneath the visual. The end result being four text marks to represent the two lines underneath the visual.</p>
+          
+        <h4>Data Label Construction</h4>
+        
+          <p>The data labels in the original visual are a concatenation of the geographic region and the percentage of 4G coverage. Recall that in Vega-Lite a <span class='monospace'>transform.calculate</span> is equivalent to a calculated column in Power BI. So we can use this to concatenate the entity column (which contains the geographic region data) and the population column (which I needed to format into a percentage) into a new column we called "Data Label". I then used this new column in the <span class='monospace'>encoding.text</span> channel to display the data labels as per the visual.</p>
+          
+    <h2>Compromises</h2>
+    
+      <h3>Data Labels</h3>
+        
+        <p>If you look closely at the original visual, you'll see that the positioning of the data labels is not consistent for all points. Sometimes the text and the value are on the same line and sometimes the value is on a line beneath the text.</p>
+        
+        <p>This approach was not something I replicated. This was because it is not a simple thing to achieve in Vega-Lite and I didn't believe the complexity was worth the effort required. I believe it could be done if we were to take a more atomic approach to the data labels. And, instead of doing them all in one text mark, we could create a series of text marks with a slightly different dataset (using <span class='monospace'>transform.filter</span>) to isolate each data label separately. We would then have one text mark per data label and be able to position each one exactly as per the original visual. </p>
+        
+        <p>I didn't do this extra step. Instead I used one text mark for the data labels which still needed to be coded carefully in terms of placement. For instance, I needed to compute an x offset which would be negative if it was 2015 or positive if 2023 so that the labels appeared either to the left of the point (in 2015) or to the right (2023). In a similar vein, I also added some logic which would define whether the text label would be right aligned (in 2015) or left aligned (in 2023). And once again the colour encoding was used to show the "World" data label in a red tone and all others in grey. Even with this compromise, I don't think anything is lost from the meaning of the visual.</p>
+        
+    <h2>Outcome</h2>
+    
+      <figure><img src='../images/World4GCoverage_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake. Recreated using Deneb & Vega-Lite inside Power BI. All elements — lines, colours, data labels, and even the headlines are constructed using code.</figcaption></figure>
+      
+    <h2>Vega-Lite Code & Config</h2>
+      
+      <p>You can view the full Vega-Lite config and specification below:</p>
+      
+      <a href='https://gist.github.com/SurnmHanes/07dd4864ac3e683ef48be3f387f0865d'>World 4G Coverage - Vega-Lite Config</a>
+      <br><br>
+      <a href='https://gist.github.com/SurnmHanes/9da4bd015893e5d775ac0033ceab0c2d'>World 4G Coverage - Vega-Lite Specification</a>  
+
+    </section>
+    
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+      
+    <hr class="section-divider">
+    
+    <section id="post6">
+      <h2>Ten Pin Bowling - Deneb Remake #6</h2>
+        <p>07-07-2025</p>
+
+      <h2>Summary</h2>
+        
+        <p>A bar chart showing the scores of individuals during a game or two of ten pin bowling.</p>
+        
+      <h2>Inspiration & Background</h2>
+      
+        <p>My son recently celebrated his 10th birthday. As part of the celebrations we went to the local 10 pin bowling place and played a couple of games. This graphic was on the screen showing us our scores and it made me wonder if I could re-create in Deneb</p>
+        
+        <figure><img src='../images/BowlingBarChart_Original.jpg' alt='Original Visualisation'><figcaption>Photo of original visualisation from <a href='https://www.hollywoodbowl.co.uk/' target='_blank'>Hollywood Bowl</a></figcaption></figure>
+        <br>
+        
+      <h2>Methodology</h2>
+      
+        <p>The raw data for this chart came from a single CSV file which other than some nominal cleaning in Power Query was good to go.</p>
+        
+        <p>The main visual is made up of two marks in Vega-Lite: one line mark for the slope graph and one rule mark for the grey vertical lines at 2015 and 2023.</p>
+        
+        <h3>Design Notes</h3>
+        
+          <h4>Zebra Stripes</h4>
+          
+          <h4>Names Label</h4>
+          
+          <h4>Data Labels</h4>
+
+          <h4>Addition of Slicer</h4>
+          
+        <h3>Challenges</h3>
+        
+          <h4>Dynamic Ranking</h4>
+          
+      <h2>Compromises</h2>
+      
+        <h3>Lack of Finesse on Visual</h3>
+        
+      <h2>Outcome</h2>
+      
+        <figure><img src='../images/BowlingBarChart_Remake.png' alt='Vega-Lite Remake' style='max-width:100%; height:auto;'><figcaption>My Deneb Remake. Recreated using Deneb & Vega-Lite inside Power BI. All elements — lines, colours, data labels, and even the headlines are constructed using code.</figcaption></figure>
+        
+      <h2>Vega-Lite Code & Config</h2>
+      
+        <p>You can view the full Vega-Lite config and specification below:</p>
+        
+          <a href='https://gist.github.com/SurnmHanes/07dd4864ac3e683ef48be3f387f0865d'>World 4G Coverage - Vega-Lite Config</a>
+          <br><br>
+          <a href='https://gist.github.com/SurnmHanes/9da4bd015893e5d775ac0033ceab0c2d'>World 4G Coverage - Vega-Lite Specification</a>
+
+
+    </section>
+
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+      
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
