@@ -1,5 +1,5 @@
 body {
-  font-family: system-ui, sans-serif;
+  font-family: sans-serif;
   line-height: 1.6;
   margin: 0 auto;
   max-width: 800px;
@@ -68,4 +68,23 @@ pre {
 .monospace {
   font-family: monospace;
   background-color: whitesmoke;
+}
+
+ul {
+  line-height: 2;
+}
+
+h1 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* border-bottom: 2px solid #ccc; */
+      padding-bottom: 0.5rem;
+}
+
+.highlight {
+      background-color: #f0f4ff;
+      padding: 1rem;
+      border-left: 4px solid #3b82f6;
+      margin: 1.5rem 0;
 }
