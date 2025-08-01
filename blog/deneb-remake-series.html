@@ -26,7 +26,7 @@
         <li><a href="#post3">03 Digital Nomads: Where Should You Go?</a></li>
         <li><a href="#post4">04 Men Speak Most in Best Picture Winning Films</a></li>
         <li><a href="#post5">05 World 4G Coverage</a></li>
-        <li><a href="#post6">06 Bringing it All Together</a></li>
+        <!-- <li><a href="#post6">06 Ten Pin Bowling</a></li> -->
     </ul>
     </section>
 
@@ -456,7 +456,7 @@
       
     <hr class="section-divider">
     
-    <section id="post6">
+    <!-- <section id="post6">
       <h2>Ten Pin Bowling - Deneb Remake #6</h2>
         <p>07-07-2025</p>
 
@@ -468,26 +468,35 @@
       
         <p>My son recently celebrated his 10th birthday. As part of the celebrations we went to the local 10 pin bowling place and played a couple of games. This graphic was on the screen showing us our scores and it made me wonder if I could re-create in Deneb</p>
         
-        <figure><img src='../images/BowlingBarChart_Original.jpg' alt='Original Visualisation'><figcaption>Photo of original visualisation from <a href='https://www.hollywoodbowl.co.uk/' target='_blank'>Hollywood Bowl</a></figcaption></figure>
+        <figure><img src='../images/BowlingBarChart_Original.jpg' alt='Original Visualisation' style="max-width: 700px;"><figcaption>Photo of original visualisation from <a href='https://www.hollywoodbowl.co.uk/' target='_blank'>Hollywood Bowl</a></figcaption></figure>
         <br>
         
       <h2>Methodology</h2>
       
-        <p>The raw data for this chart came from a single CSV file which other than some nominal cleaning in Power Query was good to go.</p>
+        <p>The raw data for this chart was small. I got it from the day out at the bowling and then just came home and typed it in an Excel file. This was done in the same format as you'd see at the bowling, so a grid with names on the left and frames from 1 to 10 across the top.</p>
         
-        <p>The main visual is made up of two marks in Vega-Lite: one line mark for the slope graph and one rule mark for the grey vertical lines at 2015 and 2023.</p>
+        <p>In order to make the data useful for analysis I had to change the shape of the data which I did using Unpivot within Power Query.</p>
+        
+        <p>The main visual is made up of five marks in Vega-Lite: two bar marks and three text marks.</p>
         
         <h3>Design Notes</h3>
         
           <h4>Zebra Stripes</h4>
           
+            <p>The main bar chart is done using a standard bar mark with a measure representing the total score on the x axis.</p>
+
+            <p>The zebra stripes or background for this standard bar mark was provided by another bar mark. This time there was no value set for the x encoding so that it would span the whole width of the chart.</p>
           <h4>Names Label</h4>
+          <p>A text mark was used to add names to each of the coloured bars. This was done using an x encoding of 80 and a left alignment so the names are all nicely aligned as is the norm with text. The reason an x value of 80 was chosen was to allow space to the left of this text but still on the bar to add the rankings.  </p>
           
           <h4>Data Labels</h4>
+          <p>Similar to the names label, this was done using a text mark. </p>
 
           <h4>Addition of Slicer</h4>
           
         <h3>Challenges</h3>
+
+          <h4>Custom Sort Order</h4>
         
           <h4>Dynamic Ranking</h4>
           
@@ -512,7 +521,7 @@
 
     <br><br>
     <a href="#top">Back to top of page</a>
-    <br><br>
+    <br><br> -->
       
     <hr class="section-divider">
 
