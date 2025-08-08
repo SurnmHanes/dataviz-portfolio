@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vega-Lite in Deneb Remake Series </title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Using the Power BI Description Box</h1>
+    
+    <p>You're building a report against a deadline and you reach for a measure but there are two with nearly identical names, which one do you need? You can't remember and need a refresher to remind yourself exactly what each one is for and which one you need now in the current context.</p>
+
+    <p>There is a field in Power BI desktop which I use which is free-type and allows the developer to describe what each measure actually does. This field can be found in the Modelling view: </p>
+
+      <figure><img src='../images/PowerBIDescBox.png' alt='Power BI Description Box' style='max-width:100%; height:auto;'><figcaption>Location of Power BI Description Box</figcaption></figure>
+      <figure><img src='../images/DecriptionBox.png' alt='Power BI Description Box' style='max-width:100%; height:auto;'><figcaption>Power BI Description Box</figcaption></figure>
+    
+    <p>Since this is free-type, it enables the developer to be quite verbose and so offers a better alternative to relying solely on the name of the measure to describe it.</p>
+
+    <p>A further benefit is that this can serve as lightweight documentation. By using the DAX INFO functions, these descriptions can be extracted from the model and used as a basis for model documentation outside of Power BI:</p>
+      <figure><img src='../images/info.measures.png' alt='Info.Measures function' style='max-width:100%; height:auto;'><figcaption>The output of INFO.MEASURES() includes the Description.</figcaption></figure>
+
+    
+    <p>One final benefit is that this description appears on a hover over. So when you're in the canvas creating a new visual and you want a measure but can't are not sure which one you need, if you go to the Data panel on the right hand side and hover the mouse the description will appear:</p>
+
+      <figure><img src='../images/PowerBIDescription-HoverOver.png' alt='Power BI Measure hover over' style='max-width:100%; height:auto;'><figcaption>The measure tooltip includes the description.</figcaption></figure>
+
+    <p>This enables you to select the correct measure quickly and without having to change context and thus improves the developing experience.</p>
+
+    <p>I've talked about this in relation to measures but every object (tables, calculated tables, columns, calculated columns) has a description box so this approach can be applied across all objects in the model.</p>
+
+    <p>So next time you create a measure, spend an extra 20 seconds adding a description in this box. Your future self and fellow developers will thank you.</p>
+
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+      
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
