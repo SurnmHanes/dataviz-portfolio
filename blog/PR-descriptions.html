@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pull Request Descriptions</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Writing Better Power BI Pull Request Comments</h1>
+    
+    <p>We've all been there: your colleague sends you their Power BI pull request to approve some changes they've made. You open it up and view the GIT changes and are met with a whole host of files that have been changed! And some files have multiple changes in them. Man! This is going to take days to check and approve!</p>
+
+    <p>Why does this happen? Power BI reports generate a lot of metadata noise. Small innocuous changes such as moving a visual can generate lots of line changes in GIT.</p>
+
+    <p>As a PR reviewer I know I've sat there transfixed by all the red and green lines and trying (and failing) to figure out precisely what has changed. The sheer volume of changes can make it less of a quick check and more of a detective job!</p>
+
+    <p>Oftentimes this can lead to the reviewer bringing in the developer to talk through the changes and understand exactly what they are reviewing. Which is a valid approach. However this means two people are now occupied with one task. And time is money...</p>
+
+    <p>Here's an idea to help your reviewer and keep the team operating efficiently:</p>
+
+    <h2>Add Context to the Commit</h2>
+
+    <p>I have used Visual Studio and Visual Studio Code to do source control. Both these applications allow for you to add a message to any commits you make:</p>
+
+      <figure><img src='../images/VisualStudioMessageBox.png' alt='Message Box - Visual Studio' style='max-width:100%; height:auto;'><figcaption>Free-type message box in Visual Studio</figcaption></figure>
+      <figure><img src='../images/VisualStudioCodeMessageBox.png' alt='Message Box - Visual Studio Code' style='max-width:100%; height:auto;'><figcaption>Free-type message box in VS Code</figcaption></figure>
+    
+    <p>What I tend to do is add brief comments into the message box describing the essentials of the PR. My format for this tends to be the same each time. I use bullets to list the changes made e.g. </p>
+
+    <ul>
+      <li>"Added logic to ensure we use config setting to define day of week for week start."</li>
+      <li>"Borders added to all donut charts in report."</li>
+      <li>"Addition of new <i>[name of measure]</i> to add to new card on Overview page of report." </li>
+      <li>"Measure tweak for calculating the number of sales in the last 12 months."</li>
+    </ul>
+
+    <h2>Advantages of This Approach</h2>
+
+    <p>This commentary in PRs has a number of advantages.</p>
+    
+    <p>First and foremost, it is immediately obvious to the reviewer what has changed and therefore saves time and frustration for them during the review process.</p>
+    
+    <p>Secondly this means that the review process as a whole is slicker and can be done asynchronously thereby freeing up more of the team more often to focus on building and increasing team velocity rather than having to collaborate in explaining and chasing down the changes.</p>
+
+    <p>Thirdly, we have created an audit trail / history. This will become far more useful when debugging or auditing the commit history. For instance, if there ever is a problem introduced into a report, with clear commentary, it will be easier to walk it back and find the problematic pull request.</p>
+    
+    <h2>Building a Documentation Culture</h2>
+
+    <p>This is simply an extension of the commentary tips I mentioned in the previous blog article (<a href="using-the-powerbi-description-box.html">Power BI Documentation and Keeping Your Future Self Happy</a>). We now have a budding ecosystem of lightweight documentation at every level:</p>
+
+    <ul>
+      <li>Comments inside measures - <b>code</b> level notes</li>
+      <li>Comments in Power BI Description Box - <b>model</b> level notes</li>
+      <li>Comments in Pull Requests - <b>workflow</b> level notes</li>
+    </ul>
+
+    <p>None of these require much effort and take minimal time to implement. Over time they will become habitual for the developers and they won't remember a time when it wasn't done! And each one on its own is super useful to the development team. All three together though compound the benefits and really help reduce frustration and accelerate your team's velocity.</p>
+
+    <h2>Social Proof</h2>
+
+    <p>In my own experience this came about naturally. I would be on the verge of making a commit and would be running through my head the changes I had actually made. I then started to jot this down in bullet form as part of the commit itself. I knew this would help me recall what I had done when the reviewer inevitably wanted to talk about what changes I had made in the PR.</p>
+
+    <p>I created this habit as somewhat of a personal safety net but it got adopted as a team-wide approach. This happened because at some point we had a team meeting specifically about pull requests as they were becoming more of a time commitment across the team. Our team lead wanted to align the approach across the team and ensure that none of us took too long to look at PRs but equally that we did a thorough job. It was during this meeting that the Data Architect mentioned my commentary approach and stated that he found this easy to follow and made my PRs straightforward to review.</p>
+
+    <h2>Conclusion</h2>
+
+    <p>So next time you do a PR, add a one-liner explaining what the change is. This will benefit yourself immediately and your team in the log run. And in a few weeks you'll wonder how you managed without.</p>
+
+    <br><br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+      
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
