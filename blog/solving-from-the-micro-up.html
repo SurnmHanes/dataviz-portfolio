@@ -20,21 +20,54 @@
     <h1>An Iterative Approach to DAX Problems</h1>
     <p>Perhaps a different approach to solving thorny DAX issues.</p>
   
-    <p>When I see colleagues attempting to write DAX functions (or Excel formulae or SQL queries) their approach seems to be to try and think of all cases at once and write the formula while thinking of all cases. Almost as if they only get one chance and it must be right first time.</p>
+    <p>When I see colleagues attempting to write DAX functions (or Excel formulae or SQL queries) their approach seems to be to try and think of all cases at once and write the "final version" straight away. Almost as if they only get one chance and it must be right first time.</p>
+
+    <p>The issue with this approach (and I've lived it) is that one small mistake and you're back to square one. You've not gained any new understanding and so you're none the wiser when attempting a re-write. It can be exasperating!</p>
+
+    <p>My new approach is different and is more iterative in nature. Rather than trying to write the measure right first time, I take baby steps until I get there.</p>
+      
+    <h2>Think in Tables</h2>
+
+    <p>The first step is mindset. If I was to teach DAX to somebody from an Excel background this is the first difference I would point out. Excel is all about cells. Power BI is all about tables.</p>
+
+    <p>So when you need to solve a problem ask yourself: What table do I need to get all the rows I want to aggregate?</p>
     
-    <p>I find it incredibly overwhelming to try and consider every possible case at once and for this reason I have refined my approach.</p><p>I tend to be iterative, starting small before expanding to cover all cases:</p>
+    <p>If that table exists in the model then happy days. If not, you'll need to create a virtual one. And for this I would recommend getting familiar with DAX functions such as ADDCOLUMNS, SUMMARIZE, FILTER and GROUPBY.</p>
+
+    <p>Thinking in tables allows iteration. We first focus on curating the correct intermediate dataset. Then we refine from there.</p>
+
+    <h2>Use Variables</h2>
+
+    <p>Once you have the right intermediate table, I would recommend using variables. This allows your logic to remain clear to you and whoever else reads it. It also creates "checkpoints". I even use variables to store my intermediate tables. That way I can always return the variable to check that the table I have contains the rows I want.</p>
+    
+    <p>Essentially using variables means that if something goes wrong in the final result you can trace it back through the checkpoints. And you can see <i>where</i> the logic went wrong. This avoids having to delete the whole thing and start again.</p>
+
+    <p>So you build up the measure step by step, checking at each step that the variable is returning exactly what you expect.</p>
+
+    <h2>Bitesize Approach</h2>
+    
+    <p>Even using this approach, I still find many DAX problems incredibly overwhelming. That's why my recommendation is always to start small and get it working before then branching out to cover every possible case.</p>
+    
+    <p>Here's what that looks like:</p>
 
     <ul>
-      <li>Isolate one row of the source and write the formula to work in this case.</li>
+      <li>Isolate one row (or small subset of rows) of the source in your mind and write the formula to work in this case.</li>
       <li>Expand this logic to include all rows.</li>
       <li>Test and refine for edge cases, nulls and blanks.</li>
     </ul>
-      
-    <p>This approach serves me well because it limits the issues I come up against and allows me to solve them one at a time rather than having to think of trying to solve many issues all at once. </p>
-    
-    <p>In addition as a visual learner, I find the feedback of seeing the result at each step a big help in understanding what is going on and why. This practical knowledge helps me refine the measure quickly and in a robust fashion so it produces the correct result in all cases.</p>
 
-    <p>Sometimes the solution starts small and snowballs.</p>
+    <p>This approach limits the issues I come up against and allows me to solve them one at a time layering the solutions instead of starting with a blank sheet of paper each time.</p>
+    
+    <h2>Debugging Along The Steps</h2>
+
+    <p>I find DAX Studio so valuable in helping me debug and course-correct the measure. It lets me see the results of the intermediate steps (i.e. the variables), gives instant feedback and feels more stable and faster than trying to do similar in Power BI desktop.</p>
+
+     <p>In addition as a visual learner, I find the feedback of seeing the tables at each step a big help in understanding what is going on and why. This practical knowledge helps me refine the measure more quickly and in a robust fashion so it produces the correct result in all cases.</p>
+
+    <h2>Final Thought</h2>
+    <p>Sometimes the solution starts small and snowballs. But behind the solution is a process of iteration: think in tables, use variables and tackle problems in bitesize chunks. It's not about building the perfect formula first time. It's about building confidence step by step to get to the final solution.</p>
+
+    <p>Instead of exasperation, this iterative approach has given me confidence and control. </p>
     
     
     <br><br>
