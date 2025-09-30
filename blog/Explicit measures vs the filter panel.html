@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explicit Measures vs the Filter Panel</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Explicit Measures vs the Filter Panel</h1>
+    
+    <h2>Background</h2>
+
+    <p>The main inspiration behind writing this article was a bug that crept into our work. The issue was that we had a year-to-date metric on a card which was showing all time, not year-to-date.</p>
+    
+    <p>It transpired that there was no filter on the card to limit the dates to the year-to-date. Our approach was to use a base measure and then add a filter in the filter panel to restrict the dates to the year-to-date. And this filter had gone "missing" due to some subsequent development work. My experience tells me it was perhaps because of some bookmarks we had added or changed on the page at a later date.</p>
+    
+    <p>No blame being apportioned here, this is <em>so</em> easy to do. I'm sure anybody reading this who has had the experience of dealing with bookmarks, especially tweaking existing ones, knows that this is prone to error and not as easy as I wish Microsoft would make it!
+    </p>
+
+    <h2>Introduction</h2>
+
+    <p>There are two main ways in which we can apply context to our metrics in Power BI. So extending the example, suppose we want a card showing the sales for the year-to-date and we also want a card showing the sales for the month-to-date. The two ways we could approach this is:</p> 
+      
+    <p>1) We could use the same measure in both cards and apply the filtering of the dates using the filter panel</p>
+    <p><b>OR</b></p> 
+    
+    <p>2) We could write two specific and different measures for each scenario so that the filtering is done in the DAX measure itself.</p>
+  
+    <figure><img src='../images/YTDMeasure.png' alt='Gross Margin YTD Measure using DAX' style='max-width:100%; height:auto;'><figcaption>Gross Margin YTD (using DAX only) - there are no restrictions in the filter panel, the filtering is done directly in the measure</figcaption></figure>
+    <figure><img src='../images/YTDMeasureFilterPanel.png' alt='Gross Margin YTD Measure using DAX and filter panel' style='max-width:100%; height:auto;'><figcaption>Gross Margin YTD (using filter panel) - base measure and then using a filter in the filter panel</figcaption></figure>
+
+    <p>Both approaches have their positives and negatives which we'll explore in this article.</p>
+
+    <h2>The Case for Explicit Measures</h2>
+    <p>The first advantage for this approach is <b>transparency</b>. At a glance of the measure logic we can see exactly what the measure does (especially if we have commented it well as mentioned in a previous article I wrote: <a href="../blog/using-the-powerbi-description-box.html">Using the Power BI Description Box</a>). This makes it easier and faster during debugging to understand what it does.</p>
+
+    <p>This approach is <b>portable</b>. The measure works wherever we drop it on the canvas and it will return what we expect. We don't need to remember to apply a filter / restriction in the filter pane to ensure it returns an accurate result. The cognitive load for the developer is therefore lower.</p>
+
+    <p>This is also <b>easier to maintain</b>. The calculation is self-contained and will return the correct result. If we also have bookmarks for different states on the page, we don't have to remember to apply the filters to each of the different bookmarks so the result stays accurate for all possible states. Because the logic is contained in the measure, it will be consistent across all  states.</p>
+
+    <p>Finally, it is <b>easier to explain</b>. When a stakeholder questions what this value represents, we can open open the DAX and be confident in explaining what it is. All the logic is in one central place (a single source of truth). The opposite involves checking the DAX logic but then also checking the filter pane for any filters that apply to the visual or the page or the report. Slower and more complicated to explain. This more lengthy process runs the risk of eroding stakeholder trust in the numbers being returned. </p>
+
+    <h2>The Case for Filter Pane plus Base Measures</h2>
+    <p>The main advantage of this approach is <b>reusability</b>. We require fewer measures since, for all our metrics, we start with the same base measure and apply our context using the filter panel. This keeps the model relatively clutter-free as we need to write fewer measures.</p>
+
+    <p>For developers coming from a SQL background, this concept is <b>easier to understand</b>: using a filter in the filter pane is equivalent to using a WHERE clause, keeping this part of the logic separate from the main computation.</p>
+
+    <p>Finally there is more <b>flexibility</b> in this approach. The opportunity for analysts to self-serve is greater. They can use the base measures and then create their own metrics by applying their own filters in the filter panel.</p>
+
+    <h2>The Pragmatist vs The Purist</h2>
+
+    <p>As with so many things Power BI the correct answer on which to use is "it depends"!!</p>
+
+    <p>For enterprise level reports where reliability, auditability and interactivity matter with different views of the same data using buttons and bookmarks I would lean towards explicit measures. In this scenario I feel like maintainability is easier, the explicit nature of the measure means it is more robust to any changes or further development in the report. And additionally it is easy to understand what the measure returns.</p>
+
+    <p>For production reporting, I feel like explicit measures are the way to go.<b>Trust and clarity in the report matter more to the end user than whether you have a neat and tidy model.</b></p>
+
+    <p>It doesn't take long for any Power BI report to suddenly have a lot of measures which do similar things. I would therefore caution against using an approach solely because it is more "reusable". My own opinion here is that rather than trying to limit the number of measures in the model, we should embrace the fact there is no hard limit to the number of measures which gives us the flexibility to achieve what we need much more quickly. However I would wholeheartedly recommend full commentary and documentation of measures in any case (See <a href="../blog/using-the-powerbi-description-box.html">Using the Power BI Description Box</a> for more details) </p>
+
+    <p>Fewer measures looks cleaner in the model but if the logic is hidden in filter panes, you've traded visible complexity for invisible complexity. Or put more starkly, would you rather have 50 well-named, well-documented measures or 10 cryptic measures plus 40 hidden filter pane settings scattered across 20 visuals?</p>
+
+    <p>However, the base measure + filter pane method has its place. For ad hoc exploration or analyst-driven (throw-away) reporting the simplicity of this approach is preferred to explicit measures. The ability to use the base measure and add your own limitations using the filter panel is exactly what you need in these scenarios.</p>
+
+  
+    <h2>Takeaway</h2>
+
+    <p>Next time you get faced with the explicit measure or filter pane choice, ask yourself: "am I building a one-off analysis, or am I building a production-level, trustworthy artefact?". 
+      
+    <p>The answer to that question will inform you which approach is best suited to your situation.</p>
+
+    
+    <br>
+    <a href="#top">Back to top of page</a>
+    <br><br>
+      
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
