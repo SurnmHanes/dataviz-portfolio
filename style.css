@@ -97,3 +97,22 @@ h1 {
     padding-bottom: 10px;
     padding-top: 0;
 }
+
+.blog-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.nav-previous, .nav-back-to-top, .nav-next{
+  flex: 1;
+}
+
+.nav-next {
+  text-align: right;
+}
+
+.nav-back-to-top {
+  text-align: center
+}
+
