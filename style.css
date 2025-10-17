@@ -92,7 +92,7 @@ h1 {
 }
 
 .post-list {
-    margin-bottom: 0;
+    margin-bottom: 10px;
     margin-top: 0;
     padding-bottom: 10px;
     padding-top: 0;
@@ -114,5 +114,17 @@ h1 {
 
 .nav-back-to-top {
   text-align: center
+}
+
+.post-date {
+  margin-top: 0rem;
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 600;
+  /* display: block; */
+  margin-BOTTOM: 0rem;
+  font-size: 0.85rem;
+  color: #777;
+  margin-left: 0; /* Remove if you want it aligned with the link */
 }
 
