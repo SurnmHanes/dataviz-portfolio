@@ -128,3 +128,7 @@ h1 {
   margin-left: 0; /* Remove if you want it aligned with the link */
 }
 
+h4 {
+  font-style: italic;
+}
+
