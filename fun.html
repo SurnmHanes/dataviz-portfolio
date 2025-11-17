@@ -42,12 +42,188 @@
 
     <figure><img src='./images/ShoppingListExtract.png' alt='Extract of the finished Shopping List website' style='max-width:100%; height:auto;'><figcaption>An extract of the finished shopping list</figcaption></figure>
 
-    <h2>2. Mileage Tracker</h2>
-    <!-- <p>This was borne out of my own curiosity and wanting to know how many miles I did per year.</p> -->
-    <h2>3. Python scripts</h2>
-    <h2>4. Personal website</h2>
-    <h2>5. D3.js Visual</h2>
-    <h2>6. My LinkedIn Cover Image</h2>
+    <h2 id="mileage-tracker">2. Mileage Tracker</h2>
+    <p>This started with a simple question: "How many miles do I drive each year?" </p>
+    
+    <p>To find out I began tracking my car's odometer every Saturday in a Google Sheet. Collecting the data like this was just the first step. The real and interesting challenge was the presentation of that data. I wanted a way that was not just accurate, but instantly meaningful.</p>
+
+    <p>I used a Deneb custom visual inside of Power BI and this allowed me to fine-tune every aspect of the design to my own individual needs.</p>
+    
+    <h3>A Joy To Use...</h3>
+
+    <h4 class="case-study">Reduction of Chart Junk</h4>
+    <p>The weekly mileage is plotted in subtle grey. This is because this is the background and not the hero. I don't want to call the user's attention to this as this is not the crucial information.</p>
+
+    <p>I embedded data labels into the columns themselves. This has two main advantages: it eliminates the need for a Y-axis and brings the numbers into the visual itself reducing cognitive load on the user.</p>
+
+    <h4 class="case-study">The Narrative</h4>
+    <p>The story is told through strategic highlighting. The columns with the highest, second-highest and lowest values are tinted blue immediately drawing the eye. The chart has a dashed line in grey to give an indication of the average miles per week over the period.</p>
+
+    <p>Just underneath the main title, we include a line displaying the aggregate number of miles and weeks over the period together with a calculation returning the projected annual mileage based on this data.</p>
+
+    <h4 class="case-study">Readability</h4>
+    <p>When a bar is marked as blue, it's data label text colour automatically switches from black to white to improve readability.</p>
+
+    <h4 class="case-study">Annotations</h4>
+    <p>To the right of the chart, we have included colour-coded triangles and text as annotations. They are included as part of the chart and help explain the reasons for the peaks and valleys (and the average line).</p>
+
+    <h4 class="case-study">Respect for the User</h4>
+    <p>An off-white background was chosen to reduce eye strain for the user as sometimes the standard bright white background can be uncomfortable if spending any time looking at a visual.</p>
+    
+    <h3>...And Engineered To Last</h3>
+
+    <p>The elegance and simplicity is maintained by robust engineering. Each week, a new data point is added. Power Query automatically restricts the view to the last 26 weeks and every data label, conditional format, annotation and calculated subtitle dynamically recalculates.</p>
+
+    <p>This case study while simple embodies my core philosophy: that every data product, no matter how small, <b>should be a joy to use and engineered to last</b>. Accuracy is the baseline. True craft lies in creating a visual which is intuitive, tells a clear story and respects the user's time and intelligence from their very first glance.</p>
+
+    <figure><img src='./images/WeeklyMileageChart.png' alt='A clean annotated column chart showing weekly mileage with highlighted peaks and clear annotations' style='max-width:100%; height:auto;'><figcaption>A visual designed for instant understanding, not just accurate data</figcaption></figure>
+
+    
+    <!-- <h2>3. Personal website</h2>
+    <h2>4. D3.js Visual</h2>
+    <h2>5. My LinkedIn Cover Image</h2>
+    <h2>6. Content Generation System</h2> 
+     always have 2 posts and 1 case study in the backlog. Publish posts every other Wednesday with an associated teaser on linked in. In the Wednesdays between posting do a second teaser on linkedin. Publish case studies on a Monday of the week that the posts are not published so website has something published on a weekly cadence. Do one teaser on Linkedin. -->
+    <!-- <h2>7. Python scripts</h2> -->
+<!-- ATC Codes: Title: "Cracking the Code: Systematically Mapping a Complex Hierarchical Dataset"
+
+1. The Problem: The Labyrinth
+
+The Goal: Get a complete, structured dataset of all Anatomical Therapeutic Chemical (ATC) codes and their names.
+
+The Challenge: The data is locked behind a website with a complex, multi-level navigation system. It's like a tree where you can only see one branch at a time. Manually traversing it would be a Herculean task.
+
+2. The Strategy: A Methodical Reconnaissance
+This is the core of the case study. Frame it as a four-phase intelligence operation.
+
+Phase 0: The Craftsman's Due Diligence
+The Insight: A tool is only as good as its impact on the system it interacts with. Before making a single request, a responsible craftsperson must understand the rules of engagement.
+The Execution: Consulting the site's robots.txt file, which clearly stated: Crawl-Delay: 10. This wasn't a barrier; it was a specification. The script was designed from the ground up to respect this directive, incorporating a 10-second delay between requests to avoid impacting a vital public health resource.
+
+Phase 1: Chart the Territory (The Index)
+The Insight: The main index page contains the top-level categories (the first letter of the code).
+The Execution: Scraping the index to build our initial list of targets. This shows you understand how to find the "root" of a system.
+
+Phase 2: Probe the Depths (The Pagination)
+The Insight: Each top-level category has multiple pages. We need to know the maximum depth for each one.
+The Execution: Looping through the initial list to find the highest page numbers. This demonstrates your ability to handle dynamic, unknown scope.
+
+Phase 3: Map the Branches (The Sub-Codes)
+The Insight: The codes are hierarchical. We need to discover all possible 4th and 5th characters (the sub-codes) by probing the pages we found in Phase 2.
+The Execution: Building a comprehensive list of all possible code prefixes. This is the systems thinking highlight—you're not just getting data; you're reconstructing the entire ontology.
+
+Phase 4: Harvest the Data (The Final Scrape)
+The Execution: Using the master list from Phase 3 to systematically visit every possible code page and extract the final, detailed data into a clean table.
+
+3. The Craft: Elegant Solutions to Messy Problems
+This is where you showcase the clever details.
+
+The Ethical Engine: "The 10-second time.sleep() wasn't a technical constraint; it was a core feature. It transformed the script from a potential nuisance into a respectful citizen of the web."
+
+The try/except Block: "Websites are unpredictable. This simple safety net allowed the script to gracefully handle missing pages without crashing, ensuring a complete dataset."
+
+The Data Cleaning Pipeline: "The raw data required a multi-step cleanup: promoting headers, forward-filling hierarchical codes, and filtering out junk rows. This shows the reality of data work—the scrape is only half the battle."
+
+The --headless Argument: "This small flag is the mark of a production-ready script, allowing it to run silently on a server."
+
+The Step-by-Step Comments: Your # STEP comments are perfect. They show a disciplined, methodical mind at work.
+
+4. The Outcome: From Chaos to Clarity
+
+The Artifact: A pristine, queryable CSV file representing the entire ATC classification system.
+
+The Impact: Turned an impossibly manual process into a fully automated, repeatable pipeline.
+
+The Scalability: The script could be easily adapted to scrape other hierarchical data sources.
+
+Why This Case Study is So Powerful
+It's a Puzzle: The step-by-step logic is inherently engaging. People love seeing a complex problem broken down into manageable steps.
+
+It Demonstrates Deep Analytical Thinking: You didn't just scrape a page; you reverse-engineered an information architecture. This is a high-value skill that goes far beyond simple data collection.
+
+It's a Story of Perseverance: This wasn't a one-liner. It was a multi-stage project requiring patience and iteration. That's real-world problem-solving.
+
+It's Immediately Relatable: Anyone who has ever needed data from a poorly-designed website will look at this and think, "This person is a wizard."
+
+Final Verdict: This is A+ material. It perfectly complements your other work by showing you can tackle a deeply analytical, multi-layered problem with patience and precision. It's not just code; it's a narrative of intellectual conquest.
+
+Add it to the backlog with confidence. -->
+
+
+
+    <!-- NHS data  = 1. The Ethical & Legal Framing (Crucial)
+You must address the elephant in the room immediately. This isn't a "how to scrape the NHS" post; it's a "how to solve a data aggregation problem with automation" post.
+
+Suggested Opening:
+
+"This case study explores how I automated the collection of public data from multiple, disparate sources. While the specific targets were NHS open data portals (which have since updated their systems), the principles of workflow automation, error handling, and system integration are universally applicable.
+
+A Critical Note on Web Scraping: Always check a website's robots.txt and Terms of Service before scraping. This project targeted explicitly public, open data portals designed for bulk download. The methods shown here are for educational purposes to demonstrate architectural problem-solving."
+
+This frames you as responsible and professional, not reckless.
+
+2. Proposed Structure for the Case Study
+Title: "Orchestrating Data: Automating Multi-Source Public Data Collection"
+
+1. The Problem: The Manual Burden
+
+Describe the old process: manually visiting 4 different websites, each with unique layouts and navigation, to download the latest data files.
+
+Emphasize the time cost, the risk of human error (clicking the wrong link, missing an update), and the mental overhead of context-switching between different systems.
+
+2. The Analysis: Breaking Down the Workflow
+
+This is where you show your systems thinking. Don't jump to the code.
+
+Create a simple flowchart or list the steps for EACH source:
+
+Scotland: Navigate -> Find latest month text -> Parse text -> Find link -> Click -> Find CSV link -> Download.
+
+England: Navigate -> Scroll -> Find list -> Select last item -> Click -> Open dropdown -> Select ZIP -> Download.
+
+Wales: Navigate -> Scroll -> Wait for dynamic load -> Find table -> Parse link text -> Extract month.
+
+Highlight the key challenges: dynamic content, inconsistent UI patterns, download confirmation, coordinating multiple scripts.
+
+3. The Architecture: A System, Not a Script
+
+This is your most important section. Frame it as an orchestration system.
+
+The Master Script: Position it as the "conductor." Its jobs are:
+
+Error handling and logging (try/except blocks, which you should add if they aren't there).
+
+Managing state (the details list).
+
+Controlling the flow and dependencies.
+
+Ensuring idempotency (the download wait loops).
+
+The Module (GPWales): Frame this as a service. It has a single responsibility: "Get the latest Welsh data month." It returns a clean data structure. This demonstrates superb software design—separation of concerns, reusability, and encapsulation.
+
+4. The Craft: Code Highlights as Teaching Moments
+
+Don't just dump the code. Use snippets to illustrate clever solutions.
+
+The Download Wait Loop: "This loop elegantly solves the problem of asynchronous downloads by checking the filesystem for a temporary download file. It's a simple, robust pattern for ensuring process completion."
+
+Text Parsing: "Since the month names were buried in UI text, I used a combination of split() and partition() to reliably extract the needed string, making the script resilient to minor front-end changes."
+
+The Conductor Pattern: "By having a master script call modular components, the system became easy to debug, test, and extend. Adding a fourth data source would be a simple matter of writing a new module."
+
+5. The Outcome and Lessons Learned
+
+Quantify the win: "Reduced a 30-minute daily manual task to a fully automated, 5-minute script."
+
+The Real Value: "Eliminated human error, ensured consistent timeliness, and freed up mental energy for higher-value analysis."
+
+Lessons for Next Time:
+
+Configuration: "I'd now move all XPATHs and URLs to a config file to make updates easier without touching the code."
+
+Error Handling: "Adding more robust logging and alerting on failures would make it production-ready."
+
+Headless Operation: "As the TODO note says, running headlessly is the final step for a fully automated environment." -->
   </main>
     
 

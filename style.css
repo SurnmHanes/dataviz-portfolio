@@ -189,3 +189,11 @@ ol.culture-steps li strong {
   margin-bottom: 0.5em;         /* Space between title and description */
 }
 
+.case-study {
+  margin-bottom: 0em;
+  font-style: italic;
+  font-weight: semi-bold;
+}
+.case-study + p {
+  margin-top: 0.2em
+}
