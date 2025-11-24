@@ -192,8 +192,22 @@ ol.culture-steps li strong {
 .case-study {
   margin-bottom: 0em;
   font-style: italic;
-  font-weight: semi-bold;
+  font-weight: 550;
 }
 .case-study + p {
   margin-top: 0.2em
+}
+
+.tight-list {
+  margin-top: 0.1em !important;
+  margin-bottom: 1em
+}
+
+.tight-list li {
+    margin-bottom: 0.1em;
+    line-height: 1.5;
+}
+
+p:has(+ .tight-list) {
+    margin-bottom: 0.25em;
 }
