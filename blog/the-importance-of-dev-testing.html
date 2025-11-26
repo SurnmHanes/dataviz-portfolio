@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Importance Of Dev Testing</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>The Importance Of Dev Testing</h1>
+
+    <figure><img src='../images/ryan-zazueta--lulun7F32c-unsplash.jpg' alt='A Science Lab metaphor for dev testing' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@iza_y_ah?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Ryan Zazueta</a> on <a href="https://unsplash.com/photos/a-bunch-of-test-tubes-filled-with-different-colored-liquids--lulun7F32c?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+      </figcaption></figure>
+
+    <h2>Introduction</h2>
+
+    <p>What is the cost of a bug found by your stakeholder?</p>
+    
+    <p>The immediate answer is the time taken to fix it. But it is so much more than that. It's a crack in the foundation of trust, it's the user who is now silently thinking: "Can I rely on this?", it's the embarrassment for the developer and a new item that derails the plan for the next sprint.</p>
+    
+    <p>During the course of my career I've worked in some teams who treat Dev Testing as a luxury which is usually the first thing sacrificed to the God of Speed. They almost see it as a nice-to-have, a task to do "if we have time". Many developers seem to rush to "done" without stress testing their own work thoroughly. </p>
+
+    <p>In my view, this isn't a curious choice. It's a strategic failure that trades short-term success for long-term chaos. </p>
+
+    <p>I believe that Dev Testing is <b>as crucial</b> for the team and therefore the data product <b>as the actual development work</b>.</p>
+
+    <h2>Why Dev Testing Matters</h2>
+    
+    <p>Dev Testing should be seen as an integral part of a data developer's role. Builders of the product and users of the product view it through different lenses.</p>
+    
+    <p>As developers we spend our time building. But once the building has stopped, we must pause and change our role to then view through the lens of the user.</p>
+
+    <p>Dev Testing is important in my view for three main reasons:
+      <ul>
+        <li>It builds <b>trust</b> with the stakeholders - fewer embarrassing bugs get spotted in demos or other public forums.</li>
+        <li>It reduces the number of rework items thereby <b>saving time</b> for developers, testers and the team as a whole.</li>
+        <li>It encourages the developers to <b>own their work</b> end-to-end, not just hand off to the tester to spot issues.</li>
+      </ul>
+    </p>
+   
+    <h2>What Good Dev Testing Looks Like</h2>
+
+    <p>To be good and effective at dev testing, the developer has to change their view of the product. Now they are a 'User'. Their one job is to press buttons, change slicers, click on visuals and so on with the sole aim of breaking the report or returning an abnormal value or visual.</p>
+    
+    <p>In practice and to give this a bit more structure I would encourage a developer when dev testing to:
+      <ul>
+        <li>Check the values / visuals when applying multiple filter contexts at once.</li>
+        <li>Click any buttons and ensure what happens is correct - check that 'Reset' and 'Back' do what they say.</li>
+        <li>Click any buttons / navigation more than once. Do they give odd results?</li>
+        <li>Consider edge cases: what would you expect to happen if there was no data for a selection or for a (data point on a) visual? Test with nulls, negatives and duplicates.</li>
+        <li>Validate the numbers against either the source system or the semantic model. Do they make sense? Do they match?</li>
+        <li>If possible, validate the numbers with a different dataset.</li>
+        <li>Consider performance, not just accuracy.</li>
+        <li>Consider UI: are any new objects aligned with the existing ones? Do the fonts / styling / colours match other existing objects in the report?</li>
+      </ul>
+    </p>
+
+    <h2>The Objections and Why They're Wrong</h2>
+
+    <p>I wanted to cover off the three main objections I hear and why I believe they're wrong and actually a form of self-sabotage.</p>
+    
+    <h4>We don't have time to Test</h4>
+    <p>I would argue strongly that you don't have time <b><i>not</i></b> to test. If you spend 30 minutes testing now while you're still in the context of the development, this will save a call with a confused user down the line (be it the tester, the PO, another stakeholder or an external user) or a couple of hours in a later sprint having to context-switch back to this exact scenario to fix the bug. It's like ripples in a pond, fix it at source and they stay small with little knock on effect. Leave them and their effects get more widespread.</p>
+    
+    <h4>That's the tester's job</h4>
+    <p>This is a dangerous viewpoint. This encourages a "throw it over the wall" culture. A culture where the tester is the enemy and the developer has no accountability for their code.</p> 
+    
+    <p>It absolves the developer of any pride in their work which can easily result in a dropping of standards to mediocre. The attitude changes from "This has to be perfect when it leaves my desk" to "That'll do, the tester will catch anything I messed up".</p>
+
+    <p>It's also inefficient for both parties. The tester, when they find fault, has to pause their testing and pick up some other testing while they wait the fix. The developer also has to  change context to pick up and re-work the issue found. As mentioned above, the whole process takes longer and involves more resource than the initial 30 minutes dev testing would have.</p>
+
+    <p>The developers need to see the tester's role differently. See it as a game: one in which they produce high-quality, well executed work and silently challenge the tester to find any fault.</p>
+
+    <h4>It works on my machine</h4>
+
+    <p>This is a concerning statement to hear any developer say. Translated it says "My job is to write code, not to ensure it actually delivers any value to the outside world."</p>
+
+    <p>This highlights the difference in role between a <b>coder</b> and a <b>developer</b>. Any coder can write semantically correct code that functions in the sterile environment of their own machine. But a developer must be able to produce reliable code that functions on any machine, for any user.</p>
+
+    <p>I would also argue that this does not meet the definition of dev testing. The whole point is that you assume the role of a user and test it in as many different scenarios and as many different setups as possible.</p>
+
+    <p>Working on your machine is a great start. But it's not a great finish.</p>
+
+    <h2>How To Build A Culture Of Dev Testing</h2>
+    <p>Fostering this mindset requires more than just an email to the team. It requires a deliberate, structured approach. Here is a practical framework for how to embed Dev testing into a data team:</p>
+
+    <ol class="culture-steps">
+      <li><b>Make it an explicit item in the Definition of Done.</b>
+    <p>This way it is baked into the team's standards and becomes non-negotiable. An item is only considered done it is has passed the developer's own rigorous testing.</p>
+    </li>
+
+    <li><b>Maintain and share testing checklists across the teams</b>
+      <p>Create a document detailing common pitfalls e.g. "slicer synchronisation across pages" or "check source connection". This provides a valuable resource for new or junior developers and a quick reference for others ensuring consistency and catching repetitive failures early.</p>
+    </li>
+
+    <li><b>Gamify the QA Cycle</b>
+      <p>Cultivate a healthy, competitive dynamic where developers take pride in shipping "unbreakable" work. This shifts the question from "will the QA find any bugs?" to "can I build something so robust that the QA can't find anything wrong?" </p>
+    </li>
+    
+    <li><b>Publicly celebrate developers who ship clean, low re-work items.</b>
+      <p>Shout out developers who successfully live these values. This indicates that the organisation values sustainable quality as much if not more so than raw output. This is immensely valuable for the team to see and hear.</p>
+    </li>
+    </ol>
+    
+    <h2>Conclusion</h2>
+
+    <p>In woodwork, we're always taught to measure twice and cut once to ensure accuracy and for best results. Testing should be seen in the same light: It's a QA function but it's also part of the developer's work.</p>
+
+    <p>Dev testing is the quality control that ensures you're building the <i>right</i> thing, correctly. It's what separates a hastily assembled prototype from a professional, trustworthy data product.</p>
+
+    <p>The mark of a professional isn't how fast they code, it's how reliably they deliver.</p>
+    
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="what-if-the-obvious-isnt-obvious.html">← Previous: What If The Obvious Isn't Obvious?</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="blog/solving-from-the-micro-up.html">Next: Iterative DAX Approach →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
