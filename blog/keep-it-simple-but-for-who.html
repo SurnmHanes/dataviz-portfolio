@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keep It Simple But For Who?</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Keep It Simple - But For Who?</h1>
+
+    <figure><img src='../images/KeepItSimpleMainPic.jpg' alt='Keep It Simple Wall Text' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@madgeeklove?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Mad Geek Love</a> on <a href="https://unsplash.com/photos/five-black-pendant-lamps-MKTZXUDQ5c8?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption></figure>
+   
+    <h2>The Mantra</h2>
+
+    <p>Every team I've worked on, every organisation I've worked for they've had one thing in common: the belief to keep things simple.</p>
+
+    <p>But we need to go beyond this straightforward phrase and ask the follow up question "simple for who?"</p>
+
+    <p>This question poses the uncomfortable truth that some teams like to keep it simple for themselves, rather than for the product users.</p>
+    
+    <h2>Simple For The Developer</h2>
+    
+    <p>Simple in this context means keeping development effort as low as possible so that the tickets are completed in a speedy manner and velocity remains high. Little focus is given to how the user will experience the product or even what the downstream effects of these choices are. The team keep it simple for today to close the ticket quickly.</p>
+
+    <p>This tends to manifest itself in the following ways:</p>
+    <ul>
+      <li>Using only native visuals even when less intuitive.</li>
+      <li>Adding page-level filters rather than putting the logic into the measures themselves.</li>
+      <li>Avoiding custom visuals because of the effort to learn.</li>
+      <li>Not actioning feedback. Taking the view that what we have already "sort of" gives what's needed.</li>
+      <li>Writing basic "quick and dirty" code that works for now.</li>
+      <li>Copying code from Google that seems to work, without understanding it.</li>
+      <li>Using implicit measures</li>
+      <li>Discounting a viable option because of an "unwritten rule" that we don't use it.</li>
+      <li>Concluding a spike with options but no recommendations.</li>
+    </ul>
+
+    <p>The reason this path is taken by teams is that it creates the appearance of velocity and efficiency. Tickets are being closed down, work is being done. These are excellent, visible metrics for management.</p>
+
+    <p>But this is the very definition of Technical Debt. Prioritising comfort and ease above rigour, documentation and long-term thinking leads to a fragile, hard-to-maintain codebase for future developers. More importantly it leads to a frustrating and abrasive experience for the user.</p>
+
+    <h2>Simple For The User</h2>
+
+    <p>The main goal is to reduce friction for the user. This is both the user of the product being developed as well as future developers who can be thought of as users of the codebase.</p>
+
+    <p>In both cases, the goal is to reduce cognitive load and ensure that they have a smooth, easy, efficient experience.</p>
+
+    <p>This can be done by implementing the following:</p>
+    <ul>
+      <li>Spending extra time building a custom visual which makes the insight unmissable.</li>
+      <li>Writing explicit measures so the logic is correct "at source" and is portable and idempotent.</li>
+      <li>Commenting code so the next developer (or your future self in 6 months' time) can understand it. </li>
+      <li>Using the best option for the job even if there are "unwritten" rules about using it.</li>
+      <li>Asking "why?" before building to ensure what is built actually solves the problem and doesn't become a vanity project.</li>
+      <li>Taking the time to listen to feedback and evaluate it: What is the user actually asking for that the current solution doesn't provide?</li>
+      <li>Once the SQL, M, DAX code is working, ask yourself if you could refactor it to make it clearer and/or more efficient.</li>
+      <li>Concluding a spike with a <i>decision</i>, not just a data dump. Abdicating the recommendation is leaving the hard work for someone else.</li>
+    </ul>
+
+    <p>The benefits of this approach is that it creates a durable, trustworthy and <i>adopted</i> data product. It builds long-term velocity.</p>
+
+    <p>However it looks like over-engineering and risk-averse thinking to a team focussed on short-term outputs. It requires more deep thought and time <i>upfront</i>.</p>
+
+    <h2>The Trade-Off</h2>
+
+    <p>The "simple for the dev" choice is like <b>a short-term loan</b>. Yes it's quicker and easier now but you end up paying interest <i>forever</i> in the form of user education, user support, bug fixes and misinterpreted data. Indeed in some cases you will also have to deal with <b>user frustration and negativity.</b></p>
+
+    <p>The "simple for the user" choice is a <b>long-term investment</b>. It takes longer in the moment but reaps rewards <i>forever</i> in the form of user trust, clarity, reduced need for user support and increased user satisfaction. And user satisfaction is important because <b>a happy user is your best marketer</b>.</p>
+
+    <p>So when you hear someone say "let's keep it simple", to build the best data product your response needs to be <b>"Are we making this simple to build or simple to use?"</b></p>
+
+    <p>The answer to this is the difference between <b>an exceptional data product and a mediocre one.</b></p>
+
+    <h2>Simplicity is a Promise</h2>
+
+    <p>"Keep it Simple" is not an excuse to cut corners. It's a promise and it's a sign of respect to the end-user.</p>
+
+    <p>True simplicity is not about having fewer lines of code, it's not about using simple tools as opposed to complex ones. It's about removing as much friction as possible so the user experience is as smooth and pain-free as possible.</p>
+
+    <p>The most sophisticated, complex piece of engineering behind the scenes can still be described as simple if it results in a single, clear and trustworthy insight for the user.</p>
+
+    <p>So the next time someone tells you to "keep it simple", make sure you ask <b>"simple for who?"</b></p>
+        
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="The-taps-metaphor.html">← Previous: The Taps Metaphor</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
