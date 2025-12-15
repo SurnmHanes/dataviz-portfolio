@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Centralising Your Power BI Analytics - The Strategy (Part 1)</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>From Sprawl To Structure</h1>
+
+        <figure><img src='../images/CentralisingPowerBI1MainPic.jpg' alt='Man Up Utility Pole Surrounded By Messy Wiring' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@weyfoto?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">weyfoto loh</a> on <a href="https://unsplash.com/photos/man-climbs-utility-pole-with-many-tangled-wires--RTOrKD7PVI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption></figure>
+
+
+    <p>Most BI teams hit this problem eventually. What begins as innocent independence turns into a maintenance time-bomb. This post walks through the strategy I used to get from sprawl to sense.</p>
+
+    <h2>The Problem</h2>
+
+    <p>I once inherited a suite of 8-10 Power BI reports which, because they were reporting on different areas of the business, were initially expected to be independent of one another. They had therefore been built as such with a separate semantic model each.</p>
+    
+    <p>However the business matured and user feedback created a problem: <b>report sprawl</b>. The same visuals, the same KPIs and the same underlying data logic began to appear in multiple reports. A change made in one report had to be manually replicated in other reports. A process that was both tedious and prone to error. Our decentralised approach was creating inconsistency and slowing down output.</p>
+
+    <p>So the crucial question was posed:</p>
+    <blockquote><p>Could we centralise the data and eliminate this risk and duplication of effort?</p></blockquote>
+  
+    <h2>The Analysis</h2>
+
+    <p>My first step was a spike to analyse the trade-offs of moving to a single, universal semantic model.</p>
+    <h3>Advantages Of A Single Dataset</h3>
+
+    <p>Centralising all the different semantic models into one universal model brings the following advantages:</p>
+
+    <ul class="tight-list">
+      <li>A single source of truth</li>
+      <li>Reduced maintenance</li>
+      <li>Reusability</li>
+      <li>Performance</li>
+      <li>Scalability</li>
+    </ul>
+    
+    <h4>A Single Source of Truth</h4>
+
+    <p>All business logic and metrics live in one place and one place only. This ensures consistency of approach across all the reports downstream from the semantic model.</p>
+
+    <h4>Reduced Maintenance</h4>
+    
+    <p>Any enhancements or fixes to current logic only need to be made in one central place, not across dozens of semantic models.</p>
+
+    <h4>Reusability</h4>
+
+    <p>Any of the metrics within the central model are available to be used in all or any (new) report, now or in the future.</p>
+
+    <h4>Performance</h4>
+
+    <p>One central and well-optimised model can perform better than lots of smaller disparate models. Especially at scale. Performance is also related to cost so faster performance can also mean lower cost.</p>
+
+    <h4>Scalability</h4>
+
+    <p>If more reports are needed in future and the chance of overlap between reports remains high, this central approach will lead to less effort being expended.</p>
+
+    <h3>Disadvantages Of A Single Dataset</h3>
+
+    <p>Centralising the existing report and dataset sprawl does come with some disadvantages:</p>
+
+    <ul class="tight-list">
+      <li>Refactor Effort</li>
+      <li>Disruption Risk</li>
+      <li>Testing Effort</li>
+      <li>Complexity</li>
+      <li>Historical Inaccuracies</li>
+    </ul>
+
+    <h4>Refactor Effort</h4>
+
+    <p>Consolidating a multi model setup to a single all-encompassing dataset is no trivial task. The work involved in doing it and doing it accurately needs to be considered.</p>
+
+    <h4>Disruption Risk</h4>
+
+    <p>While this work is being done, the velocity of output for existing reports and / or future reporting requirements will drop. Additionally there may also be disruption to the existing suite of reports.</p>
+
+    <h4>Testing Effort</h4>
+
+    <p>This is a major change and so will need to be validated / tested to ensure it is accurate.</p>
+
+    <h4>Complexity</h4>
+
+    <p>Depending on the scope of any future work, a single model may become large and difficult to manage.</p>
+
+    <h4>Historical Inaccuracies</h4>
+
+    <p>Combining all models into one may uncover discrepancies in calculations across reports leading to the uncomfortable truth that a value may have been inaccurate in an existing report.</p>
+
+    <h3>Assumptions</h3>
+
+    <p>During the spike investigation I made some assumptions as follows:</p>
+
+    <p>Although longer term we were planning to put a SQL backend on this, this was not considered for the initial centralisation task. Instead we wanted to keep the existing ETL approach (using Power Query).</p>
+    
+    <p>We could have considered a halfway house between the two, Dataflows, but to keep things as simple as possible this was also discounted.</p>
+
+    <p>Luckily in this particular vertical of the business, we weren't working with Row Level Security (RLS) so had no concerns or considerations with RLS for this centralisation exercise.</p>
+
+    <h2>The Approach</h2>
+
+    <p>After considering the trade-offs the next step was to come up with a proof of concept approach on how the consolidation to a central model <i>could</i> be achieved.</p>
+
+    <p>The first step was to identify a small subset of existing reports which we knew had overlapping logic and / or visuals and consider this subset only.</p>
+
+    <p>The process was then, in general terms, the following:</p>
+
+    <ol>
+      <li>Discovery</li>
+      <li>Design</li>
+      <li>Consolidate ETL logic</li>
+      <li>Create Relationships</li>
+      <li>Add (DAX) Logic</li>
+      <li>Publish Central Model</li>
+      <li>Validate Reports</li>
+      <li>Archive Reports</li>
+    </ol>
+
+    <p>These steps are described in further detail below.</p>
+    
+    <h3>1. Discovery</h3>
+    
+    <p>Before doing anything, we first need to understand the scope of the existing data. Things like the following:</p>
+
+    <ul>
+      <li>Are the data sources consistent throughout the reports? Are there multiple sources we need to account for?</li>
+      <li>Are there any access / permission issues with the existing data source(s)?</li>
+      <li>What tables from the source system do we use and which tables appear in multiple reports?</li>
+      <li>What measures and calculated columns do we use and why? (Potentially add comments to the code to make it easier to consolidate?)</li>
+      <li>Do we have any field parameters or calculated tables that we need to account for?</li>
+      <li>Are there any inconsistencies between report elements? (In name / logic / data type)</li>
+    </ul>
+
+    <h3>2. Design</h3>
+
+    <p>Once the discovery is done, it will be easier to see the scope and envisage how the new Central Model would look, how it would work and what needs to be included.</p>
+
+    <h3>3. Consolidate Power Query Logic</h3>
+
+    <p>The first thing we do is look to centralise the data import from the source system:</p>
+
+    <ul>
+      <li>Inventory all Power Query queries</li>
+      <li>For a given table which is loaded separately into the various semantic models, compare the PQ queries used:
+        <ul>
+          <li>Does the logic align or is there conflict?</li>
+          <li>Can we consolidate the logic?</li>
+          <li>If so, can we clean up the logic (e.g. remove duplication) and put it in one master query?</li>
+          <li>If so, add this master query to the Central Model</li>
+        </ul>
+      </li>
+      <li>Rinse and repeat this approach for all queries</li>
+      <li>Make sure the queries are named clearly and organised into folders (Examples of group names include staging, dimension, fact, Extract, Transform, Load)</li>
+    </ul>
+
+    <h3>4. Create Model Relationships</h3>
+
+    <p>After the data has flowed in using Power Query, we need to connect it all into a star schema or as close as possible:</p>
+    <ul>
+      <li>Set up a date table</li>
+      <li>Create any relevant calculated tables and field parameters</li>
+      <li>Define the required relationships between tables</li>
+    </ul>
+
+    <h3>5. Add DAX Logic</h3>
+
+    <p>At this point the data tables are in our Central Model and are related as required. Now the calculated elements can be added:</p>
+
+    <ul>
+      <li>Bring in measures and calculated columns</li>
+      <li>Schema compare between the Central Model and each of the reports to ensure we have all calculated elements (use ALM Toolkit)</li>
+      <li>Organise measures, columns and calculated columns into folders for organisational purposes.</li>
+    </ul>
+
+    <h3>6. Publish the Central Model</h3>
+
+    <p>The Central Model is now good to go and should be published to the relevant workspace.</p>
+
+    <h3>7. Validate Reports</h3>
+
+    <p><b>Clone</b> the existing reports (important to clone and keep existing reports as they are) and then change the data connection to the Central Model for the cloned reports.</p>
+
+    <p>Open each of the cloned reports and investigate any broken visuals. Replace any measures which may now have a different name.</p>
+
+    <p>Compare metrics on the cloned report to its metric in the original version of the report to see if they match or if there is any difference. This is the ideal point for QA to conduct regression testing.</p>
+
+    <h3>8. Archive Reports</h3>
+
+    <p>Once we are happy with the cloned reports that are using the Central Model as their source, we can archive the previous reports and semantic models.</p>
+
+    <h2>Concerns</h2>
+
+    <h3>Identifying Duplicates</h3>
+
+    <p>Measures which return identical values and have the same intention may not necessarily be defined identically across different reports. The reason for this is that the context where they are used can provide different effects on the calculation.</p>
+
+    <p>For example, if we use the measure in a table where the first column is, say User, the measure will automatically be filtered by user without us having to explicitly state this in the measure (due to context transition).</p>
+
+    <p>However if the measure is used in another visual without this implicit User filter, we would need to include this explicitly in the measure definition.</p>
+
+    <p>On top of this, whether or not two measures are defined identically across multiple reports, if they are named differently (perhaps one of them has a prefix or a suffix) the tooling won't be able to recognise that they are supposed to be the same.</p>
+
+    <p>For these reasons, it can be hard and time-consuming to identify duplicate measures across semantic models.</p>
+
+    <h3>Ad Hoc Transformations</h3>
+
+    <p>By implementing a Central Model (through Power Query) and a live connection from the thin reports to the model, we would be unable to make any further transformations downstream.</p>
+
+    <p>While this meets Best Practice, reality and experience lead me to suspect that there are times when stakeholders' ad hoc requests mean unique transformations are required on a given report. </p>
+
+    <p>In this situation, we would have a couple of options. Either include this unique logic in the Central Model thereby increasing its size and complexity or push the transformations upstream to SQL (or Dataflows).</p>
+
+    <h3>Performance</h3>
+
+    <p>Depending on how complex the PQ transformations required are, Power Query is not the fastest to transform data.</p>
+
+    <p>Having said that, these transformations are done on load and refresh so will not affect the end user and indeed consolidating to a central model with live connection may mean the reports actually run faster for the user. This is because the dataset is abstracted away to another file essentially.</p>
+
+    <h3>Agility</h3>
+
+    <p>Currently small changes can be made directly in the report and turned around quickly for the stakeholders. In addition, because each report is siloed from the others, any changes made don't have an impact outside of the current report.</p>
+
+    <p>The concern with the Central Model is that it would take longer for such small changes to be made. Also any changes made might impact on other reports and cause them to break or worse provide misleading metrics.</p>
+
+    <h3>Bloat</h3>
+
+    <p>Ideally we need to ensure we only migrate objects which are actually used in the current version of the reports. Objects that were created but have subsequently been abandoned for whatever reason should not be brought across since this will increase the size of the model needlessly.</p>
+
+    <p>However identifying what is used and what is no longer required is time consuming and potentially could be done as a subsequent post-consolidation task later down the line.</p>
+
+    <p>This applies to objects such as:</p>
+
+    <ul class="tight-list">
+      <li>Columns</li>
+      <li>Calculated columns</li>
+      <li>Calculated tables</li>
+      <li>Measures</li>
+    </ul>
+
+    <h2>Tooling</h2>
+
+    <p>In order to do the actual consolidation, I would look at the following tooling:</p>
+
+    <ul class="tight-list">
+      <li>ALM Toolkit</li>
+      <li>Measure Killer</li>
+      <li>Tabular Editor version 2 (free) or version 3 (paid)</li>
+      <li>TMDL view in Power BI</li>
+    </ul>
+
+    <h2>Practical Approach</h2>
+
+    <p>In migrations such as this, there is always some low hanging fruit that can be attacked with minimal fuss. The ETL process for certain dimension tables is probably the same or at least extremely similar across semantic models. So this can easily be streamlined into one process in a Central Model.</p>
+
+    <p>After this, I would take a report at a time and use ALM Toolkit to compare this report to the Central Model. ALM Toolkit will be able to identify differences relating to:</p>
+
+    <ul class="tight-list">
+      <li>Power Query</li>
+      <li>Tables and columns</li>
+      <li>Calculated tables and columns</li>
+      <li>Relationships</li>
+      <li>Measures</li>
+    </ul>
+
+    <p><b>Important:</b> ALM Toolkit does this comparison on <b>object name</b> so if the same object has a different name across reports, it will not be able to help.</p>
+
+    <p>Any differences identified can then be resolved automatically with a couple of clicks in ALM Toolkit. Unfortunately this excludes the creation or deletion of tables and any Power Query logic changes which can't be done with ALM Toolkit.</p>
+
+    <p>However I would look at potentially using the new TMDL view in Power BI itself to create / update tables as this can be done quickly in bulk by pasting the code from ALM Toolkit.</p>
+
+    <p>Power Query differences would need to be done in the Power Query UI of the Central Model but again the code can be pasted from ALM Toolkit.</p>
+
+    <p>The one drawback is that ALM Toolkit compares one report directly with another so we would need to repeat the comparison between the Central Model and an existing report, one report at a time.</p>
+
+    <h2>Summary</h2>
+
+    <p>This is a task that should not be underestimated. The quantity and complexity of objects across a suite of reports will mean this consolidation will need appropriate time to tackle.</p>
+
+    <p>Having said that, experience has taught me that although at first the task appears daunting, a careful and methodical approach means the end result is achieved more easily than first imagined.</p>
+
+    <h2>Final Thoughts</h2>
+    
+    <p>This project lives in the triangle between 3 competing forces: </p>
+    <ol>
+      <li>Consistency - the single source of truth</li>
+      <li>Agility - the ability to make changes quickly</li>
+      <li>Complexity - having a large model to manage </li>
+    </ol>
+    <p>A leader's job is not to solve this but to consciously manage the trade-offs. We chose consistency and accepted a short-term cost to agility to attain this.</p>
+
+    <p>Consolidating models like this can uncover skeletons in the closet: the pre-existing inconsistencies between models.</p>
+
+    <p>Tools like ALM Toolkit and Tabular Editor are force multipliers. They are what separate a systematic, methodical approach from a chaotic one.</p>
+        
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="keep-it-simple-but-for-who.html">← Previous: Keep It Simple But For Who?</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
