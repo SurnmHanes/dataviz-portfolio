@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Hidden Cost of Data Reduction</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>The Hidden Cost of Data Reduction</h1>
+
+
+    <h2>The Business Request</h2>
+
+    <p>I remember once looking at a suite of thin reports based on one central semantic model. The semantic model was getting ever larger leading to bottlenecks in terms of both workspace storage and performance. The users were noticing refreshes took longer and making changes in the front end led to the report taking a noticeable amount of time to re-calculate and re-render.</p>
+
+    <p>So the request came from the Business and it sounded simple: </p>
+
+    <blockquote><p>Can we not just keep the last 3 years' worth of data?</p></blockquote>
+
+    <p>But in semantic models, small changes aren't always small. So I ran a full performance and integrity audit.</p>
+ 
+    <h2>The Hypothesis</h2>
+
+    <p>The assumption was that by reducing the data to just the last 3 years, the speed of the reports would increase and storage size would decrease linearly. Less data means faster refresh leading to faster rendering. Simple, right?</p>
+
+    <p>That was the theory but the practice doesn't always bear this out.</p>
+
+    <h2>Approach</h2>
+
+    <p>As this was an investigation, the decision was made to focus on 3 of the fact tables in the model, not all of them. These tables were selected as it was felt these had the most historical records so the effect would be largest. An easy win, you might say!</p>
+
+    <p>The agreed approach was to limit the relevant entities to 3 years' worth of data and measure the effect of this reduction on three main metrics:</p>
+    <ol>
+      <li>Model size both in terms of row count and memory resource</li>
+      <li>Semantic model refresh times <i>in the Service</i></li>
+      <li>Query times within a selection of the reports</li>
+    </ol>
+
+    <p>There was also a requirement to check the user interface of the reports to ensure that limiting the data in this fashion would have no adverse effects on the UI and would therefore not be detrimental to the end user.</p>
+
+    <p>As this was an investigation, we also chose 5 of the reports to focus on rather than the whole reporting suite. The 5 were chosen as they were the most widely used and most broad in terms of fact table usage.</p>
+    
+    <h3>1. Model Size</h3>
+
+    <p>The semantic model was downloaded locally from the service. DAX Studio was then connected to this local semantic model and the model size statistics were obtained.</p>
+
+    <p>This was repeated a second time with the relevant fact and dimension tables filtered to only include records with a created date within the last 3 years. For the purposes of this investigation this filtering was done in Power Query. But the recommendation is that this is done at the SQL view level in Production.</p>
+
+    <h3>2. Refresh Times</h3>
+
+    <p>Both models were then published to a Pro workspace. They were refreshed one at a time and the refresh duration noted. This was then repeated two further times and an average of the three refreshes was recorded.</p>
+
+    <p>The duration of each run can be found by navigating to the Refresh History option on the semantic model. A pop up box appears detailing the start and end times so that a duration can be manually calculated: </p>
+
+    <figure><img src='../images/RefreshHistoryExample.png' alt='Semantic Model Refresh History popup' style='max-width:100%; height:auto;'><figcaption>An example of the refresh duration history</figcaption></figure>
+
+    <h2>Query Times</h2>
+
+    <p>Each of the 5 reports were then opened and connected to each semantic model in turn. Performance Analyzer was turned on, a change made in the report and the timings recorded.</p>
+
+    <p>To ensure fairness as much as possible, the change made was the same for both semantic models.</p>
+
+    <p>The Performance Analyzer results were then exported as a JSON file. The JSON contains the metrics and duration for a number of background events that occur when a user makes a selection. A number of these events were not relevant here as they would take the same amount of time regardless of the amount of data. Instead the event we were interested in was the "Execute DAX Query" event. This event records the time taken to run the DAX query necessary to re-calculate each metric shown on the page.</p>
+
+    <p>So this JSON file was imported into a Power BI report for analysis with the only event we focussed on being the "Execute DAX Query" event. </p>
+
+    <figure><img src='../images/PowerQueryJSONSnippet.png' alt='Performance Analyzer snippet in Power Query' style='max-width:100%; height:auto;'><figcaption>Snippet of Power Query showing the different events that are logged and highlighting the Execute DAX query events</figcaption></figure>
+
+    <h2>Findings</h2>
+
+    <h3>Reduction In Model Size</h3>
+
+    <p>The implementation of the 3 year filter led to a <b>67% reduction</b> in the size of these three fact tables in the semantic model.</p>
+
+    <figure><img src='../images/ModelSizeReduction.png' alt='Effect of Model Size Reduction' style='max-width:100%; height:auto;'><figcaption>Column chart showing the size difference for the three fact tables between both semantic models</figcaption></figure>
+
+    <p>In addition there was also a <b>76% reduction</b> in the row count for these three fact tables for the semantic model.</p>
+
+    <figure><img src='../images/RowCountReduction.png' alt='Effect of Model Size Reduction' style='max-width:100%; height:auto;'><figcaption>Column chart showing row count difference for the three fact tables between both semantic models</figcaption></figure>
+
+    <h3>Refresh Performance</h3>
+
+    <p>The refresh was performed three times for each semantic model with the duration in seconds of the refresh being recorded each time. An average of these timings was then calculated. The two averages were then compared to see if there was any reduction in timing.</p>
+
+    <p>The refresh was run on both a Premium and a Pro workspace to see if this made any difference.</p>
+
+    <figure><img src='../images/QueryRefreshTimings.png' alt='Table showing refresh timings for two semantic models' style='max-width:100%; height:auto;'><figcaption>Refresh timings for both models</figcaption></figure>
+
+    <p>Compared to the other performance metrics, although this is still a <b>12-14% reduction</b> it is a surprisingly low difference.</p>
+
+    <p>This suggests that the bottleneck for model refreshes is not (only) these tables. Instead I suspect it may be due, at least in part, to the complex calculated columns and tables that exist in this model as well as the size of the other fact tables that we haven't reduced.</p>
+
+    <h3>Query Performance and Integrity</h3>
+
+    <p>The hypothesis was clean: 
+      <ul>
+          <li><strong>All Time Selection:</strong> The reduced model should be significantly faster (scanning 3 years vs. 10+).</li>
+          <li><strong>Last 24 Months Selection:</strong> Performance should be nearly identical (scanning the same 2 years of data).</li>
+      </ul>
+    </p>
+
+    <p>The reality was more instructive. While the <strong>All Time</strong> selection showed the expected dramatic improvement, the surprise was in the <strong>Last 24 Months</strong> test. Here, the reduced model was still consistently faster. Not by the same margin, but by a measurable, repeatable percentage.</p>
+
+    <p><strong>The Lesson:</strong> This revealed a hidden cost of scale. A larger model isn't just slower when querying all its data; it carries a <strong>performance tax on every interaction</strong>, even those touching a recent, common subset. This tax is paid in the formula engine's overhead, relationship traversal, and filter context propagation across a larger structure.</p>
+
+    <blockquote><p>Reducing historical data didn't just speed up queries for old data; it made the entire model more responsive, full stop.</p></blockquote>
+
+    <p>On integrity, a manual review of calculated columns, tables, and measures confirmed no broken dependencies. The reduction was mechanically sound.</p>
+
+    <h3>All Time No Longer All Time</h3>
+
+    <p>One big issue to call out was the period slicer and selecting 'All Time'. This was now technically incorrect as for three of the fact tables, the data was reduced to the last 3 years rather than all time.</p>
+
+    <p>But because of our definition for the date table (which considered a number of different date fields in the model), it was still possible to view all time data for the other fact tables that we hadn't limited. So the 'All Time' range hadn't changed globally, only in terms of the three fact tables we had reduced.</p>
+
+    <p>This would cause confusion for the end user. Both in terms of using and trusting the 'All Time' period selection but also in terms of metrics across the report suite which purport to be 'all time' metrics. This would need consideration before implementing this data reduction.</p>
+  
+    <h3>Calculated Tables</h3>
+
+    <p>One unexpected result we saw was regarding some DAX tables we have. These calculated tables stored information on subscriptions (one line for every day that a subscription was active) and still produced the same number of rows post the data cull as before. This was because most of the data came from a dimension table which had obviously not been restricted. However because some of the columns for this table were derived from the fact tables that had, they were returning blanks rather than the relevant data (because that data no longer existed).</p>
+
+    <h2>Conclusion</h2>
+
+    <p>We achieved significant data size reduction which will lead to improved efficiency and potential cost savings. This also afforded us the headroom in the customer workspaces. The accuracy and performance of the reports did not suffer due to this data purge.</p>
+
+    <p>The change made was not technically onerous and therefore was perfectly feasible. As mentioned previously the date filtering should be done in the relevant SQL views in Production. This filter would need to be dynamic so is only ever the last 3 years from the current date.</p>
+
+    <p>The data cull did surface two issues though: the 'All Time' slicer that isn't and the calculated tables missing data.</p>
+
+    <p>The potential options to resolve these are:</p>
+    <ul>
+      <li>Remove 'All Time' as an option in the slicer.</li>
+      <li>Lock down the derivation of dates for the DimDate table to dates in the last 3 years only.</li>
+      <li>Assuming we do this, could also rename the All Time option in the slicer to be "Last 3 years" or similar.</li>
+      <li>Educate the user base that we have restricted the data that is imported into Power BI.</li>
+      <li>Add a filter into the DAX calculated tables to restrict them to underlying records created within the last 3 years.</li>
+    </ul>
+
+<h2>What a "Simple" Data Reduction Really Tests</h2>
+
+<p>This investigation began with a simple business hypothesis: less data means more speed. It succeeded as a performance fix but it's bigger value was a high-resolution diagnostic of the whole data product.</p>
+
+<p>A "simple" filter change is never just that. It is a stress test for your system's true architecture and the bill for that test, the discovery tax, is where the cost and insight lie.</p>
+
+<h3>The Discovery Tax Bill</h3>
+
+<h4>It exposes hidden bottlenecks</h4>
+  <p>Our 67% data reduction only yielded a 12-14% refresh gain. The bottleneck therefore wasn't only data volume. It was the complex calculated tables and columns in the model. This investigation highlighted the next, more critical issue ripe for optimisation.</p>
+<h4>It reveals semantic debt</h4>
+  <p>The confusion around the "All Time" slicer and the broken calculated tables weren't bugs. They were symptoms of a missing unified semantic layer and a development process that allowed hidden dependencies.</p>
+<h4>It demands careful scoping</h4> 
+  <p>Our findings were valid for the 5 reports and 3 fact tables we tested. The results however are not linear and so cannot be extrapolated. The discovery tax for a full rollout would include the cost of testing every other report and dependency, This defines the true scope, risk and effort required for this 'simple' change.</p>
+
+<h3>The Craftsman's Takeaway</h3>
+
+<p>Therefore, treat any "simple" data change as a diagnostic process. Its cost isn't just in the implementation, but in the discovery of everything you didn't know was connected. The wise team uses this discovery not as a setback, but as the most valuable map for what to fix next.</p>
+
+<p>This mindset shifting from task-completion to system-diagnosis is what separates a report builder from an architect.</p>
+
+
+
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="centralising-your-PowerBI-analytics-Part1-The-Strategy.html">← Previous: Centralising Your Power BI Analytics - The Strategy (Part 1)</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
