@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Feature That Wasn't There</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>A Lesson in Invisible Design</h1>
+
+    <p>Recently my team added a new feature to a report without writing a single line of new code for it. It was the proudest moment of my week and no-one even knew it.</p>
+
+    <h2>The Non-Event</h2>
+
+    <p>We have a report which displays actual performance against a target set in the core system for a list of KPIs. The report can surface 6 KPIs at a time and the user can select the KPIs they wish to see by using a drop-down slicer.</p>  
+
+    <p>A new KPI was added to the requirements. The team had to do some back end work in SQL to ensure that this KPI would be included in the relevant fact table and the SQL views that get imported into Power BI.</p>
+
+    <p>There was some trepidation during refinement that a similar amount of work would be required in DAX or at least in the front end of Power BI in order that the metrics would calculate correctly for this new KPI.</p>
+
+    <p>However when they came to do the back end work, it was discovered that the front-end "just worked". The KPI appeared, the actual metric, the target metric and the percentage of target all calculated correctly. The team was pleasantly surprised.</p>
+
+    <blockquote><p>Have you ever had a moment where something complex worked simply and everyone put it down to luck?</p></blockquote>
+
+    <h2>The Self-Assembling Report</h2>
+
+    <p>The "luck" in this case is in the way the metrics were architected when I first built the report a year earlier. We started with 5 KPIs but experience taught me that this list of 5 would grow as the report matured.</p>
+      
+    <p>Instantly this made me want to avoid hard coding any logic. Instead I wanted to structure the DAX in such a way that it was KPI-independent i.e. none of the metrics relied upon string literals.</p>
+
+    <p>The report has 6 visuals across with 6 dropdown slicers similar in structure to this:</p>
+
+<figure><img src='../images/KPIScreenshot.png' alt='Three donuts showing actual vs target for three separate KPIs' style='max-width:100%; height:auto;'><figcaption>Three Donut Charts showing Actual vs Target for three separate KPIs</figcaption></figure>
+
+    <p>Each donut needs to dynamically compute whatever KPI the user selected (using the drop-downs above the donuts) without knowing ahead of time which KPI the user selects.</p>
+
+    <p>The obvious way to solve this might be to use a SWITCH statement based on the name of the KPI being selected. And then use this SWITCH to return the relevant KPI measure.</p> 
+      
+    <p>However this is a maintenance headache because it relies on string literals.</p>
+    
+    <p>String literals are where we use specific text strings for the measure to work. These are simple and fast to implement but tend to be broken easily. An example is below where we have a SWITCH measure which, depending on the text of the "SelectedMetric" will run a certain measure:
+
+<figure><img src='../images/stringLiterals.png' alt='SWITCH statement relying on the text entered' style='max-width:100%; height:auto;'><figcaption>SWITCH statement relying on string literals</figcaption></figure>
+      
+      <p>But if the text changes e.g. it becomes "Number of Customers" or even "# Of Customers" (with a capital 'o')  rather than "# of Customers" the SWITCH statement will fail.</p>
+
+    <p>So returning to our case, <b><i>as long as</i></b> the list of KPIs does not expand <b><i>and</i></b> the names of these KPIs never changes, the code will be safe and reliable. That's two pretty big "if"s in my book so if we can avoid this risk completely we immediately make the code more robust and more reliable well into the future.</p>
+
+    <p>The principle was simple: build a system that understands the pattern of a KPI, not a hardcoded list of KPIs. Instead of a long SWITCH statement mapping names to logic (a ticking timebomb), the measures were designed to dynamically identify the relevant data based on the user's selection. The code didn't need to know the KPI's name, it found this out by matching the user's selection with the underlying fact table data. It just needed to understand what a KPI is. The coding pattern is the same irrespective of the KPI name. </p>
+
+<figure><img src='../images/ObtainKPI.png' alt='DAX to get KPI user has chosen' style='max-width:100%; height:auto;'><figcaption>The DAX code used to get the name of the KPI chosen by the user (the same way as the brittle SWITCH approach) </figcaption></figure>
+
+<figure><img src='../images/SnapshotTableFiltering.png' alt='Match the user inputs to the fact table to filter to relevant records' style='max-width:100%; height:auto;'><figcaption>DAX code used to match the user inputs against the fact table in order to return only the rows of interest - note that the user inputs are never actually materialised so no hardcoding required.</figcaption></figure>
+
+
+    <p>The SWITCH with string literals is the perfect foil! It represents the visible hack that gets praised (it's clear and quick!). But it's brittle. The systemic solution is strategic, invisible, slower and goes unnoticed. But it's future-proofed. It needs no new code. It produced a non-event.</p>
+
+    <h2>The Power of The Invisible Feature</h2>
+      
+    <p>The beauty of this feature is that its elegance means certainty. If more KPIs are added or existing KPIs are renamed, it elegantly absorbs this and still "just works". It's eliminates risk and reduces work for the team in the future. 
+      
+    <p>It's a ghost feature as it's true value is measured not in what it does today but in the work and worry it silently erases tomorrow.</p>
+    
+    <p>Contrast this with the SWITCH plus string literal approach. This is brittle as it only works for a certain configuration. Any change at all to the list of KPIs and this will need further development effort from the team to rectify.</p>
+    
+    <p>Slightly more work upfront (though even then, not that much more onerous) leads to a solution that is flexible enough to cope with anything that comes in the future. And I, for one, certainly prefer the "one and done" school of coding!</p>
+    
+    <p>Scaling without effort is not "luck", it's a design decision.</p>
+
+    <p>The most elegant code isn't the cleverest you can write today. It's the code that prevents you from having to write clever code again tomorrow.</p>
+
+    <h2>Why Our Best Work Often Goes Unseen</h2>
+
+    <p>Unfortunately culturally we, as humans, have <b>visibility bias</b>. We overvalue what's easily seen or heard and ignore less visible but potentially more important factors.</p>  
+    
+    <p>This means we reward the firefighter who puts out the fire because they are loud, visible and dramatic over the architect who installed the sprinklers (silent, preventative) which prevented the fire ever taking root. This is the genesis of the surprise of the team when this feature just worked in Power BI.</p>
+
+    <h2>Herald The Craftspeople</h2>
+
+    <p>This is for the engineers who take the extra hour to think about next year. I see you, I feel you, I am you. Your work upfront has not only closed today's ticket but it has prevented any further tickets being raised at any point in the future. That robustness and cleverness of thought should be saluted!</p>
+
+    <h2>Find Joy in the Silence</h2>
+
+    <p>Next time your system absorbs change without fuss, take a quiet victory. That's not luck. Somebody on your team has made that happen and they should be celebrated for creating the ghost feature.</p>
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="The-hidden-cost-of-data-reduction.html">← Previous: The Hidden Cost Of Data Reduction</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
