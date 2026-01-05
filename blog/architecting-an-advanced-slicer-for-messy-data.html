@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecting an Advanced Slicer for Messy, Real-World Data</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>The Impossible Button</h1>
+
+    <figure><img src='../images/TheImpossibleButtonMainPic.jpg' alt='A Hidden Passageway Behind A Bookshelf' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@adriencesard?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Adrien CÉSARD</a> on <a href="https://unsplash.com/photos/gray-concrete-bridge-over-river-HfGEtmnRwuE?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a><figcaption></figcaption></figure>     
+
+    <p>The ask was simple: the user wanted to have a slicer with two options to be able view either "All Sales" or "Customer Sales Only".</p>
+
+    <p>Unfortunately the solution is more complex. The reason is because what the user is asking for is not how a slicer works natively in Power BI. The whole point of a slicer is to "slice" the data into various 'buckets' for more detailed analysis. Discrete categories separate from each other e.g. sales for red products or sales for green products.</p>
+
+    <p>This ask however is "show me all sales" vs "show me all sales to external customers only (I don't care about internal / demo customers)". The key thing to note is that there is no analytical value in viewing "sales to internal customers only" so we don't want that appearing in our slicer.</p>
+    <p> This is not an either / or situation. Instead the two groups overlap. We have "All Customers" which is made up of <b>both</b> "External Customers" and "Internal Customers" and we have "External Customers only" which is <b>a subset</b> of "All Customers".</p>
+
+    <p>A simple filter on this column would not work - the slicer would display two options: External or Internal customers. So how do we build an intuitive user interface object based on a non-intuitive data structure?</p>
+
+    <p>The solution is not a neat DAX trick. It's a data modelling solution that embodies the ethos of clarity and maintainability.</p>
+
+    <figure><img src='../images/AllProductsUniverse.png' alt='Products are sliced nicely into their respective colours' style='max-width:100%; height:auto;'><figcaption>The universe of products can be split into discrete buckets based on their colour</figcaption></figure>
+  
+    <figure><img src='../images/AllCustomersUniverse.png' alt='Customers are made up of External and Internal customers' style='max-width:100%; height:auto;'><figcaption>The universe of customers can be split into discrete buckets but the user's requirement is for overlapping, not discrete, categories</figcaption></figure>
+
+    <h2>Why The Obvious Solutions Fail</h2>
+
+    <h3>The Single-Column Trap</h3>
+    <p>The idea here is to add a slicer based on the column as usual. However any solution using just the column involved will give discrete options like the Products slicer. This is not a bug, it is a feature of how Power BI slicers are designed and their usage with discrete categories. So for this slicer, the user would be able to select <b>Internal</b> or <b>External</b> customers. But crucially not <b>All Customers</b>.</p> 
+      
+    <p>We could convert such a slicer into a multi-select and add a "Select all" however the UI would then have three options: "Internal", "External" or "Select all" and we don't want the user to be able to view internal customers only. So this option clutters up the UI and adds a bit of cognitive load onto the user.</p>
+
+    <figure><img src='../images/OverlappingSelectAllSlicer.png' alt='Slicer settings to allow a "Select all" option' style='max-width:100%; height:auto;'><figcaption>Slicer settings in the Format pane showing the option to add a "Select all" in the slicer when multi-select is chosen.</figcaption></figure>
+
+    <p><b>The Outcome:</b> A frustrated user who either has to run two separate reports or mentally add two numbers together.</p>
+
+    <h3>The Just Use Two Slicers Compromise</h3>
+    <p>Theoretically we could use two separate filters in the user interface. One would allow the users to choose scope (All vs External Only) and one for Account Type (Internal/External). And the user can decide how they wish to use them.</p>
+
+    <p>This is sub-optimal for two main reasons. Firstly we are pushing the cognitive load onto the end user by essentially outsourcing the data model logic to the user. Each time they want to choose between All customers or External only, they have to set two different slicers correctly. And if they were to choose contradictory selections across the two slicers e.g. Scope = "External Only" and Account Type = "Internal" then nothing will show. And the user will blame the report and submit a ticket saying the report is broken and shows no data.</p>
+
+    <p><b>The Outcome:</b> A flexible report that is actually unintuitive and error-prone.
+
+    <h3>The DAX Workaround</h3>
+    <p>While we might be able to conjure up some DAX magic to solve the problem, this is inherently complex, hard to maintain and brittle. Depending on the size of the dataset, it could also introduce performance issues.</p>
+    
+    <p>We've solved a modelling problem by hiding the complexity in a DAX measure.</p>
+
+    <p><b>The Outcome:</b> A "clever" solution that satisfies the demand but introduces maintenance debt and offers no reusable pattern. It solves the immediate problem but makes the system worse for everyone that comes after.</p>
+
+    <h2>Building a Bridge With a Dimension Table</h2>
+
+    <p>The goal is a slicer which gives us two distinct options: one a column-level option "External only" and the other an aggregation of column-level data "All Customers". Once this is realised it becomes obvious that this cannot be solved elegantly at the column level or the original table level.</p>
+
+    <p>Instead we need to abstract away such a slicer and allow it to filter the original table. To do this we build a custom dimension table which via filter propagation will filter the original data as we require.</p>
+
+    <figure><img src='../images/separateSlicer.png' alt='The required logic is abstracted to a separate slicer table' style='max-width:100%; height:auto;'><figcaption>The required logic sits in a custom dimension table which filters the original table (DimAccount in this case)</figcaption></figure>
+
+    <h2>A Step-by-Step Build</h2>
+
+    <h3>Step 1 - Isolate the Core Concept in a Calculated Column</h3>
+      <p>Create a column that flags the specific subset. In my case whether an account is Internal or External.</p>
+      <p>The source data already had a column called [IsInternalAccount] which returned TRUE or FALSE. So I used this in my calculated column:</p>
+
+    <figure><img src='../images/CalculatedColumn.png' alt='Calculated column returning the nature of the account' style='max-width:100%; height:auto;'><figcaption>Calculated Column returning the nature of the Account based on existing column</figcaption></figure>
+
+  <h3>Step 2 - Create a Key Column</h3> 
+      <p>The next step is to create a key column. This column will be used to create the relationship to the custom dimension table and is generated by concatenating the calculated column created in Step 1 with a string literal saying "All":</p>
+
+    <figure><img src='../images/FilterKey.png' alt='Calculated column creating a filter key' style='max-width:100%; height:auto;'><figcaption>Calculated Column creating the key for the new custom dimension table</figcaption></figure>
+
+  <h3>Step 3 - Build the Bridge Table</h3>
+  
+      <p>The bridge table or custom dimension table has to be constructed in a certain way:</p>
+      <ul>
+        <li>Its data comes directly from the source table (DimAccount in my case)</li>
+        <li>It is made up of two columns only:</li>
+          <ul>
+            <li>The key column (to be able to create the relationship back to the original table)</li>
+            <li>And a label column (to be used in the slicer in the user interface)</li>
+          </ul>
+        <li>We use UNION and DISTINCT to obtain a unique list of all possibilities from the source table</li>
+      </ul>
+
+    <figure><img src='../images/OverlappingSlicerTable.png' alt='DAX code to create overlapping slicer bridge table' style='max-width:100%; height:auto;'><figcaption>DAX Code to create overlapping slicer table</figcaption></figure>
+
+<p>So referring to the screenshot above:</p>
+<ul>
+  <li>We see the table is made up of two clauses joined with a UNION</li>
+  <li>The first clause is for when the user selects "All Accounts" in the slicer. All options for the original table appear here.</li>
+  <li>The second clause is for when the user selects "Customer Orders Only". The FILTER in line 9, means this clause only returns records where the category is "External".</li>
+</ul>
+
+<p>This results in a table looking like this:</p>
+
+    <figure><img src='../images/OverlappingSlicerTable2.png' alt='Data in overlapping slicer bridge table' style='max-width:100%; height:auto;'><figcaption>All records from overlapping slicer table</figcaption></figure>
+
+<p>So, in English, if the user selects "All Accounts" from the slicer label, this equates to both FilterKeys "External|All" and "Internal|All". Since there are only two possible keys, this is all of them. And so when we create the relationship to DimAccount, no records are filtered out and all accounts are returned (both external customers and internal customers).</p>
+
+<p>Conversely, if the user selects "Customer Orders Only", this equates to key = "External|All" and this filter will propagate to the original table and only return records which have this key i.e. External customer accounts only.</p>
+
+<p>The rest of the model (which is a star schema) ensures that the correct value of sales is returned in either case.</p>
+
+<h3>Step 4 - Create the Relationship</h3>
+
+<p>The final step is to create a relationship between this new dimension table and the original table using the key columns. This will be a many-many relationship. The filter direction needs to be from the bridge table to the original table.</p>
+
+<p>The resultant slicer does what the user needs in displaying overlapping categories. When "All Accounts" selected, we get all sales visible irrespective of whether internal or external customers:</p>
+
+<figure><img src='../images/OverlappingAllAccounts.png' alt='Sales table when All Accounts option chosen' style='max-width:100%; height:auto;'></figure>
+
+<p>And conversely when we select "Customer Orders Only" we only see the external customer sales:</p>
+
+<figure><img src='../images/OverlappingExternalCustomers.png' alt='Sales table when Customers Orders Only selected' style='max-width:100%; height:auto;'><figcaption></figcaption></figure>
+  
+<h2>Why This is a Superior Approach</h2>
+
+<p>This is a better approach for 4 main reasons</p>
+
+<h3>Clarity</h3>
+
+<p>The user gets a simple single slicer with clear options which map exactly to their mental model. The complication is abstracted away from the report layer.</p>
+
+<h3>Performance</h3>
+<p>Filtering via a small, clean dimension table is incredibly efficient.</p>
+
+<h3>Maintainability</h3>
+<p>The logic is embedded in the model rather than in a cryptic measure. The next developer can understand it at a glance. They don't have to go digging through the measures to understand what is happening and how. </p>
+
+<h3>Scalability</h3>
+<p>This pattern is the asset. It can be reused anywhere that an "overlapping category" problem arises.</p>
+
+<h2>It's Not A Slicer, It's A Translation Layer.</h2>
+
+<p>The solution wasn't in writing DAX but in designing a (small) system that <i>translates</i> a complicated requirement into a simple user experience.</p>
+
+<p>This is the "taps vs pipes" divide in action. The obvious solutions provide the user a stiff tap, a broken tap or water that is scalding. An unpleasant user experience</p> 
+
+<p>In contrast this solution delivers a beautiful chrome tap that provides fresh chilled drinking water to the user.</p>
+
+<h2>The Takeaway</h2>
+
+<p>When faced with complex data challenges, teams often fall into two traps:</p>
+
+<h3>A Hasty Conclusion</h3>
+<p>A quick investigation declares something impossible which shuts down any future exploration.</p>
+
+<h3>The Brittle Workaround</h3>
+<p>Complex solutions (such as DAX 'magic') are used to solve the problem at the report layer leading to maintenance overhead and the introduction of tech debt.</p>
+
+<p>When next faced with an "impossible" UI challenge don't just look at the report canvas. Look deeper, at the data model and build a bridge.</p>
+
+
+
+ 
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="the-feature-that-wasnt-there.html">← Previous: A Lesson In Invisible Design</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
