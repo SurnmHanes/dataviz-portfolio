@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Centralising Your Power BI Analytics - The Implementation (Part 2)</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+    <h1>The Playbook from Sprawl to Structure</h1>
+
+        <figure><img src='../images/CentralisingPowerBI2MainPic.jpg' alt='A notebook sitting on the side of an American Football pitch' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@mario?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Mario Verduzco</a> on <a href="https://unsplash.com/photos/a-notebook-sitting-on-the-side-of-a-football-field-Rn6n5Lh1BdA?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption></figure>
+
+    <h2>Introduction</h2>
+    <p>The problem this post is addressing is report sprawl: the silent tax on analytics teams. It starts innocently as a 'quick' report here, a 'special' dataset there and ends up a labyrinth of overlapping logic, inconsistent metrics and duplicated effort. This isn't just technical debt it's also organisational paralysis.</p>
+    
+    <p>This playbook provides the structured process to consolidate that sprawl into a single semantic model. This is the second half of the 'Centralising Your Power BI Analytics' blog series. For part 1 visit: <a href="centralising-your-PowerBI-analytics-Part1-The-Strategy.html">Part 1 - The Strategy</a></p>
+
+    <p>Where Part 1 laid out the strategic trade-offs between <i>consistency, agility</i> and <i>complexity,</i> this post details the tactical steps to navigate them.</p>
+
+    <!-- Also included is an estimation of how long each of the intermediate steps would take. Please note though that your mileage may vary. -->
+
+    <h2>The Methodology</h2>
+
+    <p>Having established the strategic trade-offs in Part 1, the next question is tactical execution. If you were to undertake this consolidation exercise here is a proven, methodical playbook. The following six-phase approach is designed to maximise control and minimise risk:</p>
+    
+    <ol>
+        <li>Discovery</li>
+        <li>Report Zero</li>
+        <li>Consolidate Semantic Models</li>
+        <li>Clean Up</li>
+        <li>Hook Up Reports and Validate Outcomes</li>
+        <li>Regression Testing</li>
+    </ol>
+  
+    <p>Each of these phases is described in further detail below.</p>
+
+    <h3>1. Discovery</h3>
+    
+    <p>You would begin with Discovery which entails going through all the reports and looking for anything out of the ordinary. Since ALM Toolkit is used in a later phase, the Discovery phase is quite focussed. The goal here is to identify any of the following:</p>
+
+    <ul class="tight-list">
+      <li>Unusual data sources</li>
+      <li>RLS or field parameters</li>
+    </ul>
+
+    <h3>2. Report Zero</h3>
+
+    <p>This phase is all about selecting a report from the suite of reports to use as the base report ("Report Zero"). You would then look to consolidate all other reports into Report Zero using ALM Toolkit.</p>
+
+    <p>Ideally Report Zero should be quite thorough / complete and touch a lot of the areas of the given vertical. It doesn't need to be the largest report, better if it's the broadest in terms of the different entities (and therefore data tables) that it uses.</p>
+
+    <p>Such a report is then to be used as Report Zero (our new central report). The goal is to then consolidate every subsequent report into this one.</p>
+
+    <h3>3. Consolidate Reports</h3>
+
+    <p>ALM Toolkit is fantastic for identifying differences. However one of the drawbacks it does have when being used for migration is that it can only consolidate one report with another. So this consolidation phase would be iterative: you would use ALM Toolkit to compare one report's schema with Report Zero. And then choose the next report and use ALM Toolkit again for the comparison. The key here is to only bring over new additions from each report. <b>Nothing is removed out of Report Zero.</b></p>
+    
+    <h4>3.1 Adding New Objects</h4>
+    <p>The changes required will come in two forms. Firstly, new objects (tables, relationships, measures etc.) that need adding to Report Zero. </p>
+
+    <p>Once these have been identified, they should be added into Report Zero. This can be done using the ALM Toolkit interface for measures but must be done  manually in Power BI for tables and other objects (using Tabular Editor or copying and pasting in Power Query).</p>
+
+    <h4>3.2 Merging Variations of Existing Objects</h4>
+
+    <p>The second change required will be regarding objects that exist in both reports but are not identical. For example tables made up of different columns.</p>
+
+    <p>For these you would need to make sure these additional columns were included. Again this can't be done in ALM Toolkit but can be done in Tabular Editor or Power BI Desktop, either through Power Query or the TMDL view.</p>
+
+    <h4>Notes:</h4> 
+    <p>1. ALM Toolkit is very good at identifying differences between semantic models but it cannot automatically consolidate all elements into Report Zero.</p>
+
+    <p>2. To actually bring in new tables, new Power Query logic and new relationships etc. into Report Zero would be a manual process using Tabular Editor or Power BI Desktop. However in most cases, the differences identified can be copied and pasted into the report outside of ALM Toolkit.</p>
+      
+    <p>3. As a verification exercise, once these differences have been made, ALM Toolkit could be re-run to check that the changes have been made successfully and there are no further differences. This gives great peace of mind.</p>
+
+    <p>4. At commencement there would be a lot of new changes but as Report Zero "swallows" logic and objects from each report in turn, the latter comparisons should require little to no new additions.</p>
+
+    <h3>4. Clean Up</h3>
+
+    <p>While this consolidation exercise is going on, objects that are no longer used can be identified and could be removed. Things such as unused Power Query queries, unused tables, measures etc.</p>
+
+    <p>Although there is no need to remove them, it is good practice as it would improve long-term maintainability and reduce both model bloat and developer confusion in the new centralised model.</p>
+    
+    <p>As a final piece, once the consolidation of all reports in Report Zero was completed, I would recommend Measure Killer be used one final time on Report Zero to identify all objects that remain unused. These could then safely be removed. </p>
+    
+    <h3>5. Hook Up Reports and Validate Outcomes</h3>
+
+    <p>This phase would, unfortunately, be a manual process to be carried out in the following step by step method:</p>
+
+    <ul>
+      <li>Clone the original report.</li>
+      <li>Change the source for the cloned report to Report Zero.</li>
+      <li>Navigate through the report pages and identify and fix any broken visuals.</li>
+      <li>Validate the outputs by comparing the cloned report numbers with the original report. </li>
+    </ul>
+
+    <p>The reports would all contain many pages with multiple visuals per page. There is therefore a non-trivial amount of work to do so a sizeable amount of time would be needed in this phase. Indeed this would be what the bulk of the whole project's time would be spent on.</p>
+
+    <h3>6. Regression Testing</h3>
+
+    <p>Given the scope of the changes to the model as well as potential downstream impact, this centralisation would also warrant a large regression test to ensure that nothing that previously worked is now not behaving as it should. </p>
+    
+    <h2>Strategic Considerations</h2>
+
+    <h3>Advantages of Approach </h3>
+
+    <p>The two advantages of this strategy are as follows:</p>
+
+    <h4>1 Business As Usual (BAU)</h4>
+
+    <p>The approach taken means that this consolidation could be done <b>in parallel</b> with existing work, with two caveats. You would need to have a strategy for how any new development done since the consolidation commenced would be included in the centralisation piece and also would need to make it clear to stakeholders that any additional development would increase the amount of time taken for the centralisation as a whole.</p>
+
+    <h4>2 Dataflows</h4>
+
+    <p>A Dataflows approach could be considered as a stepping stone towards the stated aim of having a backend SQL database and therefore would make <i>that</i> future transition easier. However I would advise against it for 4 main reasons:</p>  
+
+    <ul>
+      <li>Dataflows would offer more value if the goal was to keep the legacy set-up of one semantic model per report. The data extraction and common transformation steps could then be abstracted out of the individual semantic models and into the shared Dataflow thereby centralising and reducing the amount of data processing.</li>
+      <li>Dataflows as an online product only is not as feature-rich as Power Query in Power BI Desktop. Therefore I would be concerned that some of the complex transforms in Power Query would not have a Dataflows equivalent.</li>
+      <li>Dataflows have to be owned by someone in the workspace which can then make accessing, changing or amending logic more difficult.</li>
+      <li>Your team may not have sufficient knowledge of the tooling and so you would be adding that additional cognitive load to the centralisation project for very little added value.</li>
+    </ul>
+    
+    <h3>Navigating Organisational Realities</h3>
+
+    <p>A playbook is only as good as the context it is used in. It's important to recognise that the disciplined, incremental and iterative approach outlined here can often be passed over in favour of a "rip it up and start again" rewrite.</p>
+    
+    <p>As an architect, your role is to clearly articulate the trade-offs of both approaches: this method reduces risk and delivers continuous value while the 'big bang' approach concentrates risk and delays the return on investment. Often in pursuit of a more visible hero narrative.</p>
+
+    <p>Presenting this outline and highlighting the trade-offs of both approaches gives stakeholders a clear, informed choice.</p>
+        
+    <h2>Architect's Value</h2>
+
+    <p>Centralising analytics sprawl is a big task and ultimately a test of system discipline. This outline provides a framework to systematically replace chaos with a coherent, manageable asset.</p>
+
+    <p>As with all architectural tasks, the real work isn't just in the tools but in the commitment to the process that values long-term stability over short-term visibility. By following a path from Discovery through to Regression, you don't just build a better semantic model, you build a robust foundation for trustworthy analytics.</p>
+
+    <p>The goal is to shift the team's energy from perpetually managing a <b>brittle infrastructure</b> to confidently evolving a <b>valuable data product</b>.</p>
+
+
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="architecting-an-advanced-slicer-for-messy-data.html">← Previous: The Impossible Button</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
+
+<!-- Tired of overlapping logic and inconsistent metrics?
+
+Here's the proven, methodical playbook to centralise your Power BI analytics and reclaim your team's focus.
+
+#BIDeveloper #DataArchitecture #PowerBI #Leadership #DataStrategy #DataGovernance #BI #Analytics #EngineeringExcellence #TechLeadership #TechDebt -->
