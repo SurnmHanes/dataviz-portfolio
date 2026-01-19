@@ -211,3 +211,11 @@ ol.culture-steps li strong {
 p:has(+ .tight-list) {
     margin-bottom: 0.25em;
 }
+
+.tight-header {
+  margin-bottom: 0.1em;
+}
+
+.tight-paragraph {
+  margin-top: 0
+}
