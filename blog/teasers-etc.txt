@@ -1,0 +1,21 @@
+
+When updating a blog post make sure the following have been changed:
+- the main pic
+- the navigation at the bottom
+- the navigation at the bottom for the previous post
+- the page listing all blog posts
+- the home page listing the 3 most recent posts 
+
+
+
+
+PERFORMANCE VS SUBSTANCE
+    "Why do efficient, automated solutions often get rejected in favour of visible, manual struggle? A reflection on the 'Craftsperson's Curse' and the two realities of modern work."
+(Tag relevant topics: #SystemsThinking, #TechLeadership, #DataCulture, #QuietQuitting, #DeepWork)
+
+I DONT CARE ABOUT BEANS
+What's more valuable: knowing every metric or making them understandable to the end user.
+
+In my latest blog post I talk about the role of data translation. The ability to build a bridge from raw data to decision quickly and clearly. 
+
+#DataLiteracy #UX #DataStorytelling #Analytics #PowerBI #DataCulture #DataStrategy

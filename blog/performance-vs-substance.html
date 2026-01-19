@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Performance vs Substance</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+
+    <h1>The Two Realities</h1>
+
+        <figure><img src='../images/PerformancevsSubstanceMainPic.jpg' alt='red theatre curtain' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@roblaughter?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Rob Laughter</a> on <a href="https://unsplash.com/photos/red-theater-curtain-WW1jsInXgwM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+      
+        </figcaption></figure>
+      
+    <h2>The Anecdote</h2>
+    <p>I used to work in a data job in health care. One of the pieces of data we needed was NHS prescribing data which would be published monthly on each of their country websites. This data was published per country and each of the various countries (England, Scotland, Wales & Northern Ireland) would publish on different days of the month to their respective websites. </p>
+    
+    <p>There was also a little bit of variance as to which day the new data would actually be uploaded onto a given site. For example, one month the England data might be available on the 20th, the next month it might be late and not available until 26th. There was no predictability to the day of the month or the time of day. </p>
+
+    <p>The manual way to ensure we got the data promptly was to bookmark the four NHS websites and refresh several times a day waiting for the new data to appear. And this was what our Head of Data would do.</p>
+
+    <p>An alternative might be some sort of automation script that can check and even download the documents automatically. And as a side project I actually built this - a web-scraper program in Python with the following characteristics:
+      
+    <ul>
+      <li> It ran automatically every morning and navigated to each of the 4 NHS websites in turn </li>
+      <li> Checked the date of the latest published document against the latest month with in it's dictionary</li>
+      <li> If there was a difference, it would then download the document</li>
+      <li> Update its dictionary</li>
+      <li> Move the downloaded file(s) to a central repository</li>
+      <li> Report a message to the user</li>
+    </ul>
+
+    <p>When I showed this to the CEO and Head of Data, their response was lukewarm. They could appreciate the technical ability but did not understand why it was needed. The Head of Data carried on doing his daily, manual checks.</p>
+
+    <h2>The Types of Work</h2>
+
+    <p>The manual way of checking daily and downloading and then repeating four times a month for each and every month sounds not only boring but error-prone and an inefficient use of time.</p>
+
+    <p>And yet I see individuals and organisations in general take this approach even when there is a quicker automatic alternative that takes the heavy lifting from them.</p>
+
+    <p>So why is this?</p>
+
+    <p>I believe it's because there is a cultural issue. A disconnect between the <i>performance</i> of work (what looks like effort) and the <i>substance</i> of work (what delivers actual outcomes). And the culture has a bias towards rewarding the former while exploiting the latter.</p>
+
+    <h3>The Performance of Work (The Theatre)</h3>
+
+    <p>The manual way is more effort. It requires context switching, it increases anxiety as the individual is aware they need to constantly do <i>something</i>.</p>
+
+    <p>The goal for the individual here is not efficiency or an easy life. It is to be seen, to be engaged and to be useful.</p>
+
+    <p>The behaviour which you may recognise is loud struggle, frequent updates, 'collaborative' meetings, visibility, "show and tells".</p>
+
+    <p>The currency is social capital, visibility and perceived dedication to the task and, by association, to the company.</p>
+
+    <h3>The Substance of Work (The Craft)</h3>
+
+    <p>The approach here is different. It's about delivering robust trustworthy solutions which work under pressure eg. with high volumes or on edge cases.</p>
+
+    <p>The goal here is a quiet life. A one-and-done mentality which means you expend as little energy as possible and quickly move on to the next puzzle.</p>
+
+    <p>The behaviour is deep work, simplicity, silence and intelligent use of automation.</p>
+
+    <p>The currency is actual outcomes and a system that is healthy and stands up to scrutiny.</p>
+
+    <h2>Why Performance Wins</h2>
+
+    <p>Humans are social creatures. Drama always draws us in. So visibility, struggle and chaos always appeals and gets the limelight. It's easy to see and therefore easy to measure. Activity and noise are easily mistaken for progress.</p>
+      
+    <p>It also feeds ego and the helplessness garners a feeling of need in others. If somebody is saying something is difficult is must be, so they need help and attention.</p>
+
+    <p>By contrast the substance workers are silent and efficient. They very rarely have to draw other team members in. The work just gets done. And 100 future tickets are prevented. None of this is visible and indeed the silence leads to suspicion "they have got the easy work again" or "if they've done it that quickly, they must be skipping steps". </p>
+
+    <h2>The Craftperson's Curse</h2>
+
+    <p>Not only are substance workers quiet and independent while they do the work but their works leads to very little upstream work. They work reliably to fix the issue and their work is of such high quality that it doesn't break.</p>
+
+    <p>The crafter unintentionally becomes a threat to the whole performance: a silent elegant solution executed quickly is an indictment on the noisy, chaotic way that things have always been done.</p>
+
+    <p>At some level, leaders recognise this ability. And you end up being the dumping ground for problems the Theatre couldn't solve (spikes, bugs, performance issues). You become the cleanup crew.</p>
+
+    <p>Worse still, your spike recommendations are ignored because they were not fully understood by the Performers and/or the solution wouldn't provide the drama and busyness they seek.</p>
+
+    <p>In contrast the brittle solutions put in by performance workers break under strain and lead to bugs and follow up work. The initial reaction shows the shallowness and the lack of ability to assess the work previously done. There is is usually surprise "oh, this bug has come from nowhere" and the additional work perpetuates the narrative: "see I told you it was really difficult" and gives the performer more fuel to be noisy about.</p>
+
+    <h2>When Substance Leaves</h2>
+
+    <p>In an environment which doesn't look deeply and values the performance worker and their visibility, the substance worker will eventually leave.</p>
+
+    <p>This will temporarily blindside the leader who had no idea their quiet, competent, easy-going employee left.</p>
+
+    <p>The automations and robust systems they created begin to decay. The technical debt that you were secretly managing starts to become everyone's problem.</p>
+ 
+    <p>And this will be when the walls cave in. It will be discovered that the substance worker was the only one whose solutions had any long term value. When they leave, more bugs will 'come from nowhere' and more tech debt will be used to fix tech debt. This debt compounds into almost daily fire-fighting.</p>
+
+    <p>And this suits the performer. They get to be centre stage and exert themselves solving today's problem. They are held up as the hero only for it to return tomorrow and nobody put two and two together.</p>
+    
+    <h2>The Path Forward</h2>
+    
+    <h3>For Craftspeople</h3>
+
+    <p>To prevent ending up frustrated in an environment of performers, you must seek out places that value outcomes over chaos. I appreciate from my own experience this is easier said than done!</p>
+
+    <p>Look for clues such as "deep work", "ownership" and "craft". Be more public about your value by writing it down. Explain your thinking and decision-making in words, document your solutions. If possible document the value of your solutions in terms of time or money saved. Heck, start a blog writing about your thinking!!</p>
+
+    <p>There is massive value in a presence, a portfolio of work, a network of like-minded people, a blog outside the day job. This prevents the feeling of frustration and restriction present in your environment and helps build your wealth in a different economy. For a craftsperson this feeling of liberation and autonomy is crucial.</p>
+
+    <h3>For Leaders</h3>
+
+    <p>Good leaders will frequently have to be amateur psychotherapists as social dynamics are often at play. If the individual is insecure or anxious or new to the team, they may be trying to project confidence and understanding within the team. If they are overwhelmed often their speech is frantic and dramatic. If they are not good at reading others they may not realise they have lost their audience and continue rambling.</p> 
+      
+    <p>Learn to be a little bit apart and reserve judgment until the the work is shipped. Then judge on the quality of the work, not on the chaos or noise that was expended in completing it.</p>
+
+    <p>Imagine the company is your company and think about the expense in terms of salary alone of holding several meetings, collaborations and long status updates. Does the item warrant this amount of cash investment?</p>
+
+    <p>Help the craftspeople by allowing and protecting periods of deep work. Space where they have uninterrupted, focus time to be able to think and solve the problem. Remember data work is knowledge work, not a factory line. Allow your staff the time to do the hard thinking necessary.</p>
+
+    <p>Do not be seduced by noise and chaos. Understand that as humans we are programmed to be drawn towards drama. But instead notice the quiet ones. Be curious towards them - why are they quiet? What are their thoughts? Draw them into the conversation. Often their viewpoints will be sharper than anything heard up to now.</p>
+
+    <h2>Conclusion</h2>
+
+    <p>The most valuable work is often the quietest. It's the automation that saves a thousand future clicks, the robust code that prevents a hundred bug tickets or the elegant data model that makes every report fast and accurate.</p>
+
+    <p>The manual refresh story from the start was not about getting the data efficiently. It was about the ritual of getting the data. The Python script which automated the daily process was rejected in favour of the manual process. Not because it was a worse solution but because it made the process invisible.</p>
+
+    <p>The path forward for the craftsperson isn't to strip away your identity and mould into the noisy environment. Instead it's to build your own stage where your work is the proof and the applause is the quiet humming of a system that just works.</p>
+
+   
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="I-dont-care-about-beans.html">← Previous: The Data Translator's Superpower</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
+
