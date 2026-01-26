@@ -19,31 +19,33 @@
   </header>
   <main>
 
-    <h1>The Two Realities</h1>
+    <h1>The Two Realities: Performance vs Substance</h1>
 
         <figure><img src='../images/PerformancevsSubstanceMainPic.jpg' alt='red theatre curtain' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@roblaughter?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Rob Laughter</a> on <a href="https://unsplash.com/photos/red-theater-curtain-WW1jsInXgwM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
       
         </figcaption></figure>
       
     <h2>The Anecdote</h2>
-    <p>I used to work in a data job in health care. One of the pieces of data we needed was NHS prescribing data which would be published monthly on each of their country websites. This data was published per country and each of the various countries (England, Scotland, Wales & Northern Ireland) would publish on different days of the month to their respective websites. </p>
+    <p>As a data professional I once had a job dealing with health care data. One of the pieces of data we needed was NHS prescribing data which would be published monthly on each of their country websites. This data was published per country and each of the various countries (England, Scotland, Wales & Northern Ireland) would publish on different days of the month to their respective websites. </p>
     
     <p>There was also a little bit of variance as to which day the new data would actually be uploaded onto a given site. For example, one month the England data might be available on the 20th, the next month it might be late and not available until 26th. There was no predictability to the day of the month or the time of day. </p>
 
     <p>The manual way to ensure we got the data promptly was to bookmark the four NHS websites and refresh several times a day waiting for the new data to appear. And this was what our Head of Data would do.</p>
 
-    <p>An alternative might be some sort of automation script that can check and even download the documents automatically. And as a side project I actually built this - a web-scraper program in Python with the following characteristics:
+    <p>An alternative might be some sort of automation script that would run and go to each of the four websites, check the latest data uploaded and download the documents automatically.</p> 
+      
+    <p>And as a side project I actually built this - a web-scraper program in Python with the following characteristics:
       
     <ul>
       <li> It ran automatically every morning and navigated to each of the 4 NHS websites in turn </li>
-      <li> Checked the date of the latest published document against the latest month with in it's dictionary</li>
+      <li> The date of the latest published document would be checked against the latest month within its dictionary</li>
       <li> If there was a difference, it would then download the document</li>
-      <li> Update its dictionary</li>
-      <li> Move the downloaded file(s) to a central repository</li>
-      <li> Report a message to the user</li>
+      <li> Consequently its dictionary would then be updated with this new date</li>
+      <li> The downloaded file(s) would be moved to a central repository</li>
+      <li> A message to the user would be reported informing them what had happened</li>
     </ul>
 
-    <p>When I showed this to the CEO and Head of Data, their response was lukewarm. They could appreciate the technical ability but did not understand why it was needed. The Head of Data carried on doing his daily, manual checks.</p>
+    <p>When I showed this programme to the CEO and Head of Data, their response was lukewarm. They could appreciate the technical ability but did not understand why it was needed. The Head of Data carried on doing his daily, manual checks.</p>
 
     <h2>The Types of Work</h2>
 
@@ -53,9 +55,9 @@
 
     <p>So why is this?</p>
 
-    <p>I believe it's because there is a cultural issue. A disconnect between the <i>performance</i> of work (what looks like effort) and the <i>substance</i> of work (what delivers actual outcomes). And the culture has a bias towards rewarding the former while exploiting the latter.</p>
+    <p>I believe it's because there is a cultural issue. <b>A disconnect between the <i>performance</i> of work (what looks like effort) and the <i>substance</i> of work (what delivers actual outcomes)</b>. And the culture has a bias towards rewarding the former while exploiting the latter.</p>
 
-    <h3>The Performance of Work (The Theatre)</h3>
+    <h3>1. The Performance of Work (The Theatre)</h3>
 
     <p>The manual way is more effort. It requires context switching, it increases anxiety as the individual is aware they need to constantly do <i>something</i>.</p>
 
@@ -65,7 +67,7 @@
 
     <p>The currency is social capital, visibility and perceived dedication to the task and, by association, to the company.</p>
 
-    <h3>The Substance of Work (The Craft)</h3>
+    <h3>2. The Substance of Work (The Craft)</h3>
 
     <p>The approach here is different. It's about delivering robust trustworthy solutions which work under pressure eg. with high volumes or on edge cases.</p>
 
@@ -79,7 +81,7 @@
 
     <p>Humans are social creatures. Drama always draws us in. So visibility, struggle and chaos always appeals and gets the limelight. It's easy to see and therefore easy to measure. Activity and noise are easily mistaken for progress.</p>
       
-    <p>It also feeds ego and the helplessness garners a feeling of need in others. If somebody is saying something is difficult is must be, so they need help and attention.</p>
+    <p>It also feeds ego and the helplessness garners a feeling of need in others. If somebody is saying something is difficult it must be, so they need help and attention.</p>
 
     <p>By contrast the substance workers are silent and efficient. They very rarely have to draw other team members in. The work just gets done. And 100 future tickets are prevented. None of this is visible and indeed the silence leads to suspicion "they have got the easy work again" or "if they've done it that quickly, they must be skipping steps". </p>
 
@@ -93,7 +95,7 @@
 
     <p>Worse still, your spike recommendations are ignored because they were not fully understood by the Performers and/or the solution wouldn't provide the drama and busyness they seek.</p>
 
-    <p>In contrast the brittle solutions put in by performance workers break under strain and lead to bugs and follow up work. The initial reaction shows the shallowness and the lack of ability to assess the work previously done. There is is usually surprise "oh, this bug has come from nowhere" and the additional work perpetuates the narrative: "see I told you it was really difficult" and gives the performer more fuel to be noisy about.</p>
+    <p>In contrast the brittle solutions put in by performance workers break under strain and lead to bugs and follow up work. The initial reaction shows the shallowness and the lack of ability to assess the work previously done. There is usually surprise "oh, this bug has come from nowhere" and the additional work perpetuates the narrative: "see I told you it was really difficult" and gives the performer more fuel to be noisy about.</p>
 
     <h2>When Substance Leaves</h2>
 
@@ -101,7 +103,7 @@
 
     <p>This will temporarily blindside the leader who had no idea their quiet, competent, easy-going employee left.</p>
 
-    <p>The automations and robust systems they created begin to decay. The technical debt that you were secretly managing starts to become everyone's problem.</p>
+    <p>The automations and robust systems they created begin to decay. The technical debt that the substance worker was secretly managing starts to become everyone's problem.</p>
  
     <p>And this will be when the walls cave in. It will be discovered that the substance worker was the only one whose solutions had any long term value. When they leave, more bugs will 'come from nowhere' and more tech debt will be used to fix tech debt. This debt compounds into almost daily fire-fighting.</p>
 
@@ -145,7 +147,7 @@
     <div class="blog-navigation">
     
       <div class="nav-previous">
-        <a href="I-dont-care-about-beans.html">← Previous: The Data Translator's Superpower</a>
+        <a href="I-dont-care-about-beans.html">← Previous: I Don't Care About Beans</a>
       </div>
     
       <div class="nav-back-to-top">
