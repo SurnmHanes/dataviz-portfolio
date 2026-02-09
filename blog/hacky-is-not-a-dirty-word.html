@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>"Hacky" Is Not A Dirty Word</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+
+    <h1>"Hacky" Is Not A Dirty Word</h1>
+
+        <figure><img src='../images/HackyIsNotADirtyWordMainPic.jpg' alt='boy playing jenga' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@mparzuchowski?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Michał Parzuchowski</a> on <a href="https://unsplash.com/photos/boy-playing-jenga-geNNFqfvw48?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></figcaption></figure>
+
+      
+    <h2>It Depends</h2>
+    <p>The word "hacky" has a bad reputation in data teams. Many developers and leaders hear the word "hacky" and this immediately brings negative connotations to their mind. They start thinking that hacky means bad practice, fragility, unprofessional standards and anti-patterns.</p>
+
+    <p>But....context matters. On one hand hacky can certainly be considered dangerous, corrosive and high-risk. But on the other it can be equated with creativity, playfulness, pragmatism. </p>
+    
+    <p>"Hacky" per se is not the problem. It's using it in the wrong layer that is.</p>
+
+    <h2>Two Kinds Of Hacky</h2>
+
+    <p>I would argue hacky solutions can be split into two distinct camps.</p>
+
+    <h4>Playful Hacky (The Good Kind)</h4>
+
+    <p>The user interface exists to make the report look and feel good and intuitive for the end user. Using the art of the possible in terms of bookmarks, buttons, shapes, layering, conditional formatting. Producing reports that delight and make users exclaim "Wow! I didn't know you could do that in Power BI!".</p>
+
+    <p>Using buttons and bookmarks to create a pop up menu over the existing report is an example of this kind of hack.</p>
+
+    <p>The reporting layer is the terminus station for the journey that the raw data takes from source to analytical reporting. There are no further stages and therefore no knock-on effects on decisions made in this layer. Therefore the blast radius is small.</p>
+    
+    <p>The advantages of this kind of hacky is that the risk is low if anything breaks. It will usually be confined to a report page or two. Which means it can quickly and easily be fixed or ripped out completely with little downtime.</p>
+
+    <p>This low risk for anything going wrong versus the upside of creating a unique, intuitive and cool looking report means this sort of hacky is encouraged. The upside ultimately outweighs the downside.</p>
+
+    <h4>Structural Hacky (The Risky Kind)</h4>
+
+    <p>This type of hack incorporates the following anti-patterns: inventing keys for relationships, building unnecessary bridge tables, creating bi-directional relationships, using implicit measures, copying DAX from AI.</p>
+
+    <p>Building a bridge table because a relationship "wouldn't work" is an example of structural hacky.</p>
+
+    <p>This is the dangerous kind as the effects aren't felt until further downstream. The numbers returned could be wrong but the root cause can be hard to get to. Not understanding why something is failing undermines trust in the data product as a whole. </p>
+
+    <p>Even more insiduously the numbers can be right until pressure is put on the system and then they fail. Again this breakage seems to "come from nowhere" and it can be hard to pinpoint the cause.  </p>
+
+    <p>Because structural hacks occur earlier in the pipeline they can affect a number of different tables and so potentially have a high blast radius (the breadth of places a hack can create issues) downstream at the reporting layer.</p>
+
+    <h2>Why Teams Confuse The Two</h2>
+
+    <p>In most teams there is no distinction between these two different kinds of hack. All hacks are treated equally. This is due to a lack of understanding of the layering of data analytics and the interconnectedness of these layers.</p>
+
+    <p>As mentioned previously, the modelling layer exists before the report layer and therefore any changes made in the modelling layer will have a consequence in the report layer. Whether that consequence is immediately visible or not.</p>
+    
+    <p>Coupled with this are the incentives in many organisations. These tend to favour velocity and getting tickets completed quickly. Consequently many junior devs don't see business intelligence as layered. They just want to work and create visuals in the report. So if a structural hack gets them past their issue, they will build one. Without necessarily understanding the consequences downstream.</p>
+
+    <h2>How To Create A Hacky-Friendly Culture</h2>
+
+    <p>Understanding the interaction between the different layers of BI is key here.</p>
+    
+    <p>If analytics was house-building using hacky solutions in the modelling layer is tantamount to using hacks and shortcuts when building the house foundations. Whereas hacks in the reporting layer are equivalent to interior decorating. Exactly where creativity is encouraged and can flourish.</p>
+
+    <p>With this mental model in mind, I would encourage playfulness at the reporting layer. Allowing creativity and artistic flow here is when the best UI/UX features are born. And your reports will be elevated as a reward.</p>
+
+    <p>However, in the same way, shortcuts and hacks should not be in house foundations for fear of an instable structure, they should also not exist in the modelling and pipeline stage. Robustness is key here and any work done needs to be reviewed and approved to ensure rigour is followed. If anyone is using hacks here, they need to be removed and a different and better structured solution needs to be implemented.</p>
+
+    <h2>The Bigger Cultural Point</h2>
+
+    <p>So in summary, hacks are not really about what was done, but more about where it was done and the potential fallout further downstream.</p>
+
+    <p>A mature BI team knows when to embrace creative hacks and when to slow down and be rigourous. On the other hand teams that don't, pay the price long term with technical debt, eroded customer trust and firefighting.</p>
+
+    <p>Hacky is not a dirty word. In the right place and at the right time, hackiness is innovation. In the wrong place and at the wrong time, hackiness is debt.</p>
+
+    <p>The skill of BI is learning the difference.</p>
+  
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="customer-is-king.html">← Previous: Customer Is King</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
+
