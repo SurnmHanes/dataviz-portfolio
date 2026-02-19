@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beyond The Sink</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Star Schema Proposal</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>Two months into a new role, I diagnosed that the existing data model had reached its limit. The team was building workarounds instead of foundations. This was my unsolicited proposal to leadership:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Proposal - 5 min read
+  <span class="document-label-minor-text"> (Preserved as originally written. Minor redactions applied)</span></span>
+  
+  <h2>Executive Summary</h2>
+  
+  <p>This report is submitted in support of amending the XXX data model to a star schema model. </p>
+    
+  <p>Power BI is a powerful tool for data visualisation and analysis but to harness its full potential it is crucial to have a well-structured data model.</p>
+    
+  <p>The Core data model is essential for managing day-to-day transactional operations but is not optimised for analytical tasks. By contrast star schema models   are purpose-built for analytics. </p>
+    
+  <p> Complex models and inefficient queries can consume more storage, lead to slow report generation and negatively impact user experience. Worse, inconsistent models can result in discrepancies leading to inaccurate reporting and decision-making. </p>
+    
+  <p> Implementing a star schema model can address these challenges. This model will also allow us more easily to cope with more complex analysis needs such as DirectQuery.  </p>
+
+  <h2>Background</h2>
+    
+  <h4>Online Transaction Processing (OLTP) vs Online Analytical Processing (OLAP)</h4>
+      
+  <p>Example of an OLTP model: </p>
+      
+  <figure><img src='../images/OLTPmodel.png' alt='OLTP ER Diagram' style='max-width:100%; height:auto;'><figcaption>OLTP Data Structure</figcaption></figure>
+      
+  <p>The Core product has an OLTP data model structure. These kinds of models are optimised for transactions as we expect to be writing new transactions on a regular basis (be that every minute, hour, day etc.) </p>
+    
+  <p> OLTP model structure is therefore compact to attempt to use the least amount of space and will avoid repetitions of the same value in order to speed up inserting new or updating existing data. This model generally increases the number of tables present (because nearly every attribute is in a separate table) and therefore the number of joins between these tables. </p>
+    
+  <p> On the other hand an OLAP model is structured to be fast for read operations. Insertion of new or updating of existing data never needs to happen when looking at analysis and so OLTP is not a good fit.</p>
+    
+  <figure><img src='../images/OLAPmodel.png' alt='OLAP Diagram' style='max-width:100%; height:auto;'><figcaption>OLAP Data Structure</figcaption></figure>
+    
+  <p> OLAP models reduce the number of joins and tables by duplicating data across the whole model. This reduces the number of tables the queries have to traverse to get all the required pieces of data. It also enables fast aggregation and filtering of data which is useful when slicing, dicing, drilling down or rolling up.</p>
+    
+  <p> Many OLAP systems obtain their data from an OLTP system via an ETL pipeline.</p>
+
+  <h4 id="what-is-a-star-schema-">What is a star schema?</h4>
+    
+
+  <figure><img src='../images/star-schema-example1.png' alt='Star Schema Diagram' style='max-width:100%; height:auto;'><figcaption>Star Schema Data Structure</figcaption></figure>
+
+  <p> The star schema has become the standard when mapping multi dimensional data structures for analytical purposes. A star schema is an OLAP data structure where the data tables are arranged into two categories:</p>
+
+  <p> <strong>Dimensions</strong> - a dimension table contains descriptive data that will be involved in the event we are seeking to analyse. These are the WHAT, WHERE, WHEN, WHO of the analysis. Examples include Product, Geography, Date/Time, Employee. They provide the viewpoints by which we want to look at the data (for example Sales by Product, by date, by employee). They typically don't have many rows (usually hundreds or thousands) but can have many columns.</p>
+    
+  <p> <strong>Facts</strong> - A fact table is a table where each row contains a separate event or transaction which we want to aggregate to obtain insight into the business eg. Sales. These are the HOW MANY or HOW MUCH of the analysis.  A fact table typically has fewer columns but many more rows (millions or billions) compared to a dimension table.</p>
+
+  <p>It is called a star schema because of the shape of the dimension tables around a central fact table. Usually a star schema would have one fact table but it is possible to have more than one fact table in a model.</p>
+
+  <h2 id="benefits-of-star-schema-model">Benefits of Star Schema Model</h2>
+
+  <h4 id="improved-performance">Improved performance</h4>
+
+  <p>A star schema simplifies the data structure reducing tables and table joins making it easier and faster to query data. They are designed for aggregating and summarizing data.</p>
+
+  <h4 id="enhanced-data-quality">Enhanced Data Quality</h4>
+
+  <p>By centralising data using a star schema model, inconsistencies are minimised. They also allow better data governance including data validation and cleansing. Data is usually cleaned, validated and transformed during the ETL process. This ensures the data is accurate and reliable.</p>
+
+  <h4 id="ease-of-use">Ease of Use</h4>
+
+  <p>As mentioned, it simplifies the data structure making it easier for developers to create and maintain reports. Developers can learn quickly how to navigate the model to create the requested reports. In contrast, OLTP models often have complex structures that are challenging to navigate for analytical purposes.</p>
+
+  <p>Tools like Power BI and Tableau are designed to work effortlessly with star schema models making it easier for non-technical users to create reports.</p>
+
+  <h4 id="scalability">Scalability</h4>
+
+  <p>Star schema models can easily accommodate new / different data sources, making it scalable for future business needs. Adding in extra dimension tables is straightforward. Even new fact tables can be added to the model.</p>
+
+  <p>As business needs evolve, the model can handle more complex analytical needs for example <strong>DirectQuery</strong> or analysing <strong>historical</strong> performance.</p>
+
+  <h4 id="clear-data-separation">Clear data separation</h4>
+
+  <p>Star schema models separate dimension tables (descriptive data) from fact tables (measurable data) providing a clear structure.</p>
+
+  <h2 id="cost-analysis">Cost Analysis</h2>
+
+  <p>A star schema model will require upfront investment in terms of time required to design and implement but the long-term benefits outlined below will outweigh these costs:</p>
+
+  <ul>
+    <li>Improved performance </li>
+    <li>Easier maintenance of any reports developed using this model</li>
+    <li>Better data quality</li>
+    <li>Faster development of future reports</li>
+    <li>Greater ability to implement more complex analytical requirements</li>
+  </ul>
+
+  <p>The above points improve the current situation for XXX but crucially also enable easier growth / development of the product in the future. </p>
+
+  <h2 id="risks">Risks</h2>
+
+  <h4 id="data-integration">Data integration</h4>
+
+  <p>A star schema model in Power BI requires a robust ETL/ELT process to be built and maintained to transform the OLTP model in the core system into an OLAP model in the datawarehouse which Power BI would then hook up to. This can be done in Azure Data Factory and SQL or we could potentially look at something like Azure Databricks.</p>
+
+  <h4 id="subject-matter-expertise">Subject Matter Expertise</h4>
+
+  <p>In order to ensure the ETL or ELT pipeline is set up correctly, we will need subject matter expertise to understand the data in the core product and be able to translate that into an analytic model involving accurate separation of descriptive data and measurable data. </p>
+
+  <h4 id="evolution-of-business">Evolution of business</h4>
+
+  <p>In order to implement near real-time analysis, the Power BI model will need to be in DirectQuery mode. A star schema is the optimal way to achieve this. </p>
+
+  <p>Additionally analysing historical performance and/or trend analysis lends itself to a star schema model. </p>
+
+  </div>
+
+  <h4 class="case-study">Reflection</h4>
+
+  <p>The team did eventually migrate to a star schema. Whether this document influenced that decision, I don't honestly know. What I do know is that this is how I think about architectural layers when no one is asking me.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <!-- <a href="the-bone-specialist.html">← Previous: The Bone Specialist</a> -->
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>

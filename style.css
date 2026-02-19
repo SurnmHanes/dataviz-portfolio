@@ -219,3 +219,38 @@ p:has(+ .tight-list) {
 .tight-paragraph {
   margin-top: 0
 }
+
+.archival-document {
+  border: 1px solid #e8e0d0;
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  margin: 2rem 0;
+  background-color: #fff9e8;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03)
+}
+
+.archival-document h2 {
+  margin-top: 0.5rem;
+  border-bottom: 1px solid #e8e0d0;
+  padding-bottom: 0.25 rem;
+}
+
+.document-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  color: #666;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed  #ddd;
+  padding-bottom: 0.5rem
+}
+.document-label-minor-text {
+  text-transform: none;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #868175;
+  margin-left: 0.25rem;
+    padding-bottom: 0.5rem
+}
