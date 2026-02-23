@@ -1,0 +1,52 @@
+
+When updating a blog post make sure the following have been changed:
+- the main pic
+- the navigation at the bottom
+- the navigation at the bottom for the previous post
+- the page listing all blog posts
+- the home page listing the 3 most recent posts 
+
+
+Core Technology:        #PowerBI #DAX #SQL
+Role & Craft:           #DataArchitecture #BusinessIntelligence #BIDeveloper #DataModeling
+Culture & Process:      #DataCulture #DataGovernance #TechDebt #DataStrategy
+Leadership:             #TechLeadership #DataTeams #DataEngineering
+
+PERFORMANCE VS SUBSTANCE
+    "Why do efficient, automated solutions often get rejected in favour of visible, manual struggle? A reflection on the 'Craftsperson's Curse' and the two realities of modern work."
+(Tag relevant topics: #SystemsThinking, #TechLeadership, #DataCulture, #QuietQuitting, #DeepWork)
+
+
+
+shallow thinking
+reactive planning
+zero systems awareness
+gaslighting
+short-term fixes
+zero self awareness
+
+This is temporary and I'm extracting insights for my next level. I'm Joey Tribbiani, this is not my fight.
+
+
+
+The £500k spike
+"Ever seen a 'spike' deliver six options with zero analysis? That's the '3V Culture' (Vibes, Visibility, Velocity) in action. It doesn't de-risk projects; it creates £500k emergencies.
+My latest post breaks down why this happens and provides a simple, four-part framework to turn spikes from theatre into your best planning tool.
+#TechLeadership #SoftwareDevelopment #DecisionMaking #Agile #DataCulture #ProductManagement"
+
+
+THe FIve Whys
+We spend so much time learning how to build. But the most powerful question is "why?"
+My new post breaks down "The What Factory"—the culture that rewards activity over outcomes—and how to fix it with one simple discipline.
+#BusinessIntelligence #ProductManagement #DataStrategy #Leadership #TechCulture
+
+When My Team Vetoed A tool
+The most dangerous words in any data team: "It's an unwritten rule."
+
+Unwritten rules aren't principles. They're just fear that never got challenged.
+
+My latest post on why tribal knowledge kills curiosity—and how to replace it with something better.
+
+[link]
+
+#DataCulture #PowerBI #TechLeadership #DataCommunity #ContinuousLearning
