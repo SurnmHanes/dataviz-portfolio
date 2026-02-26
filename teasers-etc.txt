@@ -6,6 +6,8 @@ When updating a blog post make sure the following have been changed:
 - the page listing all blog posts
 - the home page listing the 3 most recent posts 
 
+- divide by 215 to get "time to read" metric on Blueprints 
+
 
 Core Technology:        #PowerBI #DAX #SQL
 Role & Craft:           #DataArchitecture #BusinessIntelligence #BIDeveloper #DataModeling
@@ -50,3 +52,15 @@ My latest post on why tribal knowledge kills curiosity—and how to replace it w
 [link]
 
 #DataCulture #PowerBI #TechLeadership #DataCommunity #ContinuousLearning
+
+Blueprint 2 - Approach to Switching Fees
+
+"A source system change forced us to rethink our entire commission data pipeline.
+
+Three options. Clear trade-offs. And a reminder that sometimes the best solution isn't the simplest—it's the one that doesn't paint you into a corner later.
+
+New blueprint: How to handle a foundational data model change without breaking everything.
+
+[link]
+
+#DataEngineering #ETL #DataArchitecture #Analytics #TechDebt

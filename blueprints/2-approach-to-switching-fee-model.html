@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Approach To Switching Fee Model</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Approach To Switching Fee Model</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>The fee based reporting we had in Analytics was based on the fee model in Core. However the Core team were looking at a new process which would make fee and commission administration easier in Core.</p>
+
+  <p>The plan was that this new approach would replace the existing method and so the reports in Analytics would need to be addressed to allow for this transition so that they did not break.</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 5 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Background</h2>
+  
+  <p>From a user interface point of view  the commission information in Core is currently stored as fields in the Fee table.</p>
+    
+  <p>So at the moment, if we have a commission which is split between consultants we have to complete different fields in Core. Each consultant has their own fields which need completing:</p>
+
+  <figure><img src='../images/2-approach-to-fee-model-1.png' alt='Commission Split in Core' style='max-width:100%; height:auto;'><figcaption>Example of split commission in Core</figcaption></figure>
+    
+  <p>What this results in from a back-end perspective is a Fees table with different columns for the different amounts:</p>
+
+  <figure><img src='../images/2-approach-to-fee-model-2.png' alt='Table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Table demonstrating data structure for commissions</figcaption></figure>
+
+  <p>In analytics in general, aggregation is done by specifying a column. However with the above tabular structure, we cannot get the total commission for the fee by aggregating a single column.</p>
+
+  <p>We also cannot easily get simple analysis such as the <i>total commission by consultant</i> because the consultant name information is also being stored in multiple columns rather than a single 'Name' column.</p>
+
+  <p>To accommodate this, we have a step in the SQL ETL process which unpivots this data so the names and amounts are in the more usual analytical tabular format:</p>
+
+  <figure><img src='../images/2-approach-to-fee-model-3.png' alt='Analytical table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Data structure needed for analytics</figcaption></figure>
+    
+  <p>In the new world with the new process in Core, this additional wrangling in the back-end will no longer need to be done.</p>
+    
+  <p>Instead, the new commission lines grid allows the user to enter the data in this format in Core so none of the transformation work has to be done in the ETL anymore.</p>
+
+  <figure><img src='../images/2-approach-to-fee-model-4.png' alt='Core table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Revised Data structure in Core</figcaption></figure>
+
+  <p>This new method to record commission is to be the method going forward. At some point the old method of using fields in the Fee entity will be deprecated. How can we accommodate these Core changes in our Analytics processes?</p>
+
+  <h2>Investigation</h2>
+  <p>In broad terms, there are three options for how we deal with this change in Source:</p>
+
+  <ul style="list-style:none; padding:0">
+    <li>Option 1: Build a parallel ETL process</li> 
+    <li>Option 2: Extend the existing infrastructure to accommodate data from either Source entity</li>
+    <li>Option 3: Employ a dynamic approach</li>
+  </ul>
+
+  <h3>Option 1</h3>
+  <h4 class="tight-header">Overview</h4>
+  <p class="tight-paragraph">The idea here is that we could build a whole new extraction, transformation and load process in the "background" keeping the existing pipeline running as normal. And then switch over to the new one when the time is right and then retire the old way.</p>
+  
+  <h4 class="tight-header">Implementation Thoughts</h4>
+  <p class="tight-paragraph">Add another table to the Data Dictionary.</p>
+  <p>Create new staging table to house the source data extracted from the new source entity.</p>
+  <p>Create new transformation stored procedure and fact table.</p>
+  <p>Add new view to report schema.</p>
+  
+  <h4 class="tight-header">Pros</h4>
+  <p class="tight-paragraph">No need to break anything current.</p>
+  <p>Can easily be tested / validated before going "live".</p>
+  <p>If anything is broken or needs to be reworked can be done in the background.</p>
+
+  <h4 class="tight-header">Cons</h4>
+  <p class="tight-paragraph">Extra effort to create a brand new process.</p>
+  <p>More resource usage and storage while both pipelines are still in use. Would have a cost implication.</p>
+  <p>Power BI would also need re-pointing to the new view in the report schema on go-live.</p>
+
+  <h3>Option 2</h3>
+  <h4 class="tight-header">Overview</h4>
+  <p class="tight-paragraph">Similar to option 1, this time however we amend the current extraction to the staging layer to also include the new source table.</p>
+
+  <h4 class="tight-header">Implementation Thoughts</h4>
+  <p class="tight-paragraph">Either modify the existing FetchXML using joins or add an additional FetchXML query and then append / merge the data in staging.</p>
+  <p>Or keep the extraction separate and create a new stored procedure to transform the data and the merge / append the data later downstream during the load process into the Fact table.</p>
+  <p>Once the old way has been deprecated, could then remove the logic which exclusively deals with this extraction and transformation.</p>
+
+  
+  <h4 class="tight-header">Pros</h4>
+  <p class="tight-paragraph">No requirement to maintain two separate pipelines as in Option 1.</p>
+    
+  <h4 class="tight-header">Cons</h4>
+  <p class="tight-paragraph">Could be complex to re-write the FetchXML, stored procedures etc. to "merge" the two sources of data into 1 table.</p>
+  <p>What would testing look like?</p>
+  <p>If there are any issues with this, it would be a lot harder than Option 1 to revert back.</p>
+
+
+  <h3>Option 3</h3>
+  <h4 class="tight-header">Overview</h4>
+  <p class="tight-paragraph">This would involve a config setting (in the data dictionary) which confirms which is the current source table for extraction. 
+    
+  <h4 class="tight-header">Implementation Thoughts</h4>
+  <p class="tight-paragraph">As part of the deployment, the extraction would only run the FetchXML query based on the row which confirms which source tables have the isCurrent flag set to Yes.</p>
+
+  <p>Then the stored procedure which creates the staging table would create this staging table based on the IsCurrent flag and the associated FetchXML query and target mapping.</p>
+
+  <h4 class="tight-header">Pros</h4>
+  <p class="tight-paragraph">No requirement to change the downstream processes.</p>
+  <p>Scalable for the case if/when another source table changes.</p>
+
+  <h4 class="tight-header">Cons</h4>
+  <p class="tight-paragraph">Complex to accomplish.</p>
+  <p>Is this over-engineering for this one-off situation?</p>
+
+  <h2>Outstanding Questions</h2>
+  <p>Do we need to consider the history records in the three options above? We don't do any reporting on history currently but how easy would analytical reporting be based on historical records in these three cases?</p>
+
+  <h2>Future Enrichments</h2>
+  <p>The new source data in core has a number of fields which were not in the original source table. This new data opens up possibilities we didn't have previously. These are areas we could now explore, if the business has the need.<p>
+
+  <h4 class="tight-header">The commission role</h4>
+  <p class="tight-paragraph">The start date and end date for which any split / commission is applicable.</p>
+
+  <p>With these new fields we could potentially provide analysis in the following areas:</p>
+
+  <h5 class="tight-header">1. Commission cash flow forecasting</h5>
+  <p class="tight-paragraph">The ability to predict when and how much commission amounts will be paid out.</p>
+
+  <h5 class="tight-header">2. Commission Date vs Fee Date</h5>
+  <p class="tight-paragraph">Take a look at what the gap is between when the fee is earned and when the related commission is paid.</p>
+
+  <h5 class="tight-header">3. Commission by role</h5>
+  <p class="tight-paragraph">Which roles are driving the most value?</p>
+
+  <h5 class="tight-header">4. Role behaviour based on commission type</h5>
+  <p class="tight-paragraph">Do consultants (or other roles) behave differently depending on whether the commission is a flat amount or percentage based? Does the client involved affect behaviour?</p>
+
+  <h5 class="tight-header">5. Commission trends</h5>
+  <p class="tight-paragraph">Which periods see more commission?</p>
+
+  <h5 class="tight-header">6. Commission splits</h5>
+  <p class="tight-paragraph">Where multiple roles are involved, can we derive any insights? Is there a pattern to the splits?</p>
+
+  <h5 class="tight-header">7. Experience</h5>
+  <p class="tight-paragraph">Does experience play a part in the amount of commission a consultant will earn? Do more experienced roles earn larger commissions?</p>
+
+  <h2>Additional Information</h2>
+  <p class="tight-paragraph">For options 2 and 3, the current Power BI report would be unaffected because the proposed changes would happen upstream. The data being ingested into Power BI would remain in the same structure as now.</p>      
+  
+
+  </div>
+
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The old way of doing things was turned off in core with the customers being informed well ahead of time. They were also trained on the new way of submitting commissions. The data team chose to do option 2 with a new extraction and stored procedure relating to the new table.</p>
+  
+  <p>As the old way was deprecated, there was no requirement to append both tables in the warehouse. The new data flow simply replaced the old. Power BI was unaffected.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="1-star-schema-proposal.html">← Previous: Star Schema Proposal</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
