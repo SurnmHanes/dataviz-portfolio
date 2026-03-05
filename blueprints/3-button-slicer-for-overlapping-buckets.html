@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Button Slicer For Overlapping Buckets</title>
+  <link rel="stylesheet" href="../style.css" />
+    <style>
+    h2 {
+      color: #0f315c
+    }
+    h3 {
+      color: #0c8dff
+    }
+    .archival-document h4 {
+      /* color: #4dc8ff */
+      color: #115097
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 14px;
+      color: #304d6d
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Button Slicer For Overlapping Buckets</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>The team did some previous development work where they needed to switch the view of the data between three different options. But one of the options was the aggregate of the first two options and it was concluded that Power BI slicers could not be used in this scenario. This belief stemmed from the assumption slicers can only represent mutually exclusive options.</p>
+
+  <p>However it has subsequently come to light that a method could work. So a spike was created to investigate the technical feasibility of this approach as, if successful, it could be valuable in several areas of the reporting suite.</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 5 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Background</h2>
+  
+  <p>Button slicers in Power BI allow the user to filter the data into separate "bins" based on the distinct values in the underlying column used in the slicer.</p>
+    
+  <p>So, for example, if we use a Country column, a button slicer will allow us to filter by UK, USA, Germany etc.</p>
+
+  <p>The investigation was to discover if this mechanism or something similar could allow the user to filter into overlapping buckets. So using our example, could we also have a button <i>in the same slicer</i> that allows us to view the data for Europe as a whole as well as UK, USA, Germany etc.?</p>
+
+  <h2>Scope</h2>
+  <p>Due to time constraints I only considered button slicers as the vehicle to do this. I would imagine there may also be other options available other than button slicers.</p>
+  
+  <h2>Suggested Approach</h2>
+  <h3>Method 1</h3>
+  <h4>a) Create a disconnected table</h4>
+  
+  <p>Create a calculated table with one column listing all of the options that you wish to see in the slicer.</p>
+
+  <p>This could be done in SQL, Power Query or DAX. Image shows it being done in DAX: </p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-1.png' alt='DAX calculated table showing option' style='max-width:100%; height:auto;'><figcaption>Example of a disconnected table with overlapping bucket options</figcaption></figure>
+
+  <h4>b) Use this column as the basis for the slicer</h4>
+
+  <h4>c) Replace measures in the visual</h4>
+
+  <p>In the visual(s) you wish to be influenced by this slicer, you remove the existing measure and replace it with a new measure.</p>
+
+  <p>This new measure captures the user selection and carries out a different calculation dependent on the selection made:</p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-2.png' alt='DAX control flow measure using selection made' style='max-width:100%; height:auto;'><figcaption>DAX control flow measure running different code dependent on user selection </figcaption></figure>
+
+  <h3>Method 2</h3>
+  <h4>a) Create 3 calculated columns in the source table</h4>
+
+  <p>So in the example we are using Status from the dimension table so we would instead create additional columns in this dimension table.</p>
+
+  <p>The first calculated column would group the non-overlapping elements (the child elements) we want in the slicer.</p>
+  
+  <p>We would then create a second calculated column which would group the child elements and become further option(s) in the slicer (the parent element(s)).</p>
+  
+  <p>Finally we create a third column which is the concatenation of these two columns. This work can be done in SQL, Power Query or DAX. </p>
+
+  <p>Using the Lost Revenue example</p>
+  <p>Calculated Column 1 "rolls up" all the different cancelled statuses into one status called Non-Starter:</p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-3.png' alt='Grouping cancelled statuses' style='max-width:100%; height:auto;'><figcaption>Grouping cancelled statuses into one Non-Starter status</figcaption></figure>
+
+  <p>and the different terminated statuses into one status called Early Terminations:</p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-4.png' alt='Grouping terminated statuses' style='max-width:100%; height:auto;'><figcaption>Grouping terminated statuses into one Early Termination status</figcaption></figure> 
+
+  <p>Calculated Column 2 called Status Combined then adds the overlapping / parent bucket. In this example, Non-Starter and Early Terminations fall into All. Anything else is ignored: </p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-5.png' alt='Adding Overlapping Bucket Option' style='max-width:100%; height:auto;'><figcaption>Adding the Overlapping / Parent Option</figcaption></figure> 
+
+  <p>Calculated Column 3 is the concatenation of these two columns and will serve as the key column when we create the slicer table and the relationship back to this table:</p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-6.png' alt='Adding Key Column To Dimension Table' style='max-width:100%; height:auto;'><figcaption>Adding Key Column To Dimension Table</figcaption></figure> 
+
+  <h4>b) Create a separate slicer table</h4>
+
+  <p>The slicer table is made up of 2 columns. The first column contains all the possible values of both the StatusGrouped and Status Combined columns. It also has a second column which is the StatusLink column:</p>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-7.png' alt='Adding Slicer Table' style='max-width:100%; height:auto;'><figcaption>Adding Slicer Table</figcaption></figure> 
+  
+  <h4>c) Create a relationship between the StatusLink column in the slicer table and StatusLink in the dimension table (many to many).</h4>
+
+  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-8.png' alt='Creating the Relationship between tables' style='max-width:100%; height:auto;'><figcaption>Creating the relationship between tables</figcaption></figure>  
+
+  <p>(This approach introduces a many-many relationship which should be tested carefully for performance and filter propagation behaviour in larger models.)</p>
+  
+  <h4>d) And use the Status field in the button slicer</h4>
+
+  <h2>Final Thoughts</h2>
+  <p>Method 1 is the more straightforward way of doing it. However it is more manual. The rows for the disconnected table need to be hardcoded and then in the Lost Revenue Amount measure either new measures need to be brought in (if they already exist in the model) or created (if they don't). (Remember that each user selection carries out a different calculation which may or may not already exist in the model). </p>
+
+  <p>You also need to replace the measure in each visual with this new Lost Revenue Amount which, depending on the number of visuals/ cards etc which need this slicer may not be a trivial amount of work.</p>
+
+  <p>Method 2 is manual too in terms of deciding the grouping for the statuses (or whatever the underlying field is to be). In contrast to method 1, it uses the original measures so no visuals need to be altered. It also has a big advantage that once it is decided how StatusGrouped and Status Combined are to be populated, the rest of the work (the Slicer Link column, the Slicer table, the relationship between Slicer and dimPlacement, the slicer in the UI and the visual) will all automatically update.</p>
+
+  <p>In summary, if this a one and done situation, method 1 would be the best approach. Yes it's manual and there is a fair amount of work to do in terms of creating the correct calculations based on user selection and then replacing the measures in the visuals that want to be affected by the slicer. But, assuming nothing needs to change going forward, it's perfectly achievable.</p>
+
+  <p>Method 2, although more complex to set up, offers a bit more robustness should the groupings need to be altered e.g. more subgroupings or slightly different groupings and/or the number of visuals and calculations is large.</p>
+
+  <p>One thing to note is that calculated columns and tables are generated after the data has been imported / refreshed and so increasing the number of these calculations will increase the load / refresh times. Another reason to move these calculations to SQL.</p>
+
+  </div>
+
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>Nothing. The solution was never implemented. The team continued to operate under the belief that overlapping buckets aren't possible in Power BI slicers.</p>
+  
+  <p>The spike was completed and the options clearly documented. The pattern was proven but without a champion to carry it forward, it remained an interesting idea in the archive.</p>
+
+  <p>Sometimes the hardest problem isn't technical. It's organisational.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="2-approach-to-switching-fee-model.html">← Previous: Approach To Switching Fee Model</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
