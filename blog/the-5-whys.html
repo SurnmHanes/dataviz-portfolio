@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Five Whys</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+  </header>
+  <main>
+
+    <h1>The Five Whys</h1>
+
+        <figure><img src='../images/TheFiveWhysMainPic.jpg' alt='assorted question marks (dark and orange) on a dark grey background' style='max-width:100%; height:auto;'><figcaption>Photo by <a href="https://unsplash.com/@lausteff?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Laurin Steffens</a> on <a href="https://unsplash.com/photos/a-group-of-white-and-orange-objects-IVGZ6NsmyBI?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+      </figcaption></figure>
+      
+    <h2>The Two-Option Requirement</h2>
+    <p>Picture the scene: a ticket arrives into refinement stating that although what we have built is great (a bar chart) the user has suggested an improvement to be able to see the breakdown of the data per segment.</p>
+
+    <p>Product put forward two different options on the story: firstly, keep the visual as-is but add a tooltip showing the breakdown per segment. Or as an alternative changing the visual to a stacked bar with each stack representing the different segments.</p>
+
+    <figure><img src='../images/TheFiveWhys-2.png' alt='Bar chart with tooltip for colours' style='max-width:100%; height:auto;'><figcaption>Option One - Tooltip showing the sales per colour that make up the total category sales</figcaption></figure>
+
+    <figure><img src='../images/TheFiveWhys-3.png' alt='Stacked bar chart to include colours' style='max-width:100%; height:auto;'><figcaption>Option Two - Stacks showing the sales per colour that make up the total category sales</figcaption></figure>
+
+    <p>The team got to discussing the implementation of either option, how to do it and the relative ease of each one. I sat back and thought "in order to make this successful, we need to understand <i>why</i> the user wants this enhancement". That was missing from this story and discussion.</p>
+
+    <p>I would argue that the most powerful tool in a builder's kit isn't framework or language, it's the repeated discipline of asking one word: "why?".</p>
+
+    <p>I've worked with a number of development teams over the years and they have all been technically capable of producing amazing results. What separates great teams from good teams is the ability to step back and ask "why?" and seek to understand the user's motivations. Only by putting ourselves in the user's shoes can we deliver something truly amazing.</p>
+
+    <p>This is a combination of the <a href="customer-is-king.html">Customer is King</a> and <a href="keep-it-simple-but-for-who.html">Simple For Who?</a> paradigms in action.</p>
+
+    <h2>The "What" Factory</h2>
+
+    <p>In this type of factory, the "why" muscle atrophies. We have the task-doers who execute the literal what and don't concern themselves with the why.</p>
+
+    <p>On top of this we have the transactional manager who is driven by task completion. They see a route to the finish and don't stop to think about the why. In their eyes as long as the task is done, it has been a success.</p>
+
+    <p>This mentality results in a "what" factory. They produce activity, artefacts and a lot of "superficial" progress that often solves the wrong problem.</p>
+
+    <p>At a later time, the PO revisits this work and course corrects so the real problem is addressed. Nobody sees the correlation and the inefficiency of solving the problem twice.</p>
+
+    <h2>The Five Whys In Action</h2>
+
+    <p>This is about studying the request and getting to the heart of the user's need:</p>
+
+    <ol>
+      <li>Layer 1: The Original Ask - would like to see the split between the different segments for the visual.</li>
+      <li>Layer 2: Why is this needed?
+        <ul><li>To understand the composition of the work</li></ul>
+      </li>
+      <li>Layer 3: Continue asking, each answer becoming the next question
+        <ul>
+        <li>Why do they need to understand the composition of work?
+          <ul><li>To see if one type is dominating the work when it shouldn't</li></ul>
+        </li>
+        <li>Why do they need to know if one type is disproportionately high?
+          <ul><li>So they can investigate the root cause</li></ul>
+        </li>
+        <li>Why investigate the root cause?
+          <ul><li>So they can take targeted action to reduce future work of that type.</li></ul>
+        </li>
+        </ul>
+      </li>
+      <li>Layer 4: The Bedrock "Why"
+          <ul>
+            <li>Why reduce future work?
+              <ul><li>To improve team efficiency, product quality and predictability</li></ul>
+          </li>
+          </ul>
+      </li>  
+    </ol>
+
+    <p>This is the "Aha!" moment where the symptom (the requested feature) is separated from the disease (the lack of insight or visibility of the inefficiency). </p>
+    
+    <p>The user doesn't need a split visualisation. They need a system to trigger targeted intervention.</p>
+
+    <p>The "what" was a proposed solution. The "why" is the actual problem. Uncovering the why might lead you to a completely different report design for the user. The tooltip or stacked bar chart are now seen as possible components of this larger system.</p>
+
+    <h2>Why This Is A Lonely Gift</h2>
+
+    <p>This mindset is isolating. Most people focus on the "what" and activity feels good and is rewarded even if it is in the wrong direction. It's visible and so can be felt. Movement beats progress every time.</p>
+
+    <p>In certain cultures optimised for speed, you are not seen as adding rigour. Instead you are seen as "blocking progress" or "overcomplicating things". Completing a ticket is seen as the goal rather than building a high-quality data product.</p>
+
+    <p>The sadness is in seeing the system clearly but being powerless to change it. </p>
+
+    <p>The builder who asks 'why' in that refinement meeting isn't blocking progress. They're preventing next month's re-work.</p>
+
+    <h2>From Isolated Practice to Team Discipline</h2>
+
+    <p>The Five Whys approach is not a tool to use in silence. Instead it's a ritual to institutionalise in refinement. The goal is to make "Why?" the first question the <i>team</i> asks. Thereby shifting identity from task-doers to problem-solvers.</p>
+
+    <p>A practical way to implement this could be as follows:</p>
+
+    <h4 class="tight-header">The First Why Rule</h4>
+    <p>Propose a rule that no story can be scored or accepted into sprint until the ticket answers the first "Why?" in its description. This forces the initial thinking to Product, where it should reside.</p>
+
+    <h4 class="tight-header">The Five Minute Drill</h4>
+    <p>If in refinement a solution is proposed early, anyone can instigate a five-minute drill to explore the five whys. To ensure that the team is not sidetracked by the first solutions and other avenues are explored thoroughly.</p>
+
+    <p>These two behaviours move your team from a what factory to a why engine.</p>
+    
+    <h2>Velocity Through Clarity</h2>
+
+    <p>The counter argument to this approach is that it slows progress and is negative.</p>
+
+    <p>My read is that rigour (and this is what this is) is not the enemy of velocity. It is the precursor. The time spent asking why before putting a spade in the ground saves order of magnitudes more time in not building, testing, deploying and later re-working the wrong thing.</p>
+
+    <p>It is a lot easier and cleaner to pivot and change direction before any foundations have been laid than during.</p>
+
+    <p>This is a form of seniority and leadership. It is absolutely not about being a blocker or being difficult. Instead it's firstly caring for your team's energy and morale long-term (not just today) and secondly caring for the data product's quality and integrity.</p>
+
+    <p>The Five Whys is like pausing to look at a map and plotting a route <i>before</i> a long drive. The "What Factory" is the culture that celebrates pressing the accelerator immediately even if it's in the wrong direction. Which one arrives at the correct destination first? And having expended less energy?</p>
+
+    <p>The next time you're handed a "what", take a pause and ask "why?". Then ask it again. The answer might surprise you and save you months of wasted effort in the wrong direction.</p>
+
+    <p>The loneliness you might feel is the distance between you and a What Factory. But the clarity you'll find is the first step towards building a better data product.</p>
+
+    </section>
+    <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="the-£500k-spike.html">← Previous: The £500K Spike</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+   </div>
+    <hr class="section-divider">
+
+    </main>
+    <footer>
+      <p>© Neil Hanes - Hand-coded, with love</p>
+    </footer>
+  </body>
+  </html>
+
