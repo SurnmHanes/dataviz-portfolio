@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple Workspaces in the Same Tenant</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    h2 {
+      color: #545e75
+    }
+    h3 {
+      color: #63adf2
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 14px;
+      color: #304d6d
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Multiple Workspaces in the Same Tenant</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>We deploy our Power BI reports to various different customers. We had built out this infrastructure on the belief that a single customer only had one Production Power BI workspace.</p>
+
+  <p>It was discovered that some customers have multiple production workspaces and so the investigation was to understand whether this would have any impact on how we deploy. And if so, what are the details?</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Problem</h2>
+  
+  <p>The deployment infrastructure for Analytics was based on the assumption that the customer only ever has one Production environment. It has come to light recently that this is not always the case and some customers have more than one Production environment.</p>
+    
+  <p>How do we deal with this from a deployment perspective? We have dealt recently with a similar scenario involving the two demo environments for UK and US so could we learn anything from that?</p>
+
+  <p>Specifically the questions raised based on this are as follows:</p>
+
+  <ul>
+    <li>If we have one Power BI app for multiple environments what, if any, impact is there on app IDs or links to core records from the reports?</li>
+    <li>How does the sitemap work in core? How does the Power BI app get embedded? Would multiple production environments cause a problem?</li>
+  </ul>
+
+  <h2>Backend Caveat</h2>
+  <p>It was agreed that this was not the area of focus for this spike. In Azure Dev Ops, the releases use variables which are hardcoded prior to set up and so can be changed to the correct environment on a case by case basis. </p>
+
+  <h2>Power BI Deployment</h2>
+  <p>The customer would have one Power BI tenancy but within that tenancy what is the art of the possible?</p>
+
+  <h3 class="tight-header">Power BI Workspaces</h3>
+  <p class="tight-paragraph">One tenancy can have multiple workspaces which can be thought of as folders containing objects such as reports, apps, dashboards etc. ringfenced from other workspaces. Each workspace <b>must</b> have a unique name across the tenancy.<p>
+
+  <p>A workspace can only have one Power BI app and an app can only contain objects from within the workspace it resides in.</p>
+
+  <p>It is possible to have multiple apps in the tenancy (each one in a different workspace). It is equally possible to have two apps with the same name in the situation that they exist in different workspaces.</p>
+
+  <p>Contrary to the backend, it is not the name of these objects which is used to lookup and find the correct object. Instead it is their IDs which are used when interacting with the Power BI API and also used to create the URLs where the reports are hosted in the Power BI service. We use AppID, WorkspaceID and ReportID above all else. So even in the instance that apps are named the same their AppIDs will differ.</p>
+
+  <h3 class="tight-header">Core Embedding</h3>
+  
+  <p class="tight-paragraph">This works because when a user clicks on the Analytics button, the Javascript creates the Power BI app URL on the fly using reportID and AppID which it obtains from one of the tables in Core (environmentvariablevalue). The relevant IDs are entered as an array into the value column of this table and then the relevant value(s) parsed / isolated when the button is clicked.</p>
+
+  <p>(Technically the Javascript also takes note of the context of the current page where the button was clicked and this is passed as a filter when opening the report. This is how / why the Client report opens restricted to the client which we were looking at in Core when we clicked the button.)</p>
+
+  <h2>Summary</h2>
+
+  <p>I feel like the extra technical implementation and maintenance required to do something clever in combining environments within workspaces and/or apps would probably outweigh the potential benefits from doing this work. Instead I think this would work best and most cleanly and clearly if each production environment for a given customer is treated almost as a separate customer deployment.</p>
+
+  <h3 class="tight-header">Suggested Workflow</h3>
+
+  <p class="tight-paragraph">1) We would create different workspaces in the same Power BI tenancy for each production environment. They would be uniquely named.</p>
+
+  <p>2) The ADF environments would also be kept separate and the variables for workspace names / URL would be set differently for each instance and point to the relevant workspace from 1).</p>
+
+  <p>3) Deployments to these various workspaces would be via the relatively new Powershell script (so updating the reports would be automatic).</p>
+
+  <p>4) Each of these workspaces would have its own uniquely named Power BI app. As now, these would need to be manually updated during deployments to reflect any changes in the underlying reports.</p>
+
+  <p>5) As now, access to each of these apps would be via audiences (and RLS). Even if a given user needs access to more than one of these apps, I think this can be done and having the apps uniquely named will help that user identify what environment they are looking at.</p>
+
+  <h3 class="tight-header">Related Questions</h3>
+
+  <h5>What impacts are there on appIDs and links to records in Core if one app for multiple environments?</h5>
+  <p class="tight-paragraph">The key is that an app can only contain content from the same workspace that it has been created in. Given this constraint, the only way that one app can be used for multiple environments is if all the reports for those multiple environments exist in one workspace. I wouldn't recommend this as it would be a maintenance headache. Combining reports connected to different production environments in one workspace would require duplicating reports within that workspace increasing complexity and risk.</p>
+
+  <h5>How does the site map work in Core?</h5>
+  <p class="tight-paragraph">In the environmentvariablevalue table in Core there is a column called value. This holds the array containing the IDs required for the relevant Power BI App and this information is obtained via Javascript when the Analytics button is pressed by the user.</p>
+
+  <h5>Can one Power BI tenant have 2 workspaces with the same name?</h5>
+  <p class="tight-paragraph">No. Workspaces <b>must</b> be uniquely named within a tenancy:</p>
+
+  <figure><img src='../images/4-multiple-workspaces-in-same-tenant-1.png' alt='Extract from Microsoft Learning' style='max-width:100%; height:auto'><figcaption>Microsoft Learning Extract confirming workspaces uniquely named</figcaption></figure> 
+
+  <h5>Can two Power BI apps have the same name? What happens if they're in the same environment?</h5>
+  <p class="tight-paragraph">Two Power BI apps within the same tenancy could technically be given the same name. The recommendation is to provide unique names to avoid user, developer and Power BI Admin confusion because developers and Power BI Admins (and potentially some users too) would have access to multiple workspaces and therefore multiple apps.</p>
+
+  <h5>Could we combine multiple production environments into one SQL database?</h5>
+  <p class="tight-paragraph">This might be an avenue worth exploring however does come with its own issues:</p>
+  <ul>
+    <li>Would the user-base want to see the data in the reports aggregated over all environments like this? If not, we could in theory use one SQL database to feed reports which are limited to one environment by filtering by environment in Power Query, assuming we have a way in SQL to identify which environment the records come from (we currently don't have this).</li>
+    <li>We would need to bring in the different environment base URLs so links to the core records would still work correctly from the reports.</li>
+    <li>Can we ensure uniqueness when appending records from different production environments into the database? Or would we break referential integrity when combining records from different environments?</li>
+    <li>Would there be storage / performance implications from having potentially a very large dataset in SQL and/or Power BI?</li>
+  </ul>
+
+  <p>If this was a route we were to go down, I think most of these questions might need spikes of their own in order to investigate feasibility.</p>
+
+ </div>
+
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>This was a proactive risk-avoidance spike. The team were satisfied that we could treat one customer with multiple production environments almost as separate customers so had a way forward.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="3-button-slicer-for-overlapping-buckets.html">← Previous: Button Slicer For Overlapping Buckets</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
