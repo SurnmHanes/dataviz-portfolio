@@ -254,3 +254,9 @@ p:has(+ .tight-list) {
   margin-left: 0.25rem;
     padding-bottom: 0.5rem
 }
+
+.linked-in {
+  margin-top: 10px;
+  font-size: 0.95em;
+  color: #bd9013;
+}
