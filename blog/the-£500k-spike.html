@@ -26,97 +26,107 @@
 
       
     <h2>Introduction</h2>
-    <p>The point of a spike in software development is to investigate a problem and come up with potential solutions while evaluating the costs and benefits of the different options. A recommended path forward should also be included.</p>
+    <p>The purpose of a spike in software development is to explore uncertainty. They exist to investigate a problem, evaluate possible approaches and return with a recommendation grounded in trade-offs.</p>
 
-    <p>A spike investigation is supposed to de-risk a project. However, in some cultures that value harmony and visibility over substance and rigour, these investigations can become the very source of catastrophic risk.</p>
+    <p>Done well, a spike reduces risk. Done poorly, it can quietly introduce it.</p>
 
-    <p>What follows is the story of how a well-intentioned effort to explore six potential solutions instead created a costly emergency and the lessons every team must learn to avoid a similar fate.</p>
+    <p>One of the most common failure modes isn’t lack of effort, but lack of decision-ready thinking. What looks like thorough exploration on the surface can, in reality, defer the hardest part of the work: judgement.</p>
 
-    <h2>The Dysfunctional Spike</h2>
+    <p>This is how a spike designed to de-risk delivery can end up increasing cost, delay, and uncertainty.</p>
+
+    <h2>When Spikes Fall Short</h2>
 
     <h3>The Assignment</h3>
-    <p>The story starts with the Product Owner who wanted to see options for a new feature. The spike was assigned to one of the developers to explore possibilities and report back to the team.</p>
+    <p>A typical spike begins with a simple goal: explore options for a new feature or technical approach and report back to the team.</p>
+
+    <p>The expectation is not just to surface possibilities, but to enable a decision.</p>
 
     <h3>The Response</h3>
-    <p>The developer came back later in the sprint with an impressive-looking piece of work highlighting 6 different potential options. However the spike had <b>one fatal flaw:</b> there was no analysis of the pros and cons of any of the options. There was no consideration of the long-term maintenance of each of the options or how they would fit architecturally with the existing product. </p>
+    <p>Often, the output of these spikes appears strong at first glance. Multiple options are presented, sometimes with diagrams or examples, creating a clear sense of progress and activity.</p>
 
-    <p>Why did the developer do this? Why did they miss this flaw?</p>
-    
-    <p>Their behaviour was perfectly aligned to the culture. In a team culture that consciously or subconsciously incentivises the 3V's: vibes, visibility and velocity, the developer's effort was exactly what was required. They receive social credit for visible, rapid output and being able to say "look how many things I thought of!".</p>
+    <p>But there is a recurring gap:</p>
 
-    <h3>The Leadership Failure</h3>
-    <p>And indeed, their efforts were rewarded. On the face of it, it looked impressive, it looked thorough. Leadership, understandably lacking the required technical depth to spot the missing analysis, could only evaluate the performance of the work (its volume and visibility), not its substance.</p>
+    <p><b>a gap in evaluation.</b></p>
 
-    <h3>The Decision by Democracy Farce</h3>
-    <p>And, because nobody pushed back, one of the six options was chosen based on superficial appeal or the loudest voice."This one looks cool" rather than a data-backed decision based on costs and benefits of implementation.</p>
+    <p>Options are listed, but not compared. Trade-offs are implied, but not explicit. There is too little emphasis on long-term maintenance, scalability or alignment with the existing system.</p>
 
-    <p>The decision-making process was not a technical discussion regarding the pros and cons or the amount of effort required, it became a democratic vote based on visual appeal as there was nothing else to base it upon.</p>
+    <p>This isn’t typically due to lack of capability or effort. It is often a rational response to the environment. In teams where visibility, speed, and output are rewarded, producing multiple options signals productivity. Analysis, which is quieter and less visible, is easier to overlook.</p>
 
-    <p>The spike, intended to provide clarity and a data-based way forward, resulted in a decision made on vibes in an information vacuum.</p>
+    <h3>The Decision Gap</h3>
+    <p>From the outside, this kind of output can appear comprehensive. Without clearly defined evaluation criteria or explicit trade-offs, it becomes difficult to assess how decision-ready the work really is.</p>
 
-    <h3>The Inevitable Collision</h3>
+    <p>As a result, decisions tend to be guided by what is easiest to interpret: volume of output, clarity of presentation or intuitive appeal.</p>
 
-    <p>What happens next? If we play this forward for a minute, the decision will be turned into a story and will enter refinement.</p>
+    <h3>Decision-Making in a Vacuum</h3>
+    <p>When options are not evaluated against shared criteria, teams are left without a solid basis for comparison.</p>
 
-    <p>Once there, rather than be able to have a thoroughly vetted decision to refine, the team now has to actually draw conclusions and consider the pros and cons of the 6 options in real-time.</p>
+    <p>In this vacuum, decisions naturally drift toward preference, familiarity, or the most compelling narrative. What “feels right” can start to outweigh what has been rigorously assessed.</p>
 
-    <p>The team discussion goes nowhere. Any of the 6 options are viable but all of them make someone in the team uneasy because they can see the <b>undocumented</b> disadvantages. The story gets parked for another day and a further spike item is raised for re-investigation and further analysis of the problem.</p>
+    <p>The spike, intended to create clarity, ends up preserving ambiguity.</p>
 
-    <h2>Why It's a £500,000 Mistake</h2>
+    <h3>The Inevitable Rework</h3>
 
-    <p>The wasted spike has several different costs associated to it:</p>
+    <p>The consequences of this only become visible later. During refinement or implementation, the unanswered questions resurface:</p>
+
+    <ul>
+        <li>What are the trade-offs between these options?</li>
+        <li>What is the effort required for each option?</li>
+        <li>Which approach is easiest to maintain?</li>
+        <li>How does this align with the broader system?</li>
+    </ul>
+
+    <p>At this stage, the team is forced to revisit the analysis that should have been completed earlier. Work slows, confidence drops, and additional investigation is required.</p>
+
+    <p>The spike hasn’t removed uncertainty. Instead uncertainty has been deferred to a later point in time.</p>
+
+    <h2>Why It Becomes Expensive</h2>
+
+    <p>The cost of a weak spike is rarely isolated to the initial effort. It compounds across the delivery process:</p>
 
     <h4 class="tight-header">Direct Costs</h4>
-    <p class="tight-paragraph">These are costs that are fairly obvious: the salary for the spike and effort of creating the story, the salaries for the refinement meeting and then the duplication of these for the re-analysis.</p>
+    <p class="tight-paragraph">The salary for the spike and the effort of creating the subsequent story. The salaries for the refinement session and the duplication of these for the re-analysis.</p>
 
     <h4 class="tight-header">Opportunity Costs</h4>
-    <p class="tight-paragraph">The time wasted in discussing this item during refinement which could have been used to bring in another item into sprint.</p>
+    <p class="tight-paragraph">Time spent revisiting unresolved questions instead of progressing other valuable work.</p>
 
     <h4 class="tight-header">Costs of Delay</h4>
-    <p class="tight-paragraph">The feature's launch will now be delayed. This postpones the moment it can start generating value, solving a user pain point or capturing revenue. In a fast-moving market, the value of a feature is often tied to <i>when</i> it ships, not just <i>what</i> it is.</p>
+    <p class="tight-paragraph">The feature's launch will be delayed. This postpones the moment it can start generating value, solving a user pain point or capturing revenue. In a fast-moving market, the value of a feature is often tied to <i>when</i> it ships, not just <i>what</i> it is.</p>
 
     <h4 class="tight-header">Trust Cost</h4>
-    <p class="tight-paragraph">Related to delay costs, if this feature was marketed or promised to (a subgroup of) customers, the delay will erode stakeholder / customer confidence in the team's ability to deliver.</p>
+    <p class="tight-paragraph">If the feature was marketed or promised to (a subset of) customers, the delay will erode stakeholder / customer confidence in the team's ability to deliver.</p>
 
     <h4 class="tight-header">Morale Cost</h4>
-    <p class="tight-paragraph">The frustration cost for the team who now have to re-look at the area again and clean up a predictable mess.</p>
+    <p class="tight-paragraph">The cost of frustration for the team members who have to spend time covering the ground again and re-exploring the uncertainty.</p>
 
     <h2>The Antidote</h2>
 
-    <p>Remember what a spike is and why we use them. They are there to investigate unknowns and to return with a <i>decision-ready recommendation</i> based on a consideration of the advantages and disadvantages of a number of options.</p>
+    <p>A spike should aim to investigate unknowns and to return with a <i>decision-ready recommendation</i>, not just a set of possibilities.</p>
 
-    <p>A spike does not exist to diagnose the problem and stop there.</p>
+    <p>A simple framework can help:</p>
 
-    <p>A simple framework I try to follow is as follows.</p>
+    <h4 class="tight-header">1. Define decision-making criteria upfront</h4>
+    <p>What are we basing our recommendation on? Is it the time it takes to develop and test? Is it the cost of the proposed solution in terms of licensing perhaps? Is it how easy the solution is to maintain going forward? Or how easy it is to scale?</p>
 
-    <h4 class="tight-header">1. Define the decision-making criteria upfront</h4>
-    <p>What are we basing our recommendation on? Is it the time it takes to dev, to test? Is it the cost of the proposed solution in terms of licensing, for example? Is it how easy the solution is to maintain? Or how easy it is to scale? </p>
-
-    <p>Without any baselines for comparison, we can't reasonably compare different options.</p>
-
-    <h4 class="tight-header">2. Evaluate each option against the defined criteria</h4>
-
+    <h4 class="tight-header">2. Evaluate each option against those criteria</h4>
     <p>A simple table showing the options on rows and the criteria on columns would suffice. (I tend to write out mine in paragraphs although I am trying to get better at the tabular approach.)</p>
 
-    <h4 class="tight-header">3. A clear recommendation</h4>
-
+    <h4 class="tight-header">3. Provide a clear recommendation</h4>
     <p>Having evaluated all the options, a spike should include a clear, unambiguous recommendation that the team can take forward.</p>
 
-    <h4 class="tight-header">4. Explicitly document the trade-offs</h4>
-
+    <h4 class="tight-header">4. Make trade-offs explicit</h4>
     <p>No option will be perfect. A recommendation should be a fair assessment of the option chosen <b>including its drawbacks.</b></p>
-    
-    <p>This framework will only work in a culture where the leadership rewards <b>rigorous thinking</b> rather than long lists of options that look like busy work.</p>
+
+    <p>This framework will only work in a culture where the leadership rewards <b>rigorous thinking</b> rather than long lists of options without clear evaluation.</p>
 
     <h2>Stop Performing, Start Deciding</h2>
 
-    <p>A culture that allows substance-free work is a culture that is building on sand. The emergencies that appear subsequently did not "come from nowhere". They are predictable and self-inflicted.</p>
+    <p>Over time, if substance-light work becomes the norm, teams can end up building on sand. The emergencies that appear subsequently did not "come from nowhere". They are often predictable and in some cases avoidable.</p>
 
-    <p>The mark of a professional team is not in avoiding spikes. It's in conducting them in such a detailed, well-scoped, rigorous manner that it makes the subsequent work <b>faster</b> and <b>more predictable.</b></p>
+    <p>One characteristic of a professional team is not in avoiding spikes. It's in conducting them in such a detailed, well-scoped, rigorous manner that it makes the subsequent work <b>faster</b> and <b>more predictable.</b></p>
 
-    <p>Think of spikes as the building block for the development work that comes later. Your team's output is only as good as the quality of these investigation pieces. A good amount of upfront effort will prevent any sand from shifting later in the development. </p>
-    
-    <p>Invest in the craft of thinking and you'll stop creating the emergencies you're hired to solve. </p>
+    <p>Think of spikes as the building block for the development work that comes later. Your team's output is only as good as the quality of these investigations. A good amount of upfront effort will prevent any sand from shifting later in the development.</p>
+
+    <p>Invest in the craft of decision-making, and many of the emergencies that follow simply never happen.</p>
 
     </section>
     <br>
