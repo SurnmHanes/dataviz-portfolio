@@ -10,11 +10,10 @@
   <header>
     <nav>
       <a href="../index.html">Home</a> |
-      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Blueprints</a> |
       <a href="../about.html">About</a> |
       <a href="../how-i-work.html">How I Work</a> |
       <a href="../operating-manual.html">Operating Manual</a> |
-      <a href="../blueprints.html">Blueprints</a> |
       <a href="../fun.html">Just For Fun</a>
     </nav>
     <h1>Star Schema Proposal</h1>
@@ -49,7 +48,7 @@
       
   <p>Example of an OLTP model: </p>
       
-  <figure><img src='../images/OLTPmodel.png' alt='OLTP ER Diagram' style='max-width:100%; height:auto;'><figcaption>OLTP Data Structure</figcaption></figure>
+  <figure><img src='../blueprint_images/OLTPmodel.png' alt='OLTP ER Diagram' style='max-width:100%; height:auto;'><figcaption>OLTP Data Structure</figcaption></figure>
       
   <p>The Core product has an OLTP data model structure. These kinds of models are optimised for transactions as we expect to be writing new transactions on a regular basis (be that every minute, hour, day etc.) </p>
     
@@ -57,7 +56,7 @@
     
   <p> On the other hand an OLAP model is structured to be fast for read operations. Insertion of new or updating of existing data never needs to happen when looking at analysis and so OLTP is not a good fit.</p>
     
-  <figure><img src='../images/OLAPmodel.png' alt='OLAP Diagram' style='max-width:100%; height:auto;'><figcaption>OLAP Data Structure</figcaption></figure>
+  <figure><img src='../blueprint_images/OLAPmodel.png' alt='OLAP Diagram' style='max-width:100%; height:auto;'><figcaption>OLAP Data Structure</figcaption></figure>
     
   <p> OLAP models reduce the number of joins and tables by duplicating data across the whole model. This reduces the number of tables the queries have to traverse to get all the required pieces of data. It also enables fast aggregation and filtering of data which is useful when slicing, dicing, drilling down or rolling up.</p>
     
@@ -66,7 +65,7 @@
   <h4 id="what-is-a-star-schema-">What is a star schema?</h4>
     
 
-  <figure><img src='../images/star-schema-example1.png' alt='Star Schema Diagram' style='max-width:100%; height:auto;'><figcaption>Star Schema Data Structure</figcaption></figure>
+  <figure><img src='../blueprint_images/star-schema-example1.png' alt='Star Schema Diagram' style='max-width:100%; height:auto;'><figcaption>Star Schema Data Structure</figcaption></figure>
 
   <p> The star schema has become the standard when mapping multi dimensional data structures for analytical purposes. A star schema is an OLAP data structure where the data tables are arranged into two categories:</p>
 

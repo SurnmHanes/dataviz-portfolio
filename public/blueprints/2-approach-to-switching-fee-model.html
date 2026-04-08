@@ -10,11 +10,10 @@
   <header>
     <nav>
       <a href="../index.html">Home</a> |
-      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Blueprints</a> |
       <a href="../about.html">About</a> |
       <a href="../how-i-work.html">How I Work</a> |
       <a href="../operating-manual.html">Operating Manual</a> |
-      <a href="../blueprints.html">Blueprints</a> |
       <a href="../fun.html">Just For Fun</a>
     </nav>
     <h1>Approach To Switching Fee Model</h1>
@@ -39,11 +38,11 @@
     
   <p>So at the moment, if we have a commission which is split between consultants we have to complete different fields in Core. Each consultant has their own fields which need completing:</p>
 
-  <figure><img src='../images/2-approach-to-fee-model-1.png' alt='Commission Split in Core' style='max-width:100%; height:auto;'><figcaption>Example of split commission in Core</figcaption></figure>
+  <figure><img src='../blueprint_images/2-approach-to-fee-model-1.png' alt='Commission Split in Core' style='max-width:100%; height:auto;'><figcaption>Example of split commission in Core</figcaption></figure>
     
   <p>What this results in from a back-end perspective is a Fees table with different columns for the different amounts:</p>
 
-  <figure><img src='../images/2-approach-to-fee-model-2.png' alt='Table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Table demonstrating data structure for commissions</figcaption></figure>
+  <figure><img src='../blueprint_images/2-approach-to-fee-model-2.png' alt='Table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Table demonstrating data structure for commissions</figcaption></figure>
 
   <p>In analytics in general, aggregation is done by specifying a column. However with the above tabular structure, we cannot get the total commission for the fee by aggregating a single column.</p>
 
@@ -51,13 +50,13 @@
 
   <p>To accommodate this, we have a step in the SQL ETL process which unpivots this data so the names and amounts are in the more usual analytical tabular format:</p>
 
-  <figure><img src='../images/2-approach-to-fee-model-3.png' alt='Analytical table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Data structure needed for analytics</figcaption></figure>
+  <figure><img src='../blueprint_images/2-approach-to-fee-model-3.png' alt='Analytical table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Data structure needed for analytics</figcaption></figure>
     
   <p>In the new world with the new process in Core, this additional wrangling in the back-end will no longer need to be done.</p>
     
   <p>Instead, the new commission lines grid allows the user to enter the data in this format in Core so none of the transformation work has to be done in the ETL anymore.</p>
 
-  <figure><img src='../images/2-approach-to-fee-model-4.png' alt='Core table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Revised Data structure in Core</figcaption></figure>
+  <figure><img src='../blueprint_images/2-approach-to-fee-model-4.png' alt='Core table showing commission splits' style='max-width:100%; height:auto;'><figcaption>Revised Data structure in Core</figcaption></figure>
 
   <p>This new method to record commission is to be the method going forward. At some point the old method of using fields in the Fee entity will be deprecated. How can we accommodate these Core changes in our Analytics processes?</p>
 

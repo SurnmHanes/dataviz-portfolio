@@ -29,11 +29,10 @@
   <header>
     <nav>
       <a href="../index.html">Home</a> |
-      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Blueprints</a> |
       <a href="../about.html">About</a> |
       <a href="../how-i-work.html">How I Work</a> |
       <a href="../operating-manual.html">Operating Manual</a> |
-      <a href="../blueprints.html">Blueprints</a> |
       <a href="../fun.html">Just For Fun</a>
     </nav>
     <h1>Optimisation Investigation into 2 Power BI Reports</h1>
@@ -75,7 +74,7 @@
 
   <p>The first place to start is with Performance Analyzer within Power BI. This allows us to see the timings of how long the various objects take to render on the page.</p>
 
-  <figure><img src='../images/8-PowerBI-report-optimisation-1.png' alt='Performance Analyzer image' style='max-width:100%; height:auto'><figcaption>Screenshot of Performance Analyzer showing timings for the objects in the user interface</figcaption></figure>
+  <figure><img src='../blueprint_images/8-PowerBI-report-optimisation-1.png' alt='Performance Analyzer image' style='max-width:100%; height:auto'><figcaption>Screenshot of Performance Analyzer showing timings for the objects in the user interface</figcaption></figure>
 
   <p>Performance Analyzer split these timings into 3 sections to allow us to see how long each of these sections take:
   
@@ -84,7 +83,7 @@
   <li>The <b>Visual display</b> relates to time for rendering the visual and </li> 
   <li>We have a catch-all section called <b>Other:</b></li>
   </ul>
-  <figure><img src='../images/8-PowerBI-report-optimisation-2.png' alt='Performance Analyzer highlighting a few timings' style='max-width:100%; height:auto'><figcaption>Each object timings is split into 3 sections</figcaption></figure>
+  <figure><img src='../blueprint_images/8-PowerBI-report-optimisation-2.png' alt='Performance Analyzer highlighting a few timings' style='max-width:100%; height:auto'><figcaption>Each object timings is split into 3 sections</figcaption></figure>
 
   <h3>What The Timings Mean</h3>
 
@@ -141,9 +140,9 @@
 
   <p>With this approach we can convert the headers into one multi column card, the ratio and days into a grid card (multi-row and multi-column) and the GP / Margin into a multi-row card. Thereby reducing 16 cards down to 3. The below is done with 3 cards (and has none of the usual styling but hopefully illustrates the point):</p>
 
-  <figure><img src='../images/8-PowerBI-report-optimisation-3.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Potential re-design of report header using new card visuals</figcaption></figure>
+  <figure><img src='../blueprint_images/8-PowerBI-report-optimisation-3.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Potential re-design of report header using new card visuals</figcaption></figure>
 
-  <figure><img src='../images/8-PowerBI-report-optimisation-4.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Only 3 cards used in place of original 16 </figcaption></figure>
+  <figure><img src='../blueprint_images/8-PowerBI-report-optimisation-4.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Only 3 cards used in place of original 16 </figcaption></figure>
 
   <p><i>I did have to use a couple of text boxes for the Avg GP and Avg Margin labels as the card visual only allows you to choose a label above or below the value, not to the side. Although this means you are adding a couple more objects to the rendering time, we can optimise these labels further by ensuring they do not interact with any of the slicers or visuals. So that once the page is rendered, they never get re-rendered by any other changes in the report.</i></p>
 

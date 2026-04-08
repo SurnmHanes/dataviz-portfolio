@@ -28,11 +28,10 @@
   <header>
     <nav>
       <a href="../index.html">Home</a> |
-      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Blueprints</a> | 
       <a href="../about.html">About</a> |
       <a href="../how-i-work.html">How I Work</a> |
       <a href="../operating-manual.html">Operating Manual</a> |
-      <a href="../blueprints.html">Blueprints</a> |
       <a href="../fun.html">Just For Fun</a>
     </nav>
     <h1>Allowing Dynamic KPI Selection in Power BI</h1>
@@ -81,13 +80,13 @@
 
   <p>An example of how it might work with a pop up menu is included in the screenshots below:</p>
 
-  <figure><img src='../images/7-interchangeable-kpis-1.png' alt='Power BI pop up menu button' style='max-width:100%; height:auto'><figcaption>Power BI report including a new button called 'Select KPIs'</figcaption></figure>
+  <figure><img src='../blueprint_images/7-interchangeable-kpis-1.png' alt='Power BI pop up menu button' style='max-width:100%; height:auto'><figcaption>Power BI report including a new button called 'Select KPIs'</figcaption></figure>
 
-  <figure><img src='../images/7-interchangeable-kpis-2.png' alt='Power BI pop up menu' style='max-width:100%; height:auto'><figcaption>Overlay menu which appears when button clicked showing options that user can select.</figcaption></figure>
+  <figure><img src='../blueprint_images/7-interchangeable-kpis-2.png' alt='Power BI pop up menu' style='max-width:100%; height:auto'><figcaption>Overlay menu which appears when button clicked showing options that user can select.</figcaption></figure>
   
   <p>The same idea but this time with a dropdown is shown in the below screenshot. Each visual pair would have a dropdown slicer from where the user could select the KPI they wish to view:</p>
 
-  <figure><img src='../images/7-interchangeable-kpis-3.png' alt='Power BI dropdown menu' style='max-width:100%; height:auto'><figcaption>Dropdown slicer allowing user to select KPI</figure>
+  <figure><img src='../blueprint_images/7-interchangeable-kpis-3.png' alt='Power BI dropdown menu' style='max-width:100%; height:auto'><figcaption>Dropdown slicer allowing user to select KPI</figure>
 
   <h2>Methodology</h2>
 
@@ -110,23 +109,23 @@
 
   <p>One thing we do lose out on is the tooltip on the bar chart. Currently when you hover over you get the following information:</p>
   
-    <figure><img src='../images/7-interchangeable-kpis-4.png' alt='Bar chart tooltip information actual' style='max-width:100%; height:auto'><figcaption>Hover over tooltip information from bar chart</figure>
+    <figure><img src='../blueprint_images/7-interchangeable-kpis-4.png' alt='Bar chart tooltip information actual' style='max-width:100%; height:auto'><figcaption>Hover over tooltip information from bar chart</figure>
 
   <p>where the KPI in question appears on the tooltip.</p>
   
   <p>Unfortunately, this can't be replicated in the pop up method. This is because of the dynamic nature of the selection made. We can make it more general such as the following:</p>
 
-    <figure><img src='../images/7-interchangeable-kpis-5.png' alt='Bar chart tooltip information proposed' style='max-width:100%; height:auto'><figcaption>Hover over tooltip showing more generic labelling</figure>
+    <figure><img src='../blueprint_images/7-interchangeable-kpis-5.png' alt='Bar chart tooltip information proposed' style='max-width:100%; height:auto'><figcaption>Hover over tooltip showing more generic labelling</figure>
 
   <p>and leave it to the rest of the page to provide the context.</p>
 
   <p>To try and accommodate this I did have a quick play with developing a custom tooltip where we replicate what we have currently. This is possible in the drop down method because every visual uses the same measure for the KPI Name ('First KPI Name (Managers)').</p>
   <p>We can add this to our custom tooltip and then when we hover over a visual the context of the visual will provide us the correct name along the lines of this:</p>
 
-    <figure><img src='../images/7-interchangeable-kpis-6.png' alt='Custom dynamic bar chart tooltip' style='max-width:100%; height:auto'><figcaption>Tooltip shows the yellow bar chart is for 'Vacancies Added'....</figure>  
+    <figure><img src='../blueprint_images/7-interchangeable-kpis-6.png' alt='Custom dynamic bar chart tooltip' style='max-width:100%; height:auto'><figcaption>Tooltip shows the yellow bar chart is for 'Vacancies Added'....</figure>  
 
 
-    <figure><img src='../images/7-interchangeable-kpis-7.png' alt='Custom dynamic bar chart tooltip' style='max-width:100%; height:auto'><figcaption>...The same tooltip shows the blue bar chart is for 'Placements By Value'</figure>
+    <figure><img src='../blueprint_images/7-interchangeable-kpis-7.png' alt='Custom dynamic bar chart tooltip' style='max-width:100%; height:auto'><figcaption>...The same tooltip shows the blue bar chart is for 'Placements By Value'</figure>
 
   <p>However this can't be implemented in the pop up method because each bar chart uses a different measure and there is no way you can obtain the context when you hover over a given visual i.e. whether you're looking at the first or second chart. If we were to go forward with this method we would have to go with a generic tooltip as per the first example above.</p>
   

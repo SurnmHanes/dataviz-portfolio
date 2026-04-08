@@ -28,11 +28,10 @@
   <header>
     <nav>
       <a href="../index.html">Home</a> |
-      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Blueprints</a> |
       <a href="../about.html">About</a> |
       <a href="../how-i-work.html">How I Work</a> |
       <a href="../operating-manual.html">Operating Manual</a> |
-      <a href="../blueprints.html">Blueprints</a> |
       <a href="../fun.html">Just For Fun</a>
     </nav>
     <h1>Button Slicer For Overlapping Buckets</h1>
@@ -70,7 +69,7 @@
 
   <p>This could be done in SQL, Power Query or DAX. Image shows it being done in DAX: </p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-1.png' alt='DAX calculated table showing option' style='max-width:100%; height:auto;'><figcaption>Example of a disconnected table with overlapping bucket options</figcaption></figure>
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-1.png' alt='DAX calculated table showing option' style='max-width:100%; height:auto;'><figcaption>Example of a disconnected table with overlapping bucket options</figcaption></figure>
 
   <h4>b) Use this column as the basis for the slicer</h4>
 
@@ -80,7 +79,7 @@
 
   <p>This new measure captures the user selection and carries out a different calculation dependent on the selection made:</p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-2.png' alt='DAX control flow measure using selection made' style='max-width:100%; height:auto;'><figcaption>DAX control flow measure running different code dependent on user selection </figcaption></figure>
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-2.png' alt='DAX control flow measure using selection made' style='max-width:100%; height:auto;'><figcaption>DAX control flow measure running different code dependent on user selection </figcaption></figure>
 
   <h3>Method 2</h3>
   <h4>a) Create 3 calculated columns in the source table</h4>
@@ -96,29 +95,29 @@
   <p>Using the Lost Revenue example</p>
   <p>Calculated Column 1 "rolls up" all the different cancelled statuses into one status called Non-Starter:</p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-3.png' alt='Grouping cancelled statuses' style='max-width:100%; height:auto;'><figcaption>Grouping cancelled statuses into one Non-Starter status</figcaption></figure>
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-3.png' alt='Grouping cancelled statuses' style='max-width:100%; height:auto;'><figcaption>Grouping cancelled statuses into one Non-Starter status</figcaption></figure>
 
   <p>and the different terminated statuses into one status called Early Terminations:</p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-4.png' alt='Grouping terminated statuses' style='max-width:100%; height:auto;'><figcaption>Grouping terminated statuses into one Early Termination status</figcaption></figure> 
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-4.png' alt='Grouping terminated statuses' style='max-width:100%; height:auto;'><figcaption>Grouping terminated statuses into one Early Termination status</figcaption></figure> 
 
   <p>Calculated Column 2 called Status Combined then adds the overlapping / parent bucket. In this example, Non-Starter and Early Terminations fall into All. Anything else is ignored: </p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-5.png' alt='Adding Overlapping Bucket Option' style='max-width:100%; height:auto;'><figcaption>Adding the Overlapping / Parent Option</figcaption></figure> 
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-5.png' alt='Adding Overlapping Bucket Option' style='max-width:100%; height:auto;'><figcaption>Adding the Overlapping / Parent Option</figcaption></figure> 
 
   <p>Calculated Column 3 is the concatenation of these two columns and will serve as the key column when we create the slicer table and the relationship back to this table:</p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-6.png' alt='Adding Key Column To Dimension Table' style='max-width:100%; height:auto;'><figcaption>Adding Key Column To Dimension Table</figcaption></figure> 
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-6.png' alt='Adding Key Column To Dimension Table' style='max-width:100%; height:auto;'><figcaption>Adding Key Column To Dimension Table</figcaption></figure> 
 
   <h4>b) Create a separate slicer table</h4>
 
   <p>The slicer table is made up of 2 columns. The first column contains all the possible values of both the StatusGrouped and Status Combined columns. It also has a second column which is the StatusLink column:</p>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-7.png' alt='Adding Slicer Table' style='max-width:100%; height:auto;'><figcaption>Adding Slicer Table</figcaption></figure> 
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-7.png' alt='Adding Slicer Table' style='max-width:100%; height:auto;'><figcaption>Adding Slicer Table</figcaption></figure> 
   
   <h4>c) Create a relationship between the StatusLink column in the slicer table and StatusLink in the dimension table (many to many).</h4>
 
-  <figure><img src='../images/3-button-slicer-for-overlapping-buckets-8.png' alt='Creating the Relationship between tables' style='max-width:100%; height:auto;'><figcaption>Creating the relationship between tables</figcaption></figure>  
+  <figure><img src='../blueprint_images/3-button-slicer-for-overlapping-buckets-8.png' alt='Creating the Relationship between tables' style='max-width:100%; height:auto;'><figcaption>Creating the relationship between tables</figcaption></figure>  
 
   <p>(This approach introduces a many-many relationship which should be tested carefully for performance and filter propagation behaviour in larger models.)</p>
   
