@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Actuals vs Targets Without a Data Warehouse</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    h2 {
+      color: #545e75
+    }
+    h3 {
+      color: #63adf2;
+      font-size: 16px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 14px;
+      color: #304d6d
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Actuals vs Targets Without a Data Warehouse</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>This investigation was to look into what would be required and document the next steps for providing the ability to report on actuals vs target for key business metrics. This ability would be required at individual level, team/department level and also territory level.</p>
+
+  <p>We already had something like this in another reporting vertical so the intention is to build something similar using the same approach. Are there any issues with this? Can we re-use that same logic?</p>
+
+  <p>What follows is an example of a structured spike designed to assess feasibility, scope, risk and operational considerations before committing to delivery.</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Problem</h2>
+  
+  <p>We have not yet built a SQL data warehouse for Vertical B. However we have been speaking about creating a report to show actual performance vs agreed target for key business metrics. Can this be built without SQL and what are the key considerations with any approach?</p>
+    
+  <h2>Background</h2>
+  
+  <p>In Vertical A we have built an actual vs target report to display at various levels of the hierarchy the achieved performance versus the agreed targets.</p>
+
+  <p>This report has been refined over various iterations and we want to explore whether a similar report to the original iteration of this report could be created for Vertical B. The desired output would be to know whether this is possible and if so, what the stumbling blocks might be or what we still need to work out.</p>
+
+  <p>In order to achieve this in Vertical A, the approach was as follows:</p>
+  <ol>
+    <li><b>Targets Added:</b> Target values are added by user in the core system.</li>
+    <li><b>Targets imported into Analytics:</b> This table of targets is imported into the data warehouse. It contains all targets against all appropriate entities for all users.</li>
+    <li><b>Tables used for Actuals also imported:</b>The underlying entity tables are also imported into the data warehouse. As these tables are used to calculate the 'actuals'.</li>
+    <li><b>Calculations defined: </b>Measures are then created to:
+      <ul>
+        <li>calculate the target for a given entity.</li>
+        <li>calculate the actuals for a given entity.</li>
+        <li>compare the actuals against the target.</li>
+      </ul>
+    </li>
+    <li><b>Control flow logic implemented: </b>Finally, control flow measures are also created to take the context of the KPI from the user selection and return the correct actual and target based on this KPI.</li>
+  </ol>
+
+  <p>So we need to find out whether this can be replicated essentially using Power Query in place of SQL.</p>
+
+  <h2>Approach</h2>
+  
+  <p>While I could create dummy KPI targets in the target table in core, it would be time consuming to also create 'actual' records in the underlying tables. And without the knowledge of what would represent or define 'key' metrics, it was decided that this wasn't a good use of time. 
+    
+  <p>Instead the approach was taken to use existing KPIs from Vertical A to act as example KPIs to prove out the concept.</p>
+
+  <h2>Outside of Scope</h2>
+  
+  <p>The current iteration of the report in Vertical A includes being able to see historic performance against target. We are not interested in historic performance for this task. For what it's worth, I believe this would require a SQL backend to achieve.</p>
+
+  <h2>Methodology</h2>
+
+  <p>The ask can be achieved by using Dataverse as a direct source and hooking up Power Query. In more detail, the approach is as follows:</p>
+
+  <h3 class="tight-header">1. Connect To Core</h3>
+  <p class="tight-paragraph">Create a Power Query which uses core as the source. I used my usual Microsoft credentials to access this.</p>
+
+  <h3 class="tight-header">2. Import Tables</h3>
+  <p class="tight-paragraph">Import the relevant tables from core to Power Query / Power BI.</p>
+
+  <h3 class="tight-header">3. Transform the Data</h3>
+  <p class="tight-paragraph">Make the necessary transformations in the Power Query Editor to create a star schema (so dimension tables and fact tables) and load the tables into Power BI.</p>
+
+  <h3 class="tight-header">4. Create the Data Model</h3>
+  <p class="tight-paragraph">Create a data model in Power BI for analysis where we have one-to-many relationships going from the dimensions to the fact tables just created.</p>
+
+  <h3 class="tight-header">5. Create the Necessary Measures</h3>
+  <p class="tight-paragraph">Now we have the data in Power BI and have created the relationships, we just need to replicate the measures we created in Vertical A.</p>
+
+  <p>With this methodology I was able to simulate a couple of dials showing actual performance against target for a couple of different KPIs at a couple of different hierarchies</p>
+
+  <figure><img src='../images/5-version-of-actuals-versus-target-1.png' alt='Power BI PoC showing actuals vs target' style='max-width:100%; height:auto'><figcaption>Monthly Performance for the 'Territory Dev' territory</figcaption></figure> 
+
+
+  <figure><img src='../images/5-version-of-actuals-versus-target-2.png' alt='Power BI PoC showing actuals vs target' style='max-width:100%; height:auto'><figcaption>Monthly Performance for an individual</figcaption></figure>
+      
+  <h2>Summary</h2>
+
+  <p>With the assumptions listed above in mind, the ask can be achieved relatively straightforwardly using Power Query to firstly hook up to Dataverse directly to pull in the data and secondly transform that data before loading to Power BI.</p>
+
+  <p>Some things to bear in mind:</p>
+
+  <h3 class="tight-header">Definitions</h3>
+  <p class="tight-paragraph">We will need a list of the core tables required to be imported so we can calculate the metrics defined as actuals in each case. We will also need clear unambiguous definitions of what an "actual" is, for each of the KPIs we will be looking to make available in the report.</p>
+
+   <h3 class="tight-header">Production</h3>
+  <p class="tight-paragraph">I'm uncertain of the address for the production version of core so we would need this before progressing this and the relevant credentials to access. Although perhaps this is already known as has been used previously within the existing Vertical B suite?</p>
+
+  <h3 class="tight-header">Connection to Production</h3>
+  <p class="tight-paragraph">It is never a good practice to hook up Power BI direct to a live production transactional system. This is because data requests sent from Power BI will increase network traffic to the system which could block genuine users of core or at least slow down their queries. So we need to be mindful of quantity and timing for the refreshes.</p>
+
+  <p class="tight-paragraph">This comment is slightly mitigated by the fact that I believe we connect to production for the rest of Vertical B reporting so I'm assuming any issue this has caused with latency would have been reported and investigated by now.</p>
+
+  <h3 class="tight-header">Data Transformation Complexity</h3>
+  <p class="tight-paragraph">Depending on the data transformation(s) required, Power Query can slow down if there is a lot of data and / or the transformations required are row by row or complex in some other way. I can't see this being a problem as, for actuals and targets, I'm expecting the transformations required to be straightforward.</p>
+
+  <h3 class="tight-header">Report Filters Required</h3>
+  <p class="tight-paragraph">It wasn't 100% clear to me exactly which slicers we would need to be able to accommodate in this proposed report. The three in the PoC (territory, team and consultant) all come from the same core table and so are easy to implement. While not a showstopper at all, if we require slicers which originate from other source tables this will make the development more complicated.</p>
+
+  <h3 class="tight-header">Breaking New Ground</h3>
+  <p class="tight-paragraph">The PoC was fairly easy to set up as it was a case of copying the logic used in Vertical A. More thought and therefore more time will probably be required when setting this up for key business metrics. In particular I can see the implementation of the transformations required in Power Query (and ideally ensuring they are reasonably efficient) and writing the measures that need to be created could take some time.</p> 
+  
+
+ </div>
+
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>This investigation was subsequently superseded when the team decided to take on the task of migrating the back end away from Power Query to a SQL data warehouse for this vertical.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="4-multiple-workspaces-in-same-tenant.html">← Previous: Multiple Workspaces In Same Tenant</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <a href="6-advanced-filtering.html">Next:  → Advanced Filtering</a>
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>

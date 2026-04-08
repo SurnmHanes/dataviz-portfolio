@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Filtering In Power BI</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    h2 {
+      color: #873207
+    }
+    h3 {
+      color: #d64b00;
+      font-size: 16px
+    }
+    .archival-document h4 {
+      color: #ff8500
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 14px;
+      color: #ffc765
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blueprints.html">Blueprints</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Filtering Using Configurable Fields in Source</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>In our source system there were a number of fields that could be configured or unlocked by a customer depending on their payment tier.</p>
+
+  <p>The question was raised as to whether, in Analytics, it was possible to slice the data in the reports using any of these configured fields. Because some customers do not have these fields it was decided that these potential slicers should not form part of the report slicer panel that we already have in place.</p>
+
+  <p>The investigation was a feasibility study into whether these slicers could be added to the filter panel to the right hand side of Power BI and to determine if any selections made would carry through to all pages of the report.</p> 
+    
+  <p>How could we ensure that these customers as well as those on another price tier have a good user experience?</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Problem</h2>
+  
+  <p>We have a subset of our customer base that pay for the use of configurable fields in the core system. We want to allow these customers to filter the analytics reports using these fields while at the same time keeping this as discreet as possible so that other customers do not question what these fields are.</p>
+
+  <h2>Assumptions</h2>
+  
+  <p>It is assumed that the configurable fields have been included as part of the ETL for the various tables and are available as fields in the relevant dimension tables in the semantic model.</p>
+  
+  <h2>Option 1 - Filter Pane</h2>
+
+  <p>The suggestion is to add these fields to the side filter pane and educate these users about them. However there was uncertainty as to whether a selection made on one page would persist to a different page of the report.</p>
+
+  <p>More specifically if the user navigates to another page and then to a drill through page will the slicer selection chosen impact the metrics being shown in these pages? This is what we want as we don't want the user having to duplicate the effort of making these selections in the slicers each time they navigate to another page. This spike was to investigate this.</p>
+  
+  <p>The scenario is as follows:</p>
+
+  <ol>
+    <li>The user opens the report and is on the main page.</li>
+    <li>These configurable fields are already in place in the report side filter pane.</li>
+    <li>The user makes a selection from one or more of these slicers</li>
+  </ol>
+
+    <figure><img src='../images/6-advanced-filtering-1.png' alt='Power BI report filter panel' style='max-width:100%; height:auto'><figcaption>Power BI report page showing the filter pane highlighted on the right hand side with 2 choices already made</figcaption></figure>
+
+  <h3>Outcome</h3>
+
+  <p>Yes, this scenario as described is achievable in broad terms but it might require further consideration in terms of actual implementation. The simplest approach is to drag in the relevant field into the side filter pane under the section "Filters on all pages". The user can then make their selection(s) accordingly and these will propagate to all pages.</p>
+
+  <h4 class="tight-header">Advantages</h4>
+  <ul class="tight-list">
+    <li>Easy to Implement.</li>
+    <li>Fast to develop.</li>
+    <li>Relatively discreet / subtle. Little change in the existing UI.</li>
+  </ul>
+
+  <h4 class="tight-header">Disadvantages</h4>
+  <ul class="tight-list">
+    <li>Confusing if user forgets slicers persist across pages.</li>
+    <li>Inelegant as user has to be familiar with side filter pane.</li>
+    <li>Some backend work if a snowflake schema is required.</li>
+  </ul>
+
+  <h2>Option 2 - Bespoke reports for these "configured fields" customers</h2>
+
+  <h3>Overview</h3>
+  <p>Create new versions of these reports specifically for the "configured fields" customers. In these reports the existing slicers in the slicer panel on the UI would be extended to include these new fields.</p>
+
+  <h4 class="tight-header">Advantages</h4>
+  <ul class="tight-list">
+    <li>Total control per customer.</li>
+    <li>Clean UX - no requirement to involve the side filter pane for the end user.</li>
+  </ul>
+
+  <h4 class="tight-header">Disadvantages</h4>
+  <ul class="tight-list">
+    <li>Not scalable if several customers have or will have configured fields.</li>
+    <li>Maintenance nightmare as would have duplicate copies of the same report so any further dev or bug fixes etc. would need to be done twice.</li>
+  </ul>
+
+  <h2>Option 3 - A hidden page with advanced slicers on</h2>
+
+  <h3>Overview</h3>
+  <p>An additional button added to the main page which navigates the user to a hidden page containing these configured fields as slicers to allow the user to set accordingly and then be able to close this page / return to the main page. The page navigation would be dynamic (based on measures) and dependent on the customer / environment.</p>
+
+  <p>So for a "normal" customer, the button text, fill and navigation properties would be set so that the button is invisible and they would be unaware of its existence and even if the user accidentally clicked it, the dynamic navigation means it won't take them anywhere.</p>
+  
+  <p>For a "configured fields" customer, the button would be prominent on the main page and would navigate to a second page with the configured field slicers.</p>
+
+  <figure><img src='../images/6-advanced-filtering-3.png' alt='Power BI report for normal customer' style='max-width:100%; height:auto'><figcaption>Normal customer view - Power BI knows this customer doesn't have configured fields so the measures responsible for the button pick up on this and the formatting is set to be invisible</figcaption></figure>
+
+  <figure><img src='../images/6-advanced-filtering-2.png' alt='Power BI report for 'configured fields' customer' style='max-width:100%; height:auto'><figcaption>Power BI knows this customer has configured fields so the formatting is set so as to be visible</figcaption></figure>
+
+  <p>Clicking on this button navigates the user to either a pop up menu or a new page displaying the configured fields slicers that they can set.</p>
+
+  <h4 class="tight-header">Advantages</h4>
+  <ul class="tight-list">
+    <li>Best user experience.</li>
+    <li>Elegant and scalable assuming proper back end architecture.</li>
+    <li>Will easily support multiple field selections as well as the snowflake schema.</li>
+  </ul>
+
+  <h4 class="tight-header">Disadvantages</h4>
+  <ul class="tight-list">
+    <li>Requires dynamic logic based on customer context which we don't currently have in the back end warehouse.</li>
+    <li>Complexity added to backend (would need a way to identify the "configured fields" customers and the "normal" customers) and front end with measure logic.</li>
+    <li>Could be considered an over-engineered solution.</li>
+  </ul>
+
+  <h2>Questions</h2>
+
+  <p>How do we want to implement this? A number of the fields relate to more than one entity / dimension. Are we expecting that if the user selects, for example, a certain "Discipline" that this filters all the fact tables at the same time?</p>
+    
+  <p>Or do we want to modularise the selections so a user can select a certain placement discipline separately from a vacancy discipline, for example?</p>
+
+  <p>If we do want one slicer to filter all entities at once, we would be looking at a snowflake schema to achieve this. This has shades of the type filter we attempted to implement in the Appointments report for both calls and meetings.</p>
+
+  <p>If not and we want the slicers to be entity-specific (so for example one slicer to select the placement discipline and a different slicer to select the vacancy discipline) this might be overwhelming / confusing for the end user due to the number of similarly named slicers to make selections from.</p>
+    
+  <p>Additionally I wonder whether if several slicers are applied, we may get ambiguous filtering behaviour due to the data model.</p>
+
+  <p>Presumably the approach we take in this report is to be rolled out across all reports in the analytics suite? That being the case, does the above question about slicers affecting multiple entities at once require more thought?</p>
+
+  <p>Also more generally, this approach to employ user-selectable slicers in the "Filters on all pages" filter pane may work for this report but might cause concern in other reports. The slicer selection is applied to <b>every metric</b> in <b>every page</b> of the report. Could this cause unexpected results / broken visuals or "(blanks)" being surfaced? Might it conflict with other slicers we have already set?</p>
+
+  <h2>Summary</h2>
+  <p>Option 1 is the way to go on this one. As it solves the problem with the right amount of rigour and has the advantage that it is easy and fast to implement. We just need to understand whether we will have a separate slicer per entity or not and need to take care that this does not disrupt existing context in report pages.</p>
+
+  <p>Option 2 while it would work introduces additional maintenance overhead which is not something we want unless there is no other alternative.</p>
+
+  <p>Option 3 offers a scalable solution, allowing slicers to be displayed to only the audience that wants them via dynamic navigation. However, this would require introducing customer-specific data into the dataset (e.g. a field per customer for "HasConfiguredFields"), which is not currently present in the model. This type of infrastructure and model-level change falls outside the scope of this spike and would require technical expertise in our back-end architecture and data orchestration processes which is not within this current remit.</p>
+
+ </div>
+
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team chose the initial option and the slicers were successfully added to the filter pane in various reports in the analytics suite. The customer feedback received was positive.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="5-actuals-vs-targets-without-a-warehouse.html">← Previous: Actuals vs Targets Without a Warehouse</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <a href="7-allowing-dynamic-KPI-selection.html">Next: Allowing Dynamic KPI Selection →</a>
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>© Neil Hanes - Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
