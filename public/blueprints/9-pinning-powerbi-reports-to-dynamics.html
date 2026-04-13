@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimising Power BI Reports</title>
+  <title>Pin Visuals to Dynamics Dashboard</title>
   <link rel="stylesheet" href="../style.css" />
   <style>
     h2 {
@@ -12,7 +12,7 @@
     h3 {
       color: #0090ff;
       font-size: 20px;
-      font-style: italic;
+      /* font-style: italic; */
     }
     .archival-document h4 {
       color: #0090ff;
@@ -21,9 +21,10 @@
     h5 {
       margin-bottom: 0.1em;
       margin-top: 1em;
-      font-size: 14px;
-      color: #ffc765
+      font-size: 15px;
+      font-style: italic;
     }
+
   </style>
 </head>
 <body>
@@ -71,7 +72,7 @@
 
   <p>Providing this functionality would involve a direct trade-off: increased user- flexibility versus reduced security control and increased administrative overhead.</p>
 
-  <h3>Key Implications</h3>
+  <h4>Key Implications</h4>
 
   <ul>
     <li>Customers <b>can</b> create Power BI dashboards in the Analytics workspace in Power BI.</li>
@@ -83,130 +84,85 @@
 
   <h2>1. Existing Infrastructure</h2>
 
-  <p></p>
-  
-  ============
-  
-  <ol>
-    <li>Slow Calculations: </li>
-    <i>This can be because the calculations or transformations are complex or the volume of data being processed is large.</i>
-    <li>Visuals Rendering</li>
-    <i>Too many visuals need to be loaded or there are complex or custom visualisations on the page.</i>
-  </ol>
-  
-  <h2>Investigation</h2>
+  <p>The organisation provides analytical reporting in Power BI based on a core system implemented in Microsoft Dynamics.</p>
 
-  <p>I suspected that since Report B's main page is similar in design to Report A, the issues would be similar between the two reports. I focused initially on the Report A.</p>
 
-  <h3>Performance Analyzer</h3>
+  <h3>1.1 Current Architecture</h3>
 
-  <p>The first place to start is with Performance Analyzer within Power BI. This allows us to see the timings of how long the various objects take to render on the page.</p>
-
-  <figure><img src='../images/8-PowerBI-report-optimisation-1.png' alt='Performance Analyzer image' style='max-width:100%; height:auto'><figcaption>Screenshot of Performance Analyzer showing timings for the objects in the user interface</figcaption></figure>
-
-  <p>Performance Analyzer split these timings into 3 sections to allow us to see how long each of these sections take. The <b>DAX query</b> section tells us how long the calculation has taken to be computed, the <b>Visual display</b> relates to rendering the visual and then we have a catch-all section called <b>Other</b>:</p>
-
-  <figure><img src='../images/8-PowerBI-report-optimisation-2.png' alt='Performance Analyzer highlighting a few timings' style='max-width:100%; height:auto'><figcaption>Each object timings is split into 3 sections</figcaption></figure>
-
-  <h3>What The Timings Mean</h3>
-
-  <p>In our case, we can see from the screenshot above that the DAX computes extremely quickly in each case. I therefore have no concerns over the DAX being used and don't think it would be a good use of time to focus on streamlining this.</p>
-
-  <p>The majority of the time is spent in "Other". While as I say this is a catch-all category, a high value here is indicative of wait time. Power BI is not completely multi-threaded and when visuals are rendered they often have to wait for one to load fully before the next one can begin loading. Cards, in particular, load in series like this rather than in parallel.</p>
-
-  <p>Overloading the page with too many objects can significantly impact performance. Each object requires processing power to render. In addition the use of slicers leads to recalculations with every selection and so the more objects that need to be recalculated the slower the page as a whole reacts.</p>
-
-  <p>The team view page of Report A has 80+ separate objects that need to be rendered. The main page of Report B has over 120!</p>
-
-  <h2>Issues Identified</h2>
-
-  <p>The below issues are common between both reports.</p>
-
-  <h3>Cards</h3>
-
-  <p>As mentioned cards tend to render one after the other rather than at the same time. As both reports are "card heavy" this is an area we could potentially look to optimise.</p>
-
-  <p>In Report A, the headers (Vacancies through to Gross Profit) are individual cards. As are the ratios and days underneath. And the Average GP and Avg Margin metrics. A total of 16 cards.</p>
-
-  <p>In Report B, all the values under the different sections (Upcoming, Placement Info, Vacancy Info, Business Development) are all individual cards, a total of 30+ cards that need to be rendered.</p>
-
-  <h3>Background Shapes</h3>
-
-  <p>On most of our report pages we have made a design choice to use shapes to form a background around distinct elements so that they are visually "lifted" above the background of the page. These shapes take time to load as well and therefore add to the latency. Looking at the Team page of Report A in particular:</p>
-
-  <ul>
-    <li>Each dial visual has a background shape.</li>
-    <li>Each bar chart visual has a background shape.</li>
-    <li>The main logo has a background shape.</li>
-    <li>Each pair of ratio / day cards has a background shape. (They also have another triangle shape "pointing" to the chevron above).</li>
-    <li>The chevrons themselves are 4 shapes.</li>
-    <li>There is a shape behind the two slicers.</li>
-    <li>There is a shape behind the header cards.</li>
-    <li>There is a shape behind the Avg GP / Avg Margin cards.</li>
+  <p>Analytical reports are built in Power BI. Reports are deployed to each customer's Power BI tenancy in a workspace named Analytics. The users at the customers do not have access to the workspaces. Instead reports are distributed to users via a Power BI App as per best practice. Two app audiences exist:</p>
+  <ul class="tight-list">
+    <li>Consultants</li>
+    <li>Managers</li>
   </ul>
 
-  <p>A total of 26 shapes that have to be rendered each time the page loads and then re-rendered every time a selection is changed in either of the slicers.</p>
+  <p>All reports share a single semantic model which has Row Level Security (RLS) applied.</p>
 
-  <h3>Custom Visuals</h3>
+  <p>There is also one Power BI report embedded into the Dynamics core application accessible via the main navigation pane. This report receives context from the Dynamics system.</p>
 
-  <p>Custom visuals take a little bit of extra processing power to render in Power BI and so will slow down the rendering of the page. Each of the dials is a custom visual as this type of visual is not possible using native visuals (or at least not easily).</p>
-
-  <p>So the flexibility we gain from having more scope to create an appealing visual is somewhat negated by the longer latency.</p>
-
-  <p>We have 5 of these custom visuals that all take a little longer to render than a native visual.</p>
-
-  <h2>Suggested Solutions</h2>
-
-  <h3>Cards</h3>
-
-  <p>My suggested solution is to use the new card visual and take advantage of the fact you can add more than one measure at a time to one card.</p>
-
-  <p>With this approach we can convert the headers into one multi column card, the ratio and days into a grid card (multi-row and multi-column) and the GP / Margin into a multi-row card. Thereby reducing 16 cards down to 3. The below is done with 3 cards (and has none of the usual styling but hopefully illustrates the point):</p>
-
-  <figure><img src='../images/8-PowerBI-report-optimisation-3.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Potential re-design of report header using new card visuals</figcaption></figure>
-
-  <figure><img src='../images/8-PowerBI-report-optimisation-4.png' alt='Proposed formatting changes using new card visual' style='max-width:100%; height:auto'><figcaption>Only 3 cards used in place of original 16 </figcaption></figure>
-
-  <p><i>I did have to use a couple of text boxes for the Avg GP and Avg Margin labels as the card visual only allows you to choose a label above or below the value, not to the side. Although this means you are adding a couple more objects to the rendering time, we can optimise these labels further by ensuring they do not interact with any of the slicers or visuals. So that once the page is rendered, they never get re-rendered by any other changes in the report.</i></p>
-
-  <h3>Background Shapes</h3>
-
-  <p>These shapes are used to create a background layout on the report page. There are three options I can come up with to improve the performance with these:</p>
+  <h3>1.2 The Ask</h3>
 
   <ol>
-    <li>Remove interactions between the shapes and any interactive element on the page (slicers, drop-downs, bar charts etc) to avoid them re-rendering at any stage.</li>
-    <li>Remove the shapes altogether.</li>
-    <li>Create this background layout in PowerPoint or some other design tool and then import into Power BI as a static image.</li>
+  <li>Allow Analytics users at the customer to <b>pin visuals from existing Power BI reports</b> to a dashboard <b>inside the Dynamics app.</b></li>
+  <li>Allow internal staff to create <b>bespoke Dynamics dashboards </b>containing pinned Power BI visuals on behalf of the customers.</li>
   </ol>
 
-  <p>My suggestion would be to look into <b>option 3</b> (we could also include the logo as part of the background layout being designed) and then potentially roll this out to the other reports as a major UI and UX upgrade. </p>
+  <h2>2. The Decision</h2>
 
-  <p>This would not be a quick fix as we will need to ensure that the background layout is as close to identical as the current set up so that when the visuals are placed on top, everything remains balanced and there is little to no change in appearance to the end user. Pixel perfection is the ideal but layout placement can be frustrating in Power BI and potentially even more so if we are introducing a different design tool.</p>
+  <p><b>Power BI visuals cannot be pinned to dashboards within Dynamics.</b></p>
 
-  <p>Option 1 means the shapes remain in the report and so are still part of the rendering when first opening and / or navigating (back) to the page. It would also be a laborious and manual option to remove the interactions in this way. Option 2 would change the appearance of the page (for the worse) and is mentioned for completeness only.</p>
+  <p>Power BI will not support pinning visuals into Dynamics dashboards by either customers or internal staff.</p>
 
-  <h3>Custom Visuals</h3>
+  <p>There are other options available:</p>
+  <ol>
+    <li>Power BI dashboards may be created and managed within the Power BI Service.</li>
+    <li>These dashboards may either be:</li>
+    <ul>
+      <li>Accessed directly in the Power BI workspace.</li>
+      <li>Linked or embedded in Dynamics as read-only "views".</li>
+    </ul>
+  </ol>
 
-  <p>There is scope here to combine the 5 visuals into one visual. Again this is not a quick win and care would need to be taken.</p>
+  <h2>3. Technical Viability Assessment</h2>
 
-  <p>At the moment each dial / bar chart pair are siloed from every other dial / bar chart pair and respond only to the dropdown immediately above them.</p>
+  <p><b>Conclusion: Not feasible within Microsoft's platform boundaries.</b></p>
 
-  <p>If we were to combine the 5 dials into one, how best would we manage the drop downs and the fact that dropdown 1 controls dial 1 and only dial 1 and so on? It can be done but would need additional fields and additional measures.</p>
+  <p>Based on my analysis of Power BI and Dynamics capabilities there are the following limitations:</p>
 
-  <p><i>Currently we use the same field in each dropdown and then turn off interactions so each visual pair (dial + bar chart) only "sees" one dropdown. This wouldn't work if we combined all the dials into one visual. One obvious solution is that we create additional fields so each list of values which populate a dropdown is distinct from each other list of values for the other dropdowns. There would then be no danger of interaction between the dropdowns. </i></p>
+  <h5>1. Platform Limitations</h5>
 
-  <h2>Caveats</h2>
+  <p>Microsoft maintains strict separation between Power BI and Dynamics dashboards.</p>
 
-  <p>If we are to change the design of the headers and background, it is probably prudent to propagate this through the suite of reports. I know a number of the reports have the same headers and have a similar appearance. I believe if we make changes to either or both of these reports, we need to also make the changes to the other reports so they all remain stylistically consistent.</p>
+  <h5>2. No API Support</h5>
 
-  <p>None of the suggestions are quick fixes and so patience would be required if any refactoring was taken on. An iterative approach is probably the right approach.</p>
+  <p>The Power BI REST API provides no endpoints for creating dashboard tiles outside the Power BI Service.</p>
 
-  <p>One thing to note is that the new card visual is still in public preview [<i>at the time of writing</i>] and so Microsoft still have the right to make changes at any future point which may break the visual in coming releases.</p>
+  <h5>3. Architectural Mismatch</h5>
 
-  <p>The changes suggested regarding the custom visuals are advanced level changes and require a significant amount of dev and so are non-trivial.</p>
-  
+  <p>Power BI dashboard metadata cannot be stored in  Dataverse storage.</p>
+
+  <h3>3.1 What a Custom Workaround Would Involve</h3>
+
+  <p>While theoretically possible to build a custom solution, it would require overcoming significant technical challenges:</p>
+
+  <h3>3.1.1 Key Technical Hurdles</h3>
+
+  <h5>1. State Capture Complexity</h5>
+
+  <p>Power BI doesn't expose visual state (filter pane, slicer selections, PvT dial values) via API. Visuals with user interactions rely on the full report canvas context. Pinning a static image of a visual is possible, but a live, interactive visual cannot be extracted and hosted elsewhere. Any 'pinned' visuals in a custom solution would be a snapshot only.</p>
+
+  <h5>2. Rendering Limitations</h5>
+
+  <p>There is no way to render individual Power BI visuals without their full report context.</p>
+
+  <h5></h5>
+
  </div>
 
+
+
+
+
+ 
   <h4 class="case-study">What Happened Next?</h4>
 
   <p>The new card visual became generally available (GA) and the team embarked on replacing the existing cards as suggested into multi-column and grid cards. The static background idea remains an idea on the backlog. The custom visual dials were replaced with native visuals.</p>
@@ -238,7 +194,7 @@
   </main>
     
   <footer>
-    <p>© Neil Hanes - Hand-coded, with love</p>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
   </footer>
   </body>
 
