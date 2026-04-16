@@ -24,6 +24,11 @@
       font-size: 15px;
       font-style: italic;
     }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
 
   </style>
 </head>
@@ -57,117 +62,437 @@
 
   <div class="archival-document">
 
-  <span class="document-label"> Original Spike - 8 min read
+  <span class="document-label"> Original Spike - 9 min read
   <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
   
   <h2>Handling Power BI Visual Pinning and Dashboard Usage Within Dynamics</h2>
   
   <h2>Executive Summary</h2>
   
-  <p>This analysis concludes that <b>Power BI visuals cannot be pinned directly to Dynamics dashboards</b> due to platform boundaries.</p>
+    <p>This analysis concludes that <b>Power BI visuals cannot be pinned directly to Dynamics dashboards</b> due to platform boundaries.</p>
 
-  <p>While customers <b><i>can</i></b> create Power BI dashboards as an alternative, this requires granting them elevated workspace access leading to reduced security and governance compared to the current app-based approach.</p>
+    <p>While customers <b><i>can</i></b> create Power BI dashboards as an alternative, this requires granting them elevated workspace access leading to reduced security and governance compared to the current app-based approach.</p>
 
-  <p>Embedding such dashboards into Dynamics <b>is not self-service</b> and requires internal team configuration <b>for each customer</b>, creating operational overhead that scales with customer count.</p>
+    <p>Embedding such dashboards into Dynamics <b>is not self-service</b> and requires internal team configuration <b>for each customer</b>, creating operational overhead that scales with customer count.</p>
 
-  <p>Providing this functionality would involve a direct trade-off: increased user- flexibility versus reduced security control and increased administrative overhead.</p>
+    <p>Providing this functionality would involve a direct trade-off: increased user- flexibility versus reduced security control and increased administrative overhead.</p>
 
-  <h4>Key Implications</h4>
+    <h4>Key Implications</h4>
 
-  <ul>
-    <li>Customers <b>can</b> create Power BI dashboards in the Analytics workspace in Power BI.</li>
-    <li>Customers <b>cannot</b> embed them in Dynamics themselves.</li>
-    <li>Each customer dashboard requires <b>internal staff</b> effort to configure.</li>
-    <li>Operational overhead increases with number of customers.</li>
-    <li>Internal resource <b>required</b> for embedding and ongoing maintenance.</li>
-  </ul>
+      <ul>
+        <li>Customers <b>can</b> create Power BI dashboards in the Analytics workspace in Power BI.</li>
+        <li>Customers <b>cannot</b> embed them in Dynamics themselves.</li>
+        <li>Each customer dashboard requires <b>internal staff</b> effort to configure.</li>
+        <li>Operational overhead increases with number of customers.</li>
+        <li>Internal resource <b>required</b> for embedding and ongoing maintenance.</li>
+      </ul>
 
   <h2>1. Existing Infrastructure</h2>
 
-  <p>The organisation provides analytical reporting in Power BI based on a core system implemented in Microsoft Dynamics.</p>
+    <p>The organisation provides analytical reporting in Power BI based on a core system implemented in Microsoft Dynamics.</p>
 
 
-  <h3>1.1 Current Architecture</h3>
+    <h3>1.1 Current Architecture</h3>
 
-  <p>Analytical reports are built in Power BI. Reports are deployed to each customer's Power BI tenancy in a workspace named Analytics. The users at the customers do not have access to the workspaces. Instead reports are distributed to users via a Power BI App as per best practice. Two app audiences exist:</p>
-  <ul class="tight-list">
-    <li>Consultants</li>
-    <li>Managers</li>
-  </ul>
+      <p>Analytical reports are built in Power BI. Reports are deployed to each customer's Power BI tenancy in a workspace named Analytics. The users at the customers do not have access to the workspaces. Instead reports are distributed to users via a Power BI App as per best practice. Two app audiences exist:</p>
+      <ul class="tight-list">
+        <li>Consultants</li>
+        <li>Managers</li>
+      </ul>
 
-  <p>All reports share a single semantic model which has Row Level Security (RLS) applied.</p>
+      <p>All reports share a single semantic model which has Row Level Security (RLS) applied.</p>
 
-  <p>There is also one Power BI report embedded into the Dynamics core application accessible via the main navigation pane. This report receives context from the Dynamics system.</p>
+      <p>There is also one Power BI report embedded into the Dynamics core application accessible via the main navigation pane. This report receives context from the Dynamics system.</p>
 
-  <h3>1.2 The Ask</h3>
+    <h3>1.2 The Ask</h3>
 
-  <ol>
-  <li>Allow Analytics users at the customer to <b>pin visuals from existing Power BI reports</b> to a dashboard <b>inside the Dynamics app.</b></li>
-  <li>Allow internal staff to create <b>bespoke Dynamics dashboards </b>containing pinned Power BI visuals on behalf of the customers.</li>
-  </ol>
+      <ol>
+      <li>Allow Analytics users at the customer to <b>pin visuals from existing Power BI reports</b> to a dashboard <b>inside the Dynamics app.</b></li>
+      <li>Allow internal staff to create <b>bespoke Dynamics dashboards </b>containing pinned Power BI visuals on behalf of the customers.</li>
+      </ol>
 
   <h2>2. The Decision</h2>
 
-  <p><b>Power BI visuals cannot be pinned to dashboards within Dynamics.</b></p>
+    <p><b>Power BI visuals cannot be pinned to dashboards within Dynamics.</b></p>
 
-  <p>Power BI will not support pinning visuals into Dynamics dashboards by either customers or internal staff.</p>
+    <p>Power BI will not support pinning visuals into Dynamics dashboards by either customers or internal staff.</p>
 
-  <p>There are other options available:</p>
-  <ol>
-    <li>Power BI dashboards may be created and managed within the Power BI Service.</li>
-    <li>These dashboards may either be:</li>
-    <ul>
-      <li>Accessed directly in the Power BI workspace.</li>
-      <li>Linked or embedded in Dynamics as read-only "views".</li>
-    </ul>
-  </ol>
+    <p>There are other options available:</p>
+    <ol>
+      <li>Power BI dashboards may be created and managed within the Power BI Service.</li>
+      <li>These dashboards may either be:</li>
+      <ul>
+        <li>Accessed directly in the Power BI workspace.</li>
+        <li>Linked or embedded in Dynamics as read-only "views".</li>
+      </ul>
+    </ol>
 
   <h2>3. Technical Viability Assessment</h2>
 
-  <p><b>Conclusion: Not feasible within Microsoft's platform boundaries.</b></p>
+    <p><b>Conclusion: Not feasible within Microsoft's platform boundaries.</b></p>
 
-  <p>Based on my analysis of Power BI and Dynamics capabilities there are the following limitations:</p>
+    <p>Based on my analysis of Power BI and Dynamics capabilities there are the following limitations:</p>
 
-  <h5>1. Platform Limitations</h5>
+    <h5>1. Platform Limitations</h5>
 
-  <p>Microsoft maintains strict separation between Power BI and Dynamics dashboards.</p>
+      <p>Microsoft maintains strict separation between Power BI and Dynamics dashboards.</p>
 
-  <h5>2. No API Support</h5>
+    <h5>2. No API Support</h5>
 
-  <p>The Power BI REST API provides no endpoints for creating dashboard tiles outside the Power BI Service.</p>
+      <p>The Power BI REST API provides no endpoints for creating dashboard tiles outside the Power BI Service.</p>
 
-  <h5>3. Architectural Mismatch</h5>
+    <h5>3. Architectural Mismatch</h5>
 
-  <p>Power BI dashboard metadata cannot be stored in  Dataverse storage.</p>
+      <p>Power BI dashboard metadata cannot be stored in  Dataverse storage.</p>
 
-  <h3>3.1 What a Custom Workaround Would Involve</h3>
+    <h3>3.1 What a Custom Workaround Would Involve</h3>
 
-  <p>While theoretically possible to build a custom solution, it would require overcoming significant technical challenges:</p>
+    <p>While theoretically possible to build a custom solution, it would require overcoming significant technical challenges:</p>
 
-  <h3>3.1.1 Key Technical Hurdles</h3>
+    <h3>3.1.1 Key Technical Hurdles</h3>
 
-  <h5>1. State Capture Complexity</h5>
+      <h5>1. State Capture Complexity</h5>
 
-  <p>Power BI doesn't expose visual state (filter pane, slicer selections, PvT dial values) via API. Visuals with user interactions rely on the full report canvas context. Pinning a static image of a visual is possible, but a live, interactive visual cannot be extracted and hosted elsewhere. Any 'pinned' visuals in a custom solution would be a snapshot only.</p>
+        <p>Power BI doesn't expose visual state (filter pane, slicer selections, PvT dial values) via API. Visuals with user interactions rely on the full report canvas context. Pinning a static image of a visual is possible, but a live, interactive visual cannot be extracted and hosted elsewhere. Any 'pinned' visuals in a custom solution would be a snapshot only.</p>
 
-  <h5>2. Rendering Limitations</h5>
+      <h5>2. Rendering Limitations</h5>
 
-  <p>There is no way to render individual Power BI visuals without their full report context.</p>
+        <p>There is no way to render individual Power BI visuals without their full report context.</p>
 
-  <h5></h5>
+      <h5>3. Synchronisation Issues</h5>
+
+        <p>Custom tiles would break when the source reports are updated.</p>
+
+      <h5>4. Performance Impact</h5>
+
+        <p>Each custom tile would require separate Power BI API calls.</p>
+
+    <h3>3.1.2 Estimated Scale of Effort</h3>
+
+      <h5>1. High Complexity</h5>
+
+        <p>This would be a major integration project.</p>
+
+      <h5>2. Long Development Timeline</h5>
+
+        <p>It would likely span multiple development cycles.</p>
+
+      <h5>3. Continuous Maintenance</h5>
+
+        <p>Dedicated resource would be required for updates and ongoing maintenance.</p>
+
+      <h5>4. Single Point of Failure</h5>
+
+        <p>It creates a business-critical dependency on a bespoke component with no third party vendor support.</p>
+
+    <i>NB. As a developer, I can identify the technical challenges but cannot provide precise cost estimates for custom development work.</i>
+
+  <h2>4. The Rationale</h2>
+
+    <h3>4.1 Power BI dashboards are workspace-bound artefacts</h3>
+
+      <p>Power BI dashboards exist only in the Power BI service and <b>must</b> belong to a Power BI workspace.</p>
+
+      <p>Dynamics dashboards exist in Dataverse and have no native capacity to host Power BI dashboard tiles.</p>
+
+      <p>There is no supported mechanism or API to create Power BI dashboards within Dynamics or to pin Power BI visuals into Dynamics.</p>
+
+    <h3>4.2 Embedding Power BI is read-only</h3>
+
+      <p>The existing Power BI embedding in Dynamics authenticates the user, passes the context to Power BI and then renders the report from a Power BI workspace.</p>
+
+      <p>However embedding does not allow:</p>
+      <ol>
+        <li>Creation of dashboards</li>
+        <li>Pinning visuals</li>
+        <li>Modifying BI artefacts</li>
+      </ol>
+
+      <p>This is an intentional design constraint of Power BI embedding.</p>
+
+    <h3>4.3 Workspace and permission model conflicts</h3>
+
+      <p>Pinning visuals requires Member or Contributor access to the Power BI workspace.</p>
+
+      <p>This conflicts with the current abstraction based on an application approach to sharing the reports. This app approach allows us to separate audiences and this fact has been used as a design principle when creating the reports.</p>
+
+      <p>Allowing analytics users at the customers to pin would:</p>
+      <ul>
+        <li>break the curated app consumption. The users would have visibility of the reports via the workspace.</li>
+        <li>increase risk of misconfigured dashboards and reports. Can we trust the users' skillset?</li>
+        <li>complicate RLS-driven user experiences.</li>
+        <li>potentially lead to reports and dashboards being created and shared within the customer's organisation without any governance or oversight from us.</li>
+      </ul>
+
+    <h3>4.4 Security and RLS considerations</h3>
+
+      <ul>
+        <li>Dashboard tiles inherit RLS from the semantic model.</li>
+        <li>Sharing dashboards may show different data per user and lead to user-base confusion.</li>
+        <li>Embedding links to these dashboards within Dynamics does not change this RLS behaviour.</li>
+      </ul>
+  
+  <h2>5. Commercial & Licensing Implications</h2>
+    
+    <h3>5.1 Current Approach (Microsoft-Backed)</h3>
+
+      <h5>1. Predictable Licensing</h5>
+
+        <p>Uses standard Power BI Pro/Premium licenses.</p>
+
+      <h5>2. Vendor Support</h5>
+
+        <p>Fully supported by Microsoft.</p>
+
+      <h5>3. Scalable</h5>
+
+        <p>Works for all customers without custom deployment.</p>
+      
+      <h5>4. Maintenance-Free</h5>
+
+        <p>Infrastructure updates handled by Microsoft.</p>
+
+    <h3>5.2 Custom Solution Business Impact</h3>
+
+      <h5>1. High Initial Investment</h5>
+
+          <p>Would require significant development resources.</p>
+
+      <h5>2. Ongoing Maintenance Burden</h5>
+
+          <p>Custom code needs continuous updates.</p>
+
+      <h5>3. Support Complexity</h5>
+
+          <p>Would create new support categories and training needs.</p>
+
+      <h5>4. Vendor Risk</h5>
+
+          <p>Microsoft updates could break custom integrations.</p>
+
+      <h5>5. Limited Scalability</h5>
+
+          <p>Each customer customisation would add complexity.</p>
+
+    <h3>5.3 Customer Experience Considerations</h3>
+
+      <h5>1. Increased Support Needs</h5>
+
+        <p>Customers would need training on custom functionality.</p>
+
+      <h5>2. Governance Challenges</h5>
+
+        <p>Uncontrolled dashboard creation could lead to confusion.</p>
+
+      <h5>3. Performance Expectations</h5>
+
+        <p>Custom solutions often have slower performance.</p>
+
+  <h2>6. Options Considered</h2>
+
+    <h3>6.1 Option 1 - Power BI dashboards created in Power BI Service and embedded or linked in Dynamics</h3>
+
+      <p style="color:forestgreen; font-weight: 700;">Viable (with constraints)</p>
+
+      <p>The workflow would be as follows:</p>
+      <ul>
+        <li>Users create dashboards in their Power BI Service.</li>
+        <li>Dashboards live in the Analytics workspace.</li>
+        <li>Internal staff then embed these dashboards on the customer's core Dynamics app.</li>
+      </ul>
+
+      <p>Characteristics:</p>
+      <ul>
+        <li>Read-only in Dynamics.</li>
+        <li>Live data connection so updates with any data changes.</li>
+        <li>Requires Power BI permission to view (in the same way as the current embedded report).</li>
+      </ul>
+
+      <p>Each customer dashboard would be different so would require a unique configuration in their core Dynamics app. <b>This is not a "rinse-and-repeat£ embedding each time.</b></p>
+      
+      <h3>6.1.1 Permissions Implication</h3>
+
+        <p>For a customer user to complete Step 1 (create a dashboard in the Power BI Service), they <b>must</b> be granted Member or Contributor access to the workspace. This has a number of implications:</p>
+
+        <ul>
+          <li>It breaks the existing curated app approach.</li>
+          <li>It grants users ability to modify existing reports, create new content and share content via email.</li>
+          <li>It means we would have to manage all permissions at the more granular workspace / dashboard level abandoning the App based audience management currently in place.</li>
+        </ul>
+
+        <p>This is a fundamental shift in security, control and support responsibility.</p>
+    
+    <h3>6.2 Option 2 - Pin visuals directly into Dynamics dashboards</h3>
+      <p style="color:red; font-weight: 700;">Rejected</p>
+
+      <p>This is not feasible for the following reasons:</p>
+      <ul>
+        <li>Not supported by Power BI or Dynamics.</li>
+        <li>No API or embedding capability exists.</li>
+        <li>Violates workspace boundaries.</li>
+      </ul>
+    
+    <h3>6.3 Option 3 - Curated dashboard-style report pages embedded in Dynamics</h3>
+      <p style="color:forestgreen; font-weight: 700;">Viable</p>
+
+      <p>This would work as follows:</p>
+      <ul>
+        <li>Internal team creates report pages designed as dashboards (so a consolidation of visuals from across the report suite).</li>
+        <li>These reports would be embedded in Dynamics in the same fashion as the current embedded report.</li>
+      </ul>
+
+  <h2>7. Multi-Tenant Implementation Reality</h2>
+    
+    <h3>How Option 1 Would Actually Work</h3>
+
+    <p>For a <i>single</i> customer :</p>
+    <ol>
+      <li>Customer creates dashboard in their Power BI workspace.</li>
+      <li>Internal team updates Dynamic embedding configuration.</li>
+      <li>Updated core app deployed to that customer.</li>
+    </ol>
+
+    <p>For <i>multiple</i> customers:</p>
+
+      <h5>1. Configuration Management Challenge</h5>
+
+      <p>Each customer needs separate embedding configuration.</p>
+
+      <h5>2.Deployment Complexity</h5>
+
+      <p>Potentially separate app deployments per customer. Deployment timelines would presumably follow the timeline for the core Dynamics deployments so would not be as timely as customer might expect.</p>
+
+      <h5>3. Support Overhead</h5>
+
+      <p>Each customisation increases support burden.</p>
+
+    <h3>7.2 Limitations to Communicate</h3>
+
+    <p>Worth calling out the limitations:</p>
+
+    <h5>1. Not Self-Service</h5>
+    <p>Customers cannot embed dashboards themselves.</p>
+
+    <h5>2. Fundamental Security Model Change</h5>
+    <p>Requires elevating customer user privileges on the Power BI workspace reducing security, governance and increasing maintenance overhead.</p>
+
+    <h5>3. Lead Time Required</h5>
+    <p>Dashboard requests require internal team involvement and would presumably be deployed in line with current core development cycle.</p>
+
+    <h5>4. Scalability Concerns</h5>
+    <p>Manual process doesn't scale to hundreds of customers.</p>
+
+    <h5>5. UX Concerns</h5>
+    <p>How many dashboards would a customer require? If more than one, how and where would these be integrated into Dynamics?</p>
+
+  <h2>8. Recommendation to Stakeholders</h2>
+
+    <p>Based on my analysis:</p>
+
+    <table>
+      <tr style="text-align: left;">
+          <th>Option</th>
+          <th>Description</th>
+          <th>Technically Viable?</th>
+          <th>Dev/Resource Alignment & Ability</th>
+          <th>Commercial Sense</th>
+          <th>Key Risks / Considerations</th>
+      </tr>
+      <tr>
+          <td>Option 1: Power BI Dashboards + Embedding</td>
+          <td>Customers create in Power BI Service. Internal team embeds in Dynamics.</td>
+          <td><b>Yes</b> with constraints.</td>
+          <td><b>Medium.</b> Requires process change and ongoing configuration work per customer.</td>
+          <td><b>Conditional.</b> Increases value but also overhead. Must adjust security model.</td>
+          <td>Shifts security to workspace grain. Risks scale linearly with customer count.</td>
+      </tr>
+      <tr>
+          <td>Option 2: Native Pinning to Dynamics</td>
+          <td>As originally requested.</td>
+          <td><b>No.</b> Platform limitation.</td>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>Not possible.</td>
+      </tr>
+      <tr>
+          <td>Option 3: Curated Dashboard Reports</td>
+          <td>Internal team builds "dashboard-style" report pages and embed them in Dynamics.</td>
+          <td><b>Yes.</b> Uses existing pattern.</td>
+          <td><b>High.</b> Uses current skills. Low risk. Scalable.</td>
+          <td><b>Good.</b> Maintains control, costs remain predictable. Enhances current offering.</td>
+          <td>Does not enable customer self-service.</td>
+      </tr>   
+      <tr>
+          <td>Option 4: Custom Development</td>
+          <td>Build a bespoke integration.</td>
+          <td><b>Theoretically.</b> High complexity and risk.</td>
+          <td><b>Very low.</b> High cost. Long development cycle. Permanent maintenance burden.</td>
+          <td><b>Poor.</b> Negative ROI, conflicts with current model. High support costs.</td>
+          <td>Becomes a mission-critical unsupported liability.</td>
+      </tr>   
+
+    </table>
+
+    <h3>8.1 Recommended Path Forward</h3>
+
+    <ol>
+      <li>Enable Option 1 where there is a clear customer need. Use Power BI's native dashboard capabilities.</li>
+      <li>Create user guidance. Help customers navigate between Dynamics and Power BI.</li>
+      <li>Consider Option 3. Develop curated dashboard-style report pages.</li>
+      <li>Monitor for platform updates. Microsoft occasionally adds new integration capabilities.</li>
+    </ol>
+
+  <h2>9. Consequences of Choosing Option 1</h2>
+
+    <table>
+      <tr style="text-align: left;">
+          <th>Aspect</th>
+          <th>Reality</th>
+          <th>Implication</th>
+      </tr>
+      <tr>
+          <td>Responsibility</td>
+          <td>No separation of concern. Customers gain content creation responsibility. Internal team retains configuration and security governance accountability.</td>
+          <td>Creates a hands-on co-dependent model.</td>
+      </tr>
+      <tr>
+          <td>Security</td>
+          <td>Moves from a curated app-based abstraction to a more granular workspace access model.</td>
+          <td>Reduces control, increases governance overhead and misconfiguration risk.</td>
+      </tr>
+      <tr>
+          <td>RLS & Architecture</td>
+          <td>Aligns with Microsoft best practice.</td>
+          <td>Avoids the cost, risk and maintenance of a custom integration</td>
+      </tr>   
+      <tr>
+          <td>User flexibility</td>
+          <td>Users can create and modify dashboards using Power BI Service. They can also create, amend and share other elements.</td>
+          <td>Achieves the core <i>ask</i> but outside the Dynamics infrastructure.</td>
+      </tr>   
+    </table>
+
+  <h2>10. Clarification on </h2>
+
+    <p>If a Power BI dashboard is embedded or linked in Dynamics any changes made in Power BI Service (tiles, layout, pinned visuals) are reflected automatically in Dynamics because Dynamics renders a live view of the dashboard.</p>
+
+    <p>Dynamics acts as a read-only window into Power BI.</p>
+
+  <h2>11. Final Notes</h2>
+
+    <p>This decision aligns with:</p>
+    <ul>
+      <li>Power BI Service architecture</li>
+      <li>Microsoft-supported embedding practices</li>
+      <li>Secure, scalable analytics delivery</li>
+    </ul>
 
  </div>
-
-
-
-
 
  
   <h4 class="case-study">What Happened Next?</h4>
 
-  <p>The new card visual became generally available (GA) and the team embarked on replacing the existing cards as suggested into multi-column and grid cards. The static background idea remains an idea on the backlog. The custom visual dials were replaced with native visuals.</p>
-
-  <p>The reports became quicker to render as a result of the changes.</p>
+  <p>This was a proactive investigation spike. The findings above were circulated to the stakeholders for deliberation and no further action has been taken thus far.</p>
 
   <br>
     <hr class="section-divider">
