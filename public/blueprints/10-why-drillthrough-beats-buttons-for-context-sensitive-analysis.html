@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why Drillthrough Beats Buttons For Context-Sensitive Analysis</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    h2 {
+      color: #681f1f
+    }
+    h3 {
+      color: #8E5757;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #B48F8F;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#B48F8F
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Why Drillthrough Beats Buttons For Context-Sensitive Analysis</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>We had a Power BI report which showed an individuals performance against target for a user-selected KPI. The limitation was that the report was only able to show performance for the current period. So how they were doing against this week's or month's target.</p>
+
+  <p>The ask was to investigate what is possible in terms of being able to see the individual's historic performance over time for the KPI in question.</p>
+
+  <p>Below is a write up of the investigation carried out:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 5 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Background</h2>
+  
+    <p>When we look at a team or an individual's actual vs target position, we are only able to show the current timeframe. We have no sense of history and how, for example, an individual did last month, last quarter, last year. </p>
+    
+    <p>This makes contextualising the current timeframe performance difficult. Is for example a figure of 70% of target better than previous timeframes or worse than previous timeframes for this individual?</p>
+
+    <p>This problem is less about visual design and more about what evaluation context can (and cannot) be passed between report elements.</p>
+
+  <h2>Investigation</h2>
+
+    <p>There are a number of designs we could implement to achieve this but all of them boil down to two main implementations both with the advantages and disadvantages:</p>
+
+    <h3>1. Using a Button</h3>
+  
+      <p>This could take several forms. For example:</p>
+
+      <h5>View History</h5>
+
+        <p>A button with a View History tooltip and icon which leads to a pop-up showing the historical performance:</p>
+
+        <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-1.png' alt='View History button on Power BI visual' style='max-width:100%; height:auto'><figcaption>View History button on Power BI visual</figcaption></figure> 
+
+        <p>which would then lead to a pop-up displaying a line chart showing performance over time: </p>
+
+        <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-2.png' alt='Line chart on modal' style='max-width:100%; height:auto'><figcaption>Line chart showing individual's performance over time for chosen KPI</figcaption></figure> 
+      
+      <h5>Toggle Buttons</h5>
+
+        <p>Another option could be to have a couple of buttons at the top of the visual and allow the user to toggle between the dial and a line chart:</p>
+
+        <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-3.png' alt='Dial with toggle buttons' style='max-width:100%; height:auto'><figcaption>Default view showing the dial with toggle buttons</figcaption></figure>
+        
+        <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-4.png' alt='Line chart with toggle buttons' style='max-width:100%; height:auto'><figcaption>View when line chart button selected</figcaption></figure>
+
+      <p>Advantages</p>
+      <ul>
+        <li>Complete flexibility of how we construct this trigger from a UI point of view.</li>
+        <li>Could be a pop up on the existing page or navigation to a new page.</li>
+      </ul>
+
+      <p>Disadvantages</p>
+      <ul>
+        <li>No way to pass the evaluation context to the button.</li>
+      </ul>
+
+      <p>So the button will not know which of the KPIs you are looking at. This information would have to be statically held in the destination page using bookmarks.</p>
+
+      <p>In other words, we would need at least 15 bookmarks - one for each distinct KPI (and also potentially three for each KPI depending on whether the individual has a daily, weekly or monthly target).</p>
+
+      <p>We would also need different destinations and therefore different bookmarks depending on whether the user is navigating from the team or individual context.</p>
+
+      <p>The maintenance challenge and performance implications of this solution (the report would have many pages which may make loading and rendering take a not insignificant amount of time) would make it unfavourable as a solution.</p>
+    
+    <h3>2. Using drillthrough</h3>
+
+      <p>We can refactor how we show the performance target in each of the dials. Instead of having it as an attribute of the visual, we could superimpose a card visual (or a one-cell table visual) on top of the dial visual.</p>
+
+      This would then give us the ability to drillthrough to a separate page showing actual vs target over time. 
+
+      <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-5.png' alt='dial with drillthrough' style='max-width:100%; height:auto'><figcaption>Dial with overlaid one-cell table visual allowing drillthrough</figcaption></figure>
+
+      <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-6.png' alt='Drillthrough line chart page' style='max-width:100%; height:auto'><figcaption>Drillthrough page displaying line chart showing performance over time</figcaption></figure>
+
+      <p>Advantages</p>
+      <ul>
+        <li>This only requires one additional page. The drillthrough functionality brings the filter context of the initial page to the destination page so that the visuals reflect this context.</li>
+      </ul>
+
+      <p>This means whether we are drilling through from the individual page or the team page, the destination page would be the same. It is the filters which are passed from the originating page which provide the context of what is shown in the visual.</p>
+
+      <p>Disadvantages</p>
+      <ul>
+        <li>The user experience is not as friendly / intuitive as clicking on a button. It involves right-clicking on a metric and navigating a menu.</li>
+      </ul>
+
+      <p>This user experience could be improved somewhat by adding a drillthrough button. This would work as follows:</p>
+
+      <h5 class="tight-header">Step 1</h5>
+      <p class="tight-paragraph">The dial would be shown as normal by default:</p>
+
+      <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-7.png' alt='default dial' style='max-width:100%; height:auto'><figcaption>Dial when first opening the report</figcaption></figure>
+      
+      <h5 class="tight-header">Step 2</h5>
+      <p class="tight-paragraph">The user clicks on the percentage and the view history icon appears:</p>
+      <figure><img src='../blueprint_images/10-why-drillthrough-beats-buttons-8.png' alt='dial with view history icon' style='max-width:100%; height:auto'><figcaption>View history icon appears after clicking percentage</figcaption></figure>
+
+      <h5 class="tight-header">Step 3</h5>
+      <p class="tight-paragraph">Clicking this button would take you to a drillthrough page.</p>
+      
+    <h3>Note</h3>
+      <p>A couple of things to be aware of:</p>
+      <ol class="tight-list">
+        <li>The drillthrough method requires the user to drill through on a metric - I have chosen the percentage of target figure. It could equally be achieved by drilling through on the actual figure.</li>
+        <li>In order to implement a drillthrough button, the percentage measure is actually within a table visual which has been shrunk to display only one cell. This is because when the user selects a cell from a table visual, this has the impact of filtering the data which the drillthrough button "listens" for and becomes enabled when the data has been sliced in this way. Conversely clicking on a card does not affect the underlying dataset. A bit of a hacky solution.</li>
+      </ol>
+
+  <h2>Other Options</h2>
+      <p>The only other option considered (and discounted) was using a custom tooltip.</p>
+      <p>This provides the user with a snapshot of the performance history only. There is no means for them to interact with the tooltip by, for example, changing the timeframe of the line chart, cross-filtering or exporting the data.</p>
+
+      <p>In addition adding a custom tooltip to a custom visual (which is what the dials are) requires further investigation on how to do and was outside the scope of this work.</p>
+
+  <h2>Final Thoughts</h2>
+      <p>I think it would be beneficial to do a small spike (1/2 - 1 day) when we have the historic data within the model to check that the above remains true and there are no "gotchas" with how the real data would interact with the above theory.</p>
+
+      <p>In terms of what could actually be displayed, it would depend on what is the key thing of interest - does the user need to know the actuals and the targets (so two metrics) over time or just the percentage of target achieved over various timeframes? This would inform the decision of what to show visually.</p>
+
+      <p>While button-driven UX appears far more intuitive, it breaks down quickly due to lack of context awareness. Drillthrough despite a less polished interactive method, aligns with the semantic model and scales cleanly.</p>
+
+ </div>
+
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team decided to implement the drillthrough button approach. The drillthrough page then displayed a column chart (one column per week or month depending on target cadence) rather than the line chart shown in the mockups above.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="9-pinning-powerbi-reports-to-dynamics.html">← Previous: Pinning Power BI Reports to Dynamics</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
