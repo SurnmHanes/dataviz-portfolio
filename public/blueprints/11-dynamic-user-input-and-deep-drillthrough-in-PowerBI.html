@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nested Drillthrough and Dynamic Weightings in Power BI: A Technical Investigation</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    h2 {
+      color: #065FF8
+    }
+    h3 {
+      color: #2E78F8;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #5691F7;
+      font-size: 18px
+    }
+    
+    .archival-document h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#7EABF7
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Dynamic User Input and Deep Drillthrough in Power BI</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>We had an existing Power BI report which we were looking to enhance with a couple of high-level requirements as follows: </p>
+  
+  <ol>
+    <li>Drillthroughs to the individual records based on status.</li>
+    <li>Users having the ability to change the weightings.</li>
+  </ol>
+  
+  <h5>Drillthroughs</h5>
+  
+  <p>The main visual in the report shows high level "buckets" of likely income with segments of the stacked bar chart for vacancies, existing placements and likely extensions.</p>
+
+  <p>By clicking on a segment in the visual, the user can navigate to a drillthrough page showing a more detailed breakdown of, for example, the vacancies making up the forecast so they can see another stacked bar chart with these segments representing the differently weighted vacancies based on shortlist progression.</p>
+
+  <p>The investigation required is to assess options for then being able to select a segment of these detailed bars (e.g. perm vacancies at offer stage, weighted at 90% of available gross profit) and navigate to a further drillthrough showing row level detail of each vacancy making up that segment of the forecast (including the ability to navigate to that record in core similarly to other reports) </p>
+
+  <h5>Weightings</h5>
+
+  <p>The investigation for the second item is to assess options for enabling a user to change the weightings applied to different segments that make up the forecast within the report itself.</p>
+
+  <p>For example, rather than apply a weighting of 30% of True GP for a Permanent vacancy at "submitted" stage, an organisation may want to reduce this to only 20%.</p>
+
+  <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-1.png' alt='stacked bar showing forecast for different job categories' style='max-width:100%; height:auto'><figcaption>Forecast Chart Based on User Selected Weightings</figcaption></figure>
+
+  <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-2.png' alt='drillthrough chart showing breakdown for forecasted Perm Vacancies' style='max-width:100%; height:auto'><figcaption>Drillthrough Chart Showing Breakdown for Forecasted Perm Vacancies</figcaption></figure> 
+
+  <p>Below is a write up of the investigation carried out:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 5 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Problem</h2>
+
+    <p>We are looking at enhancing the GP Forecast report and as such we want to investigate whether two suggested enhancements are feasible. The items under consideration are:</p>
+    
+    <ol>
+      <li>Drillthrough to individual records.</li>
+      <li>Users able to change weightings applied.</li>
+    </ol>
+
+    <p>We need to satisfy ourselves whether these can be implemented or not. And if so, what compromises or considerations we must be aware of prior to going ahead and doing the necessary development.</p>
+
+  <h2>Background</h2>
+  
+    <p>A drillthrough page works by telling Power BI that for this page we wish to navigate to it from one measure or a combination of them (can also drillthrough from columns) anywhere else on the report. So the functionality activates when the user filters (by making a selection, right-clicking or hovering over) a segment of a visual where the measure / column / combination is used.</p>
+    
+    <p>The main visual in the report shows a stacked bar chart over time with "buckets" of likely income relating to vacancies, existing placements and likely extensions.</p>
+
+    <p>Currently there is a drillthrough in place which allows the user to navigate from, for example, the vacancies to an additional stacked bar chart split into further buckets representing each of the stages involved in the shortlist progression and the forecast income each of these stages will generate based on a set probability weighting.</p>
+
+    <p>The first item in this investigation is to see if it is possible to drillthrough from this more detailed stacked bar chart to a table visual detailing the individual records (vacancy records in this example) which make up the total income for that bucket.</p>
+
+    <p>Additionally the main visual includes two buckets for existing placement income (contract/temp and permanent placements). These two buckets do not drillthrough to the secondary stacked bar chart (since they are current / existing income rather than forecast income). So this item is also to understand if we can drillthrough from the main visual to line level data (for these buckets) rather than from the secondary stacked bar chart.</p>
+
+    <p>The second item is to investigate whether it is possible for the user to be able to change the weighting assigned to each of the different segments and thus make the visual react to these changes and therefore be more insightful.</p>
+
+  <h2>Investigation</h2>
+
+    <h3>Drillthrough to Individual Records</h3>
+
+      <p>I think the concern here was drilling through from a drillthrough page. In principle this is not a problem but of course there are things to consider when doing so.</p>
+
+    <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-3.png' alt='drillthrough capability on a drillthrough chart' style='max-width:100%; height:auto'><figcaption>Drillthrough Capability on a Drillthrough Chart</figcaption></figure>
+
+      <h4>Considerations</h4>
+        
+        <p>In theory we could have only one drillthrough page and include all the measures in the stacked bar chart. This would then mean that whichever "bucket" the user hovers over, the same drillthrough would be available and would allow the user to navigate to the same target page.</p>
+
+        <p>This approach has been taken by the functionality for the drillthrough from the main page to the secondary page: when we drillthrough from one of the segments above the line or the corresponding segment below the line, we end up in the same drillthrough page. </p>
+
+        <p>This works because the target page is identical regardless of where you drillthrough from. However this won't work here because we want to view the underlying (vacancy etc) records that make up the particular segment the user has drilled down from and the segments are all mutually exclusive. A (vacancy) record exists in one and only one segment.</p>
+
+        <p>So, I believe, we will need a separate drillthrough target page created for every category in each of the secondary charts.</p>
+
+    <h3>User-Driven Weightings</h3>
+    
+      <p>The obvious solution here is to use what-if parameters - new parameters to allow the user to vary the percentage for each of the weightings via a slicer or a text box (such as in Contract Finishers). The measures are then adapted to be multiplied by this value so if the user, for example, selects 50% weighting, the measure returns 50% of the original value.</p>
+
+      <p>When a new numeric parameter is created, Power BI creates a one-column table in the background with each row containing each option that the user may wish to select.</p>
+
+      <p>The concern is the number of variables that we want to be adjusted by the user as we want the following to be user-driven:</p>
+
+      <ul>
+        <li>Vacancies weighted based on their current status (shortlisted, interview stage, offer etc.)</li>
+        <li>Placements weighted based on their likelihood to extend.</li>
+      </ul>
+
+      <p>So we could end up with multiple of these one-column tables clogging up our model.</p>
+
+      <p>Other approaches were tried to attempt to reduce the amount of tables that might be needed, however each approach encountered two main problems:</p>
+      <ol>
+        <li>Slicer interference.</li>
+        <li>Metrics being used on the same visual.</li>
+      </ol>
+
+      <h4>Slicer Interference</h4>
+
+        <p>To allow user input, we need to provide a list of values to a slicer for a user to pick from. If separate lists (i.e. separate table columns) is not the way forward then we need to look at slicers sharing a joint list of values instead.</p>
+
+        <p>The issue here then becomes that if the user makes a selection from slicer 1, then the underlying list of values has now been filtered to just one option (the one chosen in slicer 1) so when the user goes to slicer 2, they only have one option to choose from rather than the original full list of values.</p>
+
+        <p>The resolution to this is by editing interactions in the UI between the slicers - essentially telling slicer 2 to ignore slicer 1 and vice versa. This is the way that the dials were built on Manager - Performance vs Target ("MPvT").</p>
+
+        <p>The issue here is that the choice made in slicer 1 isn't just ignored, it's "overwritten" by slicer 2. From the backend table point of view, it shows that the table has been filtered by slicer 2 only. So any measures which are based on the percentages chosen, will all apply the percentage as per slicer 2 and slicer 1 percentage will be ignored.</p>
+
+        <p>Unlike in HTML we are unable to target the input value in slicer 1 and apply this to measure 1 while at the same time using the input value from slicer 2 and applying this to measure 2.</p>
+
+        <p>With a shared list of percentages to pick from, we're unable to apply different percentages to different measures.</p>
+
+        <p>(We can achieve this in the MPvT report because we essentially ring-fence each pairing of slicer and visual from each other so one slicer drives one visual and no more. A slightly different scenario.)</p>
+
+      <h4>Metrics on a shared visual</h4>
+
+        <p>Because the measures which are based on the slicer inputs are used in a shared visual we are unable to de-couple them from one another. If they were used on separate visuals we could edit interactions and potentially do as we did for the MPvT.</p>
+
+  <h2>Summary</h2>
+
+      <h3>Drillthrough to Individual Records</h3>
+
+        <p>This can be done and drilling through from a drillthrough table is not a problem. The filters applied on the original page are combined with the new ones coming from the segment that the user chooses to drillthrough from. </p>
+
+        <h4>Storage and Performance</h4>
+
+          <p>Additional drillthrough pages add very little additional storage overhead. Just a few extra lines in the report.json file. No additional data is added to the semantic model.</p>
+
+          <p>Performance-wise, the drillthrough pages don't "exist" until the user activates the drillthrough mechanism to go to the drillthrough page. At this point the table visual will render. What will decide how efficient this is from a performance point of view is not the number of pages in the report but rather the complex DAX used in the data in the table. This will therefore need careful consideration in terms of the columns to be displayed in these drillthrough tables.</p>
+
+        <h4> Other Concerns</h4>
+
+          <p>I actually think the biggest issue will be from the front end side of things. There are a couple of things worth calling out: 1) Maintaining the large number of drillthrough pages will be difficult from a developer point of view and 2) from an end user point of view the navigation between pages could be a confusing, overwhelming or even frustrating experience - being able to view similar looking tables but perhaps not grasping their distinction or remembering how to navigate to them the next time.</p>
+
+      <h3>User-Driven Weightings</h3>
+
+        <p>This is again something we can do via the native approach of What-If parameters.</p>
+
+          <h4>Storage and Performance</h4>
+
+            <p>The underlying tables are one-column tables with values ranging from 0% to say, 200% incrementing by 1%. This is 200 rows of integer data. For each What-If parameter. Uncompressed this won't take up much storage and the Vertipaq engine compresses columnar integer data incredibly well on top of this. Since these will all be disconnected tables, there are no relationships (which add overhead) to the dimension and fact tables to be concerned about from a performance point of view during load and refresh.</p>
+
+            <p>These extra tables will also have minimal effect on model refresh times since they are small number of rows and contain static integer data only (i.e. there are no calculations).</p>
+
+          <h4>Other Concerns</h4>
+
+            <p>Any performance issues that may arise will be felt in the report itself. And will not be as a result of the What-If parameters. Rather it will be as a result of complicated scenarios / DAX which is being recalculated as a result of the user input. And there may be an opportunity to simplify these.</p>
+
+            <p>There was also a question about the fact that it is not possible for the user to select a segment to then drillthrough from. This unfortunately is Power BI functionality and it is not possible to highlight one segment of a stacked bar chart. However there are a couple of interactions that may be of interest in place of this:</p>
+
+            <p>By selecting the relevant segment in the legend, the chart will cross-highlight:</p>
+
+            <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-4.png' alt='stacked bar chart cross highlighted' style='max-width:100%; height:auto'><figcaption>The green segment has been cross-highlighted after selecting it in the legend.</figcaption></figure>
+
+            <p>By hovering over the relevant segment, the context menu will pop up and give the user the ability to drillthrough from that segment:</p>
+
+            <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-5.png' alt='drillthrough capability from segment' style='max-width:100%; height:auto'><figcaption>Drill through capability from hovering over relevant segment</figcaption></figure>
+
+            <p>By right-clicking on the relevant segment, the context menu gives the user the ability to drillthrough from that segment:</p>
+
+            <figure><img src='../blueprint_images/11-dynamic-user-input-and-deep-drillthrough-6.png' alt='drillthrough capability from right clicking relevant segment' style='max-width:100%; height:auto'><figcaption>Drill through capability from right clicking relevant segment.</figcaption></figure>
+
+  <h2> Out of Scope</h2>
+
+      <p>Translytical task flows  allow native data write-back from a Power BI report. However this has not been considered because a) it requires a drastic change in underlying infrastructure - reliance on Fabric SQL databases and Fabric User Data Functions and b) it is a preview feature which came out very recently (in May 2025).</p>
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team decided to implement both the drillthroughs from the drillthrough page and the what-if parameters so the user could define their own weightings.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="10-why-drillthrough-beats-buttons-for-context-sensitive-analysis.html">← Previous: Why Drillthrough Beats Buttons For Context-Sensitive Analysis</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
