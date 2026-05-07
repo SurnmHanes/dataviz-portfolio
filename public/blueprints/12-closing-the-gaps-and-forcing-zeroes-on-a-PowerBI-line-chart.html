@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Closing the Gaps</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #61475e
+    }
+    h3 {
+      color: #ad88ab;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #B48F8F;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#B48F8F
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Closing the Gaps and Forcing Zeroes on a Power BI Line Chart</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: DAX context manipulation, Power BI semantic modelling, filter context debugging, UX-driven data modelling, and time series visualisation design.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Implemented a control-flow DAX pattern to preserve slicer behaviour while enabling continuous time-series visualisation with zero-filled gaps.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+  
+  <p>In our Power BI report suite, one of our reports had a line chart plotting user-selected measure over months. We received customer feedback stating that it can be difficult to understand where no data exists for part of the period in question. The current behaviour is that the line breaks and re-starts the following month. The customer asked whether the line could drop to zero instead rather than disappear.</p>
+  
+  <figure><img src='../blueprint_images/12-closing-the-gap-1.png' alt='line chart with gaps' style='max-width:100%; height:auto'><figcaption>Line chart with gaps where there is no data</figcaption></figure>
+
+  <p>Below is a write up of the investigation carried out:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 4 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Objective</h2>
+
+    <p>The objective of this spike was to determine how to display continuous time series (including zero values for missing data) without breaking existing date filter behaviour.</p>
+
+    <p>The challenge was to achieve this without altering existing measures or breaking report-wide filter behaviour.</p>
+
+  <h2>Background</h2>
+  
+    <p>The line chart in question is actually flexible in design:</p>
+    
+    <ul>
+      <li>It is driven by the normal slicers in the filter pane that all reports in the suite have.</li>
+      <li>It is also driven by a hierarchy slicer which allows the user to view by Consultant, by Team, by Site or by Business Unit.</li>
+      <li>It is also dependent on a field parameter which is materialised in the UI as a dropdown for the user to select one out of a total of 12 different measures to view on the line chart.</li>
+    </ul>
+
+    <p>A customer provided feedback on this comparison page main visual:</p>
+
+    <p>"Chart is not easy to understand at a glance because where no data exists for any consultant for example, the line representing that person breaks and then starts again the following month - could it drop to zero instead?"</p>
+
+    <p>We attempted to add 0 to blanks so that the line chart wouldn't have breaks in each line where no data was available.</p>
+
+    <p>However when we did this for any measures in the dropdown, all dates outside the selected range appeared in the x-axis and the date period selector was essentially being ignored with the visual showing years & years of data.</p>
+
+    <figure><img src='../blueprint_images/12-closing-the-gap-2.png' alt='line chart with no gaps but ignoring time frame' style='max-width:100%; height:auto'><figcaption>Continuous line chart but time frame selected not being respected.</figcaption></figure>
+
+    <p>So how could we meet the customers request?</p>
+
+  <h2>Outcome</h2>
+
+    <p>A working solution has been identified using DAX.</p>
+
+    <h3>Root Cause</h3>
+
+      <p>The cause of the issue was the way that the measure being plotted interacts with the date filter context.</p>
+      
+      <p>By replacing BLANK() with 0 directly in the measure, the visual no longer treats missing data as absent. This causes Power BI to materialise all dates from the date table, effectively bypassing the intended slicer-driven filter behaviour and displaying the full date range.</p>
+
+    <h3>Solution</h3>
+
+      <p>Instead of altering the source measures, we use a so-called <b>control flow</b> measure and plot this in the visual. A control flow measure <i>controls what calculation is performed downstream</i> by determining the user selection in the UI and then running the correct measure based on this selection.</p>
+
+      <p>This measure evaluates the metric chosen by the user for every date value in DimDate. It also checks if the current data point falls within the user's selected period (as given by the date slicer) and returns one of three outcomes:</p>
+
+      <ol>
+        <li>blank for out of range dates.</li>
+        <li>the measure value where it is non-blank or</li>
+        <li>zero where it evaluates to blank.</li>
+      </ol>
+
+      <p>This preserves all existing filter relationships and slicer functionality.</p>
+
+      <p>The detail of the measure is included below under 'Technical Note'.</p>
+
+      <figure><img src='../blueprint_images/12-closing-the-gap-3.png' alt='Continuous line chart reducing to zero' style='max-width:100%; height:auto'><figcaption>Continuous line chart reducing to zero when data is missing rather than breaking.</figcaption></figure>
+
+      <p>The resultant visual improves readability and reduces confusion and ambiguity for end users.</p>
+
+  <h2>Implementation Effort</h2>
+
+      <p>The effort required is <b>low</b>. It solely requires creating a new measure in the semantic model and updating the y axis to plot this new measure.</p>
+
+      <p>The change would be isolated to this visual only so there is no danger of anything else breaking in the report suite.</p>
+
+  <h2>Recommendation</h2>
+
+      <p>Proceed with implementing the change as described.</p>
+
+  <h2>Technical Note</h2>
+
+      <p>A possible DAX measure that I think will achieve the requirements is below. The key technical points are:</p>
+
+      <ol>
+        <li>By using an ordinal to match, we don't need to worry about the names of the measures in the dropdown changing. It will still work (unless the order of the measures in the dropdown changes or measures are added to or removed from the existing 12)</li>
+        <li>Using ALLSELECTED means we get the period selected by the date slicer and we completely ignore the dates on the visual</li>
+        <li>We then compare this period with every date and only plot something when the dates overlap</li>
+        <li>And what we plot is the measure value or 0, if it evaluates to blank.</li>
+      </ol>
+
+      <pre><code class="language-dax">
+        -- obtain the number from the order column of the field parameter table (this identifies which measure the user has selected)
+      VAR _selectedMeasureOrdinal = SELECTEDVALUE( 'Activity Comparison'[Activity Comparison Order] )
+
+      -- evaluate the relevant measure calculation
+      VAR _measureCalculation = 
+      SWITCH( 
+          _selectedMeasureOrdinal,
+          0, [Vacancy Positions Sum],
+          1, [Shortlist Submit Count],
+          2, [Shortlist Interview Count],
+          3, [Shortlist Offer Made Count],
+          4, [Placement New Excluding Cancelled Count],
+          5, [Placement Gross Profit Excluding Cancelled Sum],
+          6, [Candidate Count],
+          7, [Client Count],
+          8, [Client Contact Count],
+          9, [Speculative Send Count],
+          10, [Phonecall Count],
+          11, [Appointment Count]
+      )
+
+      -- obtain the minimum and maximum dates as per the selections external to the visual
+      VAR _minDate = 
+          CALCULATE( 
+              MIN( DimDate[Date] ), 
+              ALLSELECTED( DimDate ) 
+          )
+
+      VAR _maxDate = 
+          CALCULATE( 
+              MAX( DimDate[Date] ), 
+              ALLSELECTED( DimDate ) 
+          )
+
+      -- check if the date given by the x-axis row context is within the date range given by the external selections
+      VAR _hasValidPeriodContext = 
+      NOT 
+          ISEMPTY( 
+              FILTER( 
+                  DimDate,
+                  DimDate[Date] >= _minDate
+                      && DimDate[Date] <= _maxDate
+              )
+          )
+
+      -- if the measure calculation is blank but the date is in the valid date range, return a 0. Otherwise return the measure calculation
+      VAR _result = 
+      IF( 
+          ISBLANK( _measureCalculation )
+              && _hasValidPeriodContext,
+          0,
+          _measureCalculation
+      )
+      RETURN 
+      _result
+      </code></pre>
+
+          
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team were happy with the investigation and decided to change the measure being used in the line chart to the one suggested.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="11-dynamic-user-input-and-deep-drillthrough-in-PowerBI.html">← Previous: Dynamic User Input and Deep Drillthrough in Power BI</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
