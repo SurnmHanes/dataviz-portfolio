@@ -264,3 +264,26 @@ p:has(+ .tight-list) {
 .section-home {
   border-color:  #f9c73c
 }
+
+.case-study-meta {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #444;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.2px;
+  text-align: left
+}
+
+.case-study-outcome {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-style: italic;
+  text-align: left
+}
+
+header h1 {
+  margin-bottom: 0.5rem;
+}

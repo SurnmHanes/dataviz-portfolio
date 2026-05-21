@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>When Deletion and Archiving Look The Same</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #61475e
+    }
+    h3 {
+      color: #ad88ab;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #B48F8F;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#B48F8F
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>When Deletion and Archiving Look The Same</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Root cause analysis, ambiguity identification, cross-system investigation, data lifecycle assessment, risk-based prioritisation.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Discovered that the downstream data warehouse deletion logic treats archived records as deleted, creating a data integrity risk. No solution was implemented because the investigation raised a number of questions that need upstream clarification before a reliable solution can be defined.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>In this organisation, “Core” refers to the source transactional system (Dataverse), while “Analytics” refers to the downstream reporting warehouse.</p>
+
+  <p>The “storage solution” is a retention mechanism that archives completed activity records into a Cosmos database after a defined period.</p>
+
+  <p>This spike investigates whether the current Analytics logic correctly distinguishes between:</p>
+
+  <ul>
+    <li>archived records (which should remain analytically valid) and </li>
+    <li>hard deleted records (which should be removed or anonymised) </li>
+  </ul>
+
+  <p>The investigation uncovered ambiguity in how deletion and archival states are inferred downstream, creating potential data integrity and reporting risks.</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 2 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Objective</h2>
+
+    <p>The objective of this spike was to review and understand the storage solution and raise any questions or comments to discuss prior to next steps.</p>
+
+  <h2>Observations</h2>
+
+  <p>The current process does not distinguish between archived activity records and deleted activity records. Instead all records no longer in Dataverse are considered as deleted. This creates ambiguity between different types of records:</p>
+
+  <ul>
+    <li>Completed then archived (should be included in analytics)</li>
+    <li>Deleted before completed (should be removed or anonymised)</li>
+  </ul>
+
+  <p>Therefore there is a very real risk that we are marking activity records as deleted and anonymising them when in fact they are not hard deletions but archived records instead.</p>
+
+  <p>It is not clear whether Core itself tracks the difference between activity records that have been archived and records that have been hard deleted. Or whether this distinction is something Analytics will have to infer.</p>
+
+  <p>If Cosmos records cannot be altered (immutable), they provide a robust point-in-time log of archived activity. If however they are mutable, they may not be trustworthy to be used in Analytics logic.</p>
+
+  
+  <h2>Existing Logic</h2>
+
+    <p>As I understand it, the existing logic is as follows:</p>
+
+    <ul>
+      <li>If a record exists in both Dataverse and Cosmos, it appears to be treated as a record which has been completed but not yet archived.</li>
+      <li>If a record exists only in Cosmos, it appears to be treated as an archived record.</li>
+      <li>If a record exists in neither, it appears to be treated as a deleted record (before or after completion).</li>
+    </ul>
+
+     
+  <h2>Questions</h2>
+    
+    <ol>
+      <li>What is the mechanism in Core to distinguish between completed records and deleted records?
+        <ul>
+          <li>Is it a change of state?</li>
+          <li>Is it a change of status?</li>
+          <li>Does an audit table get updated?</li>
+        </ul>
+      </li>
+      <li>If so, does Core expose this distinction to downstream systems? (Can we make use of this mechanism in Analytics?)</li>
+      <li>If there is no mechanism and we are looking to infer record status from timestamps, what logic and which timestamp columns represent a completed record, a deleted record, a copied record?</li>
+      <li>When the record is deleted from Cosmos before the end of the retention period, does Analytics process this case correctly? i.e. it is treated as a completed record prior to the deletion and then treated as a deleted record after.</li>
+      <li>When a record is completed (and not deleted), is this treated correctly in Analytics?</li>
+      <li>Judging by the examples it appears that Cosmos records are immutable but for completeness I would want that clarified.</li>
+      <li>Are there any other instances / states that lead to activity records being copied to Cosmos e.g. if they are cancelled? And if so, do we need to factor these in?</li>
+      <li>How many of the Analytics customers have this storage solution? (How big of a risk is this?)</li>
+    </ol>
+
+    <figure><img src='../blueprint_images/14-when-deletion-and-archiving-look-the-same.png' alt='sketch of 3 scenarios regarding deletions' style='max-width:100%; height:auto'><figcaption>Simplified lifecycle scenarios illustrating where archived and deleted records become ambiguous in downstream Analytics processing.</figcaption></figure>
+          
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>This piece of work is still ongoing and the team is trying to fully understand the deletion and anonymisation process used in Core. Once this is understood we can then investigate what needs to be done in Analytics to mirror this logic.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="12-closing-the-gaps-and-forcing-zeroes-on-a-PowerBI-line-chart.html">← Previous: Closing the Gaps and Forcing Zeros on a Power BI Line Chart</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
