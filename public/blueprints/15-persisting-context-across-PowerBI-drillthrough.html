@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Persisting Context Across Power BI Drillthrough</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #61475e
+    }
+    h3 {
+      color: #ad88ab;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #B48F8F;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#B48F8F
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>When Drillthrough Context Isn't Enough</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Technical investigation, Power BI semantic modelling, UX-focused analytics design, constraint analysis, proof-of-concept prototyping, trade-off evaluation.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Investigated multiple approaches for persisting drillthrough frequency context in Power BI. Determined that the requirement could not be fully achieved using native functionality alone and produced a proof-of-concept custom visual solution to demonstrate a possible alternative.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>We have a report which shows Actuals vs Targets for a number of different KPIs. We received a requirement to be able to view this metric over time. This was done by way of a drillthrough. So the first page would show the percentage for the current period and the user could then drillthrough to see that person's performance against that KPI over time. </p>
+
+  <p>Different consultants operated at different reporting frequencies for the same KPIs. Some consultants had weekly targets while others had monthly targets. When users drilled through into historical performance, Power BI could not automatically persist the originating frequency to the destination page.</p>
+
+  <p>This investigation was about identifying an automated way to achieve this and remove the need for the user to explicitly set the frequency on the drillthrough page which shows the performance over time.</p>
+
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 10 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Background</h2>
+
+    <p>As part of the previous dev work relating to performance history over time, we wanted to be able to drill through from the team / individual page of Managers PvT to the history page and have the column chart x-axis reflect the frequency chosen in the original page.</p>
+
+    <p>We were unable to achieve this as part of that dev. Instead we added a slicer onto the history page so the user, after drilling through, could then select the frequency desired. This investigation piece is therefore to see if there is a way to do this automatically.</p>
+
+  <h2>Investigation</h2>
+
+  <p>The investigation was approached as follows:</p>
+
+  <ol>
+    <li>Can we prove that the frequency selection chosen in the first page is "carried through" to the history page? In other words, without breaking anything in the origin page, can we ensure that when we navigate to the history page, it is filtered by the frequency chosen / selected in the first page?</li>
+    <li>Can we use this knowledge to automatically select the correct x-axis? Using a slicer or a measure or something else?</li>
+    <li>Could we use bookmarks - so when we drill through from first page, we actually go to a bookmark showing the correct frequency rather than a true drill through page?</li>
+    <li>Are there any other (outside the box) possibilities worth considering?</li>
+  </ol>
+
+  <h3>Step 1</h3>
+
+    <p>If we consider the Consultant Dashboard drillthrough and the individual page of the Performance vs Target report, the current implementation does not actually consider frequency. Instead we drill through from the actual vs target % measure which carries across the chosen KPI. The team / individual information is also filtered due to other filters on those original pages.</p>
+
+    <p>The first step was therefore to confirm it is possible that when drilling through to the history page, the frequency is also "carried" across. The way we did this was to enhance the dial percentages.</p>
+    
+    <p>The "dial percentage" visual was not actually a native dial. It was a heavily styled table visual showing only the first visible cell while the remaining structure was rendered transparent. This gave us a way to inject additional hidden drillthrough context without changing the visible UX.</p>
+
+    <p>By adding the frequency column from the target snapshot fact table into this table visual, we now have context of frequency while also not breaking anything in the page.</p>
+
+    <p>We could then change the drillthrough mechanism to drill through based on the frequency selection. This essentially narrows down the drillthrough to just one frequency (plus the previous filters of team / individual as before).</p>
+
+  <h3>Step 2</h3>
+
+    <p>The original idea is for this unique frequency selection to then be used in a measure which could be set as the x-axis in the column chart. The idea being a simple IF statement along the lines of if frequency is 'week' then use week commencing on the axis, otherwise if frequency is 'month' use month commencing.</p>
+
+    <p>With Power BI visuals, unfortunately the axes are determined by table columns or calculated columns. It's not possible to have a measure be the x- axis (or y-axis).</p>
+
+    <p>Calculated columns cannot be used to solve this because they are calculated at the point of refresh / initial load and are then static. If we think of Power BI as having separate layers like a lasagne, the data layer is below the report layer so any changes the user makes in the report layer, do not then go back to the data layer.</p>
+
+    <p>The one exception to being able to use measures is when using a Field parameter. A Field parameter is essentially a bucket where you can throw in columns and/or measures. A slicer on the page then dictates which of these columns/measures is used in the visual.</p>
+
+    <p>So some time was spent investigating the use of Field parameters on the x-axis. However despite trying to automate this process either directly or using a hidden and related slicer, no way was found for this mechanism to work automatically upon drilling through. In other words, Field parameters could not be used without the slicer.</p>
+
+  <h3>Step 3</h3>
+
+    <p>Bookmarks are not a favourite option for the author. And in this case, the inability to "carry" context means that this is unlikely to be the answer here.</p>
+
+    <p>Bookmarks are usually used in conjunction with buttons which essentially navigate to different pages depending on options chosen on the original page. However the page you are navigated to is essentially static and so does not change depending on choices made in the origin page. This would potentially mean we would need a different page for each combination of frequency and KPI. It feels unmanageable.</p>
+
+    <p>The advantage of a drill through is that you carry the context from the original page and are focussing on more curated data. While this could be replicated by bookmarks and buttons, we have seen from the Consultant Dashboard that there is no substitute for the real thing.</p>
+
+    <p>This approach would also increase the amount of maintenance since you would need a drillthrough page per frequency (and possibly KPI) and would potentially need some UI changes to the origin page as well.</p>
+
+    <p>Another approach is potentially to use bookmarks but have two charts in the drill through page and make the relevant chart visible on the fly depending on what the chosen frequency is in the first page. Unfortunately this wont work because you have to specify a layer order for the two chart visuals (z-order). So there will always be one behind the other. We could get the top one to show but there is no way to programmatically make a chart visible/invisible.</p>
+
+  <h3>Step 4</h3>
+
+    <p>The problem we were having was an inability to change what was displayed on the x-axis when drilling through.</p>
+
+    <p>This is because Power BI does not allow you to use measures or get to the underlying code which defines the visual.</p>
+
+    <p>One way around this is to build your own visual using code. Then you have freedom to define the x axis however you want.</p>
+
+    <p>I have done a rough PoC to show how this might work:</p>
+
+      <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-1.png' alt='starting point of original page' style='max-width:100%; height:auto'><figcaption>Proof of Concept showing dial with target value and frequency.</figcaption></figure>
+
+    <p>Changes made to this original page in this image explained below:</p>
+
+      <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-2.png' alt='starting point for original page' style='max-width:100%; height:auto'><figcaption>Original page explaining set up for Proof of Concept.</figcaption></figure> 
+
+    <p>And when we drill through:</p>
+
+      <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-3.png' alt='drillthrough page displaying context-specific x-axis' style='max-width:100%; height:auto'><figcaption>Drillthrough page showing context-specific x-axis.</figcaption></figure> 
+  
+    <p>The x-axis dynamically changes depending on the frequency of the target for the given KPI:</p>
+
+    <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-6.png' alt='origin page with week frequency selected' style='max-width:100%; height:auto'><figcaption>Origin page showing week selection.</figcaption></figure> 
+
+    <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-7.png' alt='target page showing week x-axis' style='max-width:100%; height:auto'><figcaption>Drillthrough page displaying a weekly x-axis automatically.</figcaption></figure>
+
+    <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-4.png' alt='origin page with month selected' style='max-width:100%; height:auto'><figcaption>Origin page showing month selection.</figcaption></figure> 
+    
+    <figure><img src='../blueprint_images/15-persisting-context-across-powerBI-drillthrough-5.png' alt='target page showing month x-axis' style='max-width:100%; height:auto'><figcaption>Drillthrough page showing month selection automatically.</figcaption></figure> 
+    
+    <p>This custom visual approach allows us the rendering logic to exist outside the constraints of the Power BI visual configuration. And hence we have more control and flexibility in this approach.</p>
+     
+  <h2>Summary</h2>
+    
+    <p>The requirement cannot be met using native Power BI functionality.</p>
+
+    <p>A solution has been found using custom visuals by coding our own chart and grid visuals.</p>
+
+    <h3>Advantages</h3>
+
+      <p>Complete flexibility in terms of design and functionality. Not just axes but also, for example, tooltips, column width or plot area.</p>
+
+      <p>We have used this approach for both the dials and the dial percentages so this wouldn't be a brand new technique.</p>
+
+      <p>Cleaner UX as no requirement for slicer or card informing user to select correct frequency on drill through pages.</p>
+
+      <p>In addition there was chat initially on having the consultant grid sorted by latest week or month rather than full name. This is not possible with native matrix visual but could be addressed using this approach. Important to note that any sort could not be over-ridden by the user however (there is no user interactivity).</p>
+       
+    <h3>Disadvantages</h3>
+
+      <p>Steep learning curve to be able to write the code required.</p>
+
+      <p>Custom visuals can be slower to load.</p>
+
+      <p>Extra effort compared to using the native visuals (is the juice worth the squeeze?)</p>
+
+      <p>Interactivity between these custom-built visuals and other visuals can be tricky to get right (not an issue here as there are no other visuals on page and no expectation of cross-filtering or cross-highlighting).</p>
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team decided against the custom visual solution and have kept the drillthrough page as-is with a frequency selector for the user after drillthrough.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="14-when-deletion-and-archiving-look-the-same.html">← Previous: When Deletion And Archiving Look The Same</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
