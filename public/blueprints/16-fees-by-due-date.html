@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding 'Due Date' as a Fee Viewing Option in Power BI</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #336c29
+    }
+    h3 {
+      color: #50a641;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #B48F8F;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 15px;
+      font-style: italic;
+      color:#B48F8F
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Adding 'Due Date' as a Fee Viewing Option in Power BI</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Power BI semantic modelling, DAX control flow measures, disconnected table design, FetchXML extraction, stored procedure modification, UI/UX enhancement.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Successfully added 'Due Date' as a fourth fee viewing option in the Financial Overview report. Converted the button slicer to a dropdown and integrated it into the existing bespoke filter panel. Documented the key caveat: this is a context-switching slicer, not a relationship-based filter.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>We have a Financial Overview report which allows the user to view fee amounts in one of three ways: by created date, by issued date or by recognised  date.</p>
+
+  <p>A question was raised during customer feedback regarding whether it would be possible to add a 4th option and be able to view by due date.</p>
+
+  <p>In addition, rather than have this as a fourth option in the existing button slicer, could this be converted to a dropdown slicer and added to the existing filters at the top of the report?</p>
+
+  <p>Below is a write-up of the investigation carried out:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+
+  <h2>Executive Summary</h2>
+
+    <p>This analysis concludes that we <b>could add a 4th option</b> to the existing selection of available fee related dates.</p>
+
+    <p>Furthermore this can be converted from a button slicer to a drop down slicer and added to the Advanced Filter panel.</p>
+
+    <p>However there is something to be aware of if implementing this: This slicer only works in the existing pages of the Financial Overview report (Trends and Breakdowns) and would be redundant in a) the other pages of this report (Splits and Financial Transactions) and b) in any other report.</p>
+
+  <h2>1. Existing Infrastructure</h2>
+
+    <h3>1.1 User Interface</h3>
+
+      <p>We currently have a button slicer labelled with three options:</p>
+
+        <figure><img src='../blueprint_images/16-fees-by-due-date-1.png' alt='' style='max-width:100%; height:auto'><figcaption></figcaption></figure>
+
+      <p>A new two-column table has been manually created in Power Query called FeeDateRelationship from which these inputs originate.</p>
+
+      <p>When a user selects an option, the visuals and cards alter. These Power BI artefacts are dependent on 4 "control flow" measures:</p>
+
+        <ul>
+          <li>Fee Split Toggle Amount Sum</li>
+          <li>Fee Split Toggle Amount Average</li>
+          <li>Fee Split Toggle Placement or Vacancy Fee Percentage</li>
+          <li>Fee Split Toggle Amount Cumulative Sum</li>
+        </ul>
+
+      <p>These measures react to the choice made and run a subsequent measure. The measure which is ultimately run depends on the user selection made in the button slicer.</p>
+
+      <p>There are therefore <i>three</i> different varieties (one each depending on what was selected between created date, issued date or recognised date) of the 4 subsequent measures in the following pattern:</p>
+
+        <figure><img src='../blueprint_images/16-fees-by-due-date-2.png' alt='' style='max-width:100%; height:auto'><figcaption></figcaption></figure>
+
+    <h3>1.2 Back End</h3>
+
+      <p>The source data comes from the Fee table in dataverse. The following FetchXML shows that we currently grab the created on date, the issued on date and the recognised on date.</p>
+
+        <figure><img src='../blueprint_images/16-fees-by-due-date-3.png' alt='The fetch XML query run against the source system' style='max-width:100%; height:auto'><figcaption>The FetchXML query used to extract the data from the source system (Dataverse)</figcaption></figure>
+      
+      <p>This data is then loaded into Staging.Fee and then transformed in the datawarehouse using a stored procedure to become the FctFeeSplit table.</p>
+
+  <h2>2. Suggested Approach</h2>
+
+      <p>In order to achieve the ask, we need to do the following things:</p>
+
+      <ol>
+        <li>Add the relevant date field from the source system into the FetchXML query to bring the column into Staging.Fee
+              <figure><img src='../blueprint_images/16-fees-by-due-date-4.png' alt='An extract of the source system showing the field required' style='max-width:100%; height:auto'><figcaption>An extract from Dataverse with the field required highlighted</figcaption></figure>
+        </li>
+        <li>Update the stored procedure to add this new field into the FctFeeSplit table (and consequently the SQL view).</li>
+        <li>In Power BI, we need to add a row in Power Query to the FeeDateRelationship table.</li>
+        <li>And then create the new "Fee Split Due On" measures.</li>
+        <li>And update the Fee Split Toggle measures that sit above these to allow "Due Date" to be an option.</li>
+        <li>Then the object on the user interface can be changed from a button slicer to a dropdown slicer with four options and added to the Advanced panel.</li>
+      </ol>
+
+      <p>So each of the 4 control flow measures will end up looking like this:</p>
+
+        <figure><img src='../blueprint_images/16-fees-by-due-date-5.png' alt=''' style='max-width:100%; height:auto'><figcaption>Due Date would be a 4th different flow</figcaption></figure>
+
+  <h2>3. Caveats</h2>
+    
+      <h3>No Modelling Relationship</h3>
+
+        <p>Firstly this is not and never shall be a dimension table filtering the related fact table. That pattern works by allowing the user to filter a column in the dimension table and then this selection to subsequently filter the fact table records via the relationship between the dimension and the fact.</p>
+
+        <p>This is how the other slicers in the filter panel work. And it works because each record in the fact table has one discipline, one consultant or one currency assigned to it. So if the user filters to a specific currency, the relationship ensures only fact records with that currency are returned.</p>
+
+        <p>This can't work like that because this is about frames of reference rather than filtering fact records into a subgroup based on a category selection. The record is the same in each case, we're just deciding through which time lens we wish to view it. Every record has multiple dates (issued on, recognised on, created on and due on) so creating a dimension column to filter doesn't work.</p>
+
+        <p>So the FeeDateRelationship table has no relationship with the fact table and instead we use DAX to artificially create a relationship during the calculation.</p>
+
+      <h3>Practical Consequences</h3>
+
+        <p>What this means in practice is that this 'slicer' will only work on visuals that use these measures i.e. specifically the Trends page and the Breakdowns page of the Financial Overview report.</p>
+
+        <p>If we wanted to implement elsewhere, additional effort and thought would be required as we would need to re-write measures. And context changes like this can have unexpected downstream consequences.</p>
+
+  <h2>4. Effort Required</h2>
+
+    <p>As per above, both SQL work and Power BI work needs to be done to achieve this.</p>
+    
+    <h3>4.1 SQL Changes</h3>
+      
+      <p>A new column needs to be added into:</p>
+      <ul>
+        <li>the extraction from the source system.</li>
+        <li>the stored procedure to convert staging data to the fact table.</li>
+        <li>the SQL view which goes over the fact table.</li>
+      </ul>
+
+    <h3>4.2 Power BI Changes</h3>
+
+      <p>The following due date measures will need to be created:</p>
+      <ul>
+        <li>Fee Split Due On Amount Average</li>
+        <li>Fee Split Due On Amount Sum</li>
+        <li>Fee Split Due On Amount Cumulative</li>
+        <li>Fee Split Placement or Vacancy Fee Percentage Amount</li>
+      </ul>
+
+      <p>The following measures need to be extended to include one each of the above due date measures:</p>
+      <ul>
+        <li>Fee Split Toggle Amount Sum</li>
+        <li>Fee Split Toggle Amount Average</li>
+        <li>Fee Split Toggle Placement or Vacancy Fee Percentage</li>
+        <li>Fee Split Toggle Amount Cumulative Sum</li>
+      </ul>
+
+  <h2>5. Recommendation</h2>
+  
+      <p>Assuming the scope of this change is limited to the Financial Overview report and the pages on which it already exists and we accept this is a context-switching slicer rather than a true filter, I would recommend we implement the changes as discussed above.</p>
+
+
+    
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team went ahead with this change as described.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="15-persisting-context-across-PowerBI-drillthrough.html">← Previous: Persisting Context Across Power BI Drillthrough</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
