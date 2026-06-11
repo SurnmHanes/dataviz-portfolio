@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self Service Reporting in Power BI</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #844c91
+    }
+    h3 {
+      color: #ff87ab;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #ff87ab;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Consideration For Using a Separate Model</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Power BI semantic modelling, Perspective design, TMDL authoring, proof-of-concept development, DirectQuery evaluation, Row-Level Security (RLS) assessment, technical debt analysis.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Investigated five potential approaches for simplifying a self-service reporting experience while avoiding duplicate semantic model maintenance. Identified Power BI Perspectives as the most viable solution, documented the associated limitations and trade-offs and produced a working proof of concept that was subsequently adopted for customer deployments.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>Amongst our reporting suite, we have a self-serve report where the end user can create their own visuals using drag-and-drop. This report uses the same semantic model as the other reports.</p>
+
+  <p>This has one major drawback: the self-service user sees all the columns, calculated columns and measures in the semantic model. This could feel overwhelming for the user as they may not have the necessary data literacy or context to understand or distinguish all the objects.</p>
+
+  <p>So the question was raised as to whether it would be worthwhile moving the self-serve report to be based off a different semantic model.</p>
+
+  <p>Below is a write-up of the investigation carried out:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 8 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Background</h2>
+
+    <p>The Analytics Builder self-serve report is hooked up to the current semantic model. The requirement was to look at the possibility of having a second model on top of our existing model purely to feed the Analytics Builder report.</p>
+
+    <p>The aim of this is to make the user experience of the Analytics Builder more friendly without increasing our workload and/or technical debt.</p>
+
+    <p>During this investigation the following would need to be addressed:</p>
+      <ul>
+        <li>What extra work / tech debt will it give us maintaining measures in two models?</li>
+        <li>Is there a way we create / change measures in our existing model and we can import / replicate them automatically into the secondary model?</li>
+        <li>How would our release be impacted if at all?</li>
+        <li>How would Row-Level Security (RLS) be impacted if at all?</li>
+        <li>Would the limitations / constraints of direct query (DQ) cause issues?</li>
+      </ul>
+
+  <h2>Options Considered</h2>
+
+    <p>A number of potential options were considered as follows:</p>
+
+    <h5>1. Perspectives and renaming fields directly</h5>
+
+      <p>The idea being to use a perspective to get a subset of the semantic model schema and rename the fields required to more user-friendly names.</p>
+    
+    <h5>2. Perspectives and Calculation Groups</h5>
+
+      <p>Again, using a perspective to reduce the schema to the tables required for Analytics Builder and then somehow using Calculation Groups to alias the object names to be more user-friendly.</p>
+
+    <h5>3. Dataflows Gen 1 connected to current semantic model</h5>
+
+      <p>Set up a dataflow in the workspace which has the data source as the semantic model. Then filter the schema in the dataflow to return only the subset of tables required and hook up the report to this dataflow.</p>
+
+    <h5>4. Use the Power BI REST API with objects in the Service</h5>
+
+      <p>Use Powershell to locate the semantic model in the workspace, transform the schema to remove irrelevant tables and publish as a new semantic model in the workspace.</p>
+
+    <h5>5. Use the Power BI REST API on objects locally</h5>
+
+      <p>Extend the existing customer deployment script by programmatically downloading the semantic model from the Service, opening Tabular Editor, connecting to the local copy of the semantic model, running a C# script which removes unwanted tables and leaves the model optimised for the Analytics Builder report and then publish this to the service and connect the Analytics Builder report.</p>
+
+  <h2>Investigation</h2>
+
+    <p>The investigation showed that most of the options considered have blockers which I have summarised as follows:</p>
+    
+    <ul>
+      <li>Calculation Groups cannot be used for simple renaming.</li>
+      <li>Dataflows Gen 1 cannot connect to datasets. (I believe Gen 2 can but a Fabric licence is required - this was not investigated)</li>
+      <li>The REST API doesn't expose the model schema so cannot be used alone to alter the tables.</li>
+      <li>To export using the REST API requires Premium capacity.</li>
+    </ul>
+    
+    <p>This left the only option as setting up a perspective.</p>
+
+  <h2>Proof of Concept / Example</h2>
+
+    <p>In order to try this out, I first opened the current semantic model.</p>
+
+    <p>I then navigated to the TMDL view which is now in GA (See <a href="https://powerbi.microsoft.com/en-us/blog/power-bi-september-2025-feature-summary/">Power BI September 2025 Feature Summary</a>):</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-1.png' alt='TMDL view button in Power BI user interface' style='max-width:100%; height:auto'><figcaption>TMDL button on Power BI menu</figcaption></figure>
+    
+    <p>From here, I defined the perspective. To do this we use a createOrReplace command, give the perspective a name and then declare what tables and columns we want to include. [Note you can also include ad hoc measures using "perspectiveMeasure"]:</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-2.png' alt='Perspective definition in Power BI' style='max-width:100%; height:auto'><figcaption>Defining a Perspective in Power BI: 1 - naming the perspective. 2, 3 & 4 - defining the tables and the columns in those tables</figcaption></figure>
+
+    <p>Clicking apply from here then adds the perspective to the semantic model. A semantic model can contain a number of different perspectives.</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-3.png' alt='Showing List of Perspectives in current model' style='max-width:100%; height:auto'><figcaption>List of Perspectives available in current semantic model</figcaption></figure>
+
+    <p>We can now save the semantic model and publish it to the service.</p> 
+
+    <p>Now we need to connect the Analytics Builder report to this perspective and unfortunately this is not as straightforward as it should be.</p>
+
+    <p>First we open the Analytics Builder report and link it to the semantic model in which we have defined the perspective.</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-4.png' alt='Confirming connection to the semantic model containing the perspective' style='max-width:100%; height:auto'><figcaption>Confirming connection to the semantic model where we have defined / created the Perspective</figcaption></figure>
+
+    <p>Now we click on "Make changes to this model" and we are faced with a warning about a DirectQuery connection being required:</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-5.png' alt='Direct Query warning' style='max-width:100%; height:auto'><figcaption>Direct Query warning</figcaption></figure>
+
+
+    <p>We add a local model ensuring we select Perspectives from the dropdown option:</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-6.png' alt='Selecting Perspectives' style='max-width:100%; height:auto'><figcaption>Select Perspectives from the Dropdown</figcaption></figure>
+
+    <p>and then select the Perspective we've just defined in the semantic model:</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-7.png' alt='Selecting the correct Perspective from the list' style='max-width:100%; height:auto'><figcaption>Selecting the correct Perspective</figcaption></figure>   
+      
+    <p>The connection now changes to DirectQuery and the list of tables etc available are as per the Perspective definition from earlier:</p>
+
+      <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-8.png' alt='DirectQuery connection to Perspective' style='max-width:100%; height:auto'><figcaption>Confirming connected via DirectQuery to Perspective</figcaption></figure>
+
+  <h2>Limitations</h2>
+    
+    <p>The example above proves that the requirement can be met, however there are some caveats / limitations to the approach.</p>
+    
+      <h3>No renaming capabilities</h3>
+
+        <p>A perspective only hides or exposes objects from the original semantic model. A perspective cannot rename them. This still has to happen in the original semantic model.</p>
+
+        <p>This can be mitigated in the semantic model by using more precise naming conventions for objects, renaming only the objects used in the Analytics Builder report and / or use of the description box in Power BI (which appears when a user hovers over the object in question):</p>
+
+          <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-9.png' alt='Description box for measures' style='max-width:100%; height:auto'><figcaption>Description Box for Measures</figcaption></figure>
+
+      <h3>DirectQuery behaviour when connecting</h3>
+
+        <p>In all cases a thin report connected to a Perspective ends up as a DirectQuery connection. This means there might be a performance hit if the end users interact heavily with the Analytics Builder report.</p>
+
+        <p>In addition the workspace requires a host semantic model to be set up to port through to connect to the Perspective. This is an additional (empty) object that needs to stay in the workspace:</p>
+
+          <figure><img src='../blueprint_images/17-self-service-reporting-in-PowerBI-10.png' alt='Additional semantic model created for Perspective' style='max-width:100%; height:auto'><figcaption>Additional Semantic Model Created For Perspective</figcaption></figure>
+
+      <h3>Perspectives are a usability feature</h3>
+
+        <p>Perspectives are specifically designed to give the developer or user the option to hide or expose objects from the enterprise semantic model. They therefore meet the brief here.</p>
+
+        <p>However they are a feature and are not bulletproof. It is still possible for the end user to gain access to other fields from the semantic model, if they wanted to and were savvy enough.</p>
+
+        <p>That said, security is guaranteed: the RLS that is in place in the original semantic model will also hold firm in the report connected to the perspective.</p>
+
+      <h3>Maintenance overhead</h3>
+
+        <p>Any time a new measure, column, calculated column etc. that needs to be visible to the Analytics Builder report is added to the original semantic model, the Perspective definition will need to be updated manually to include it.</p>
+
+        <p>This additional maintenance can be weighed up against how often the measures and columns would actually need to change in the Analytics Builder. And changing the Perspective definition is not an onerous task.</p>
+
+      <h3>Customer deployments</h3>
+
+        <p>Since this is an architecture change that affects one report only, this could be an additional manual step in the process short-term with the aim to enhance the existing PowerShell script to automate this report deployment in the long-term.</p>
+
+    <h2>Summary</h2>
+
+        <p>There is no solution that fulfils the whole brief. Perspectives feels like the most viable solution as long as we are aware of the caveats above. To directly answer the questions posed:</p>
+
+        <h5>What extra work / tech debt will it give us maintaining measures in two models?</h5>
+        <p>A: The perspectives approach means you only have one model to worry about.</p>
+
+        <h5>Is there a way we create/change measures in our existing model and we can import/replicate them automatically into the secondary model?</h5>
+        <p>A: The suggested approach of perspectives means we're only really dealing with one base model so this wouldn't be a concern. The only thing that needs maintenance is new measures, columns, calculated columns. If we create new objects and want them in the perspectives model, we will need to have to add them manually to the perspective definition.</p>
+
+        <h5>How would our release be impacted if at all?</h5>
+        <p>A: I wonder if this could be added to the existing deployment script longer term? Short term the deployment can be manual as it is only one extra report.</p>
+
+        <h5>How would RLS be impacted if at all?</h5>
+        <p>A: RLS would be inherited from the original semantic model.</p>
+
+        <h5>Columns/Calculated columns & renaming?</h5>
+        <p>A: User-friendly naming needs to be done in the original semantic model. One of the drawbacks of perspectives is there is no scope to be able to rename objects.</p>
+
+        <h5>Limitation/constraints of DQ</h5>
+        <p>A: Although the connection is DirectQuery, it is not DirectQuery in the traditional sense. As I understand it, every interaction in the thin report will send queries back to the original semantic model, <b>not</b> the original database (as in traditional DQ).</p>
+
+        <p>So the query goes from the Analytics Builder report to the original semantic model only. Because the semantic model is in Import mode, the data is cached in this model so the query is answered here and returned to the Analytics Builder. It does not have to travel backwards and forwards to the Azure SQL database. There will be a small amount of latency for the Analytics Builder user compared to if it was in Import mode but it shouldn't be a frustrating amount (unless there are a lot of users interacting with the report concurrently) and may not even be that noticeable to the end user.</p>
+
+        <a class="note" href="https://www.mssqltips.com/sqlservertip/8153/perspectives-in-power-bi/">Source: https://www.mssqltips.com/sqlservertip/8153/perspectives-in-power-bi/ </a>
+
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team went ahead with this change as described. The customer deployments of the Analytics Builder are manual to begin with (which is workable since only a small number of customers are receiving it initially) while we incorporate this into the automatic deployment process.</p>
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="16-fees-by-due-date.html">← Previous: Adding 'Due Date' as a Fee Viewing Option in Power BI</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
