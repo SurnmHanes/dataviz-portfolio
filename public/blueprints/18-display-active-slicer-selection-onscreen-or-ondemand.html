@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Displaying Active Slicers</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #0b645c
+    }
+    h3 {
+      color: #ff87ab;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #ff87ab;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Display Active Slicer Selection On-Screen or On-Demand</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Power BI semantic modelling, UX and report interaction design, DAX-based state management, tooltip-driven UI design patterns.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Evaluated three approaches for surfacing active slicer selection in Power BI. Identified a custom tooltip and tooltip page as the most attractive solution balancing usability, maintainability and complexity. Documented trade-offs across all three approaches.
+    </p>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>All of our reports give the end user the ability to filter the data down in various ways using different slicer options. We have built both a basic filter pane (with the most common options) and an advanced filter pane. These different panes are navigated to using buttons and bookmarks in the top of each page of the report.</p>
+
+  <p>It would be good to be able to display to the end user what filter options have been applied on-screen or easily on-demand without the user having to navigate back to the pane to remind themselves of this.</p>
+
+  <p>Below is a write-up of the options investigated to achieve this:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 3 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Objective</h2>
+
+    <p>The objective of this spike was to provide design options to enable an Analytics report user to identify what slicer selections have been made at any given time. As an alternative an on-demand option such as a tooltip should also be considered.</p>
+
+    <p>The key thing is that we want the list of options to be presented to the user without them having to go through each of the filters in turn to ascertain this information.</p>
+
+  <h2>Scope</h2>
+
+    <p>The following options were not considered as they do not meet any part of the brief:</p>
+
+    <ul>
+      <li>Dynamically altering the slicer titles / real estate in real time to show what has been selected per slicer.</li>
+      <li>Substituting the native drop-down slicers for third party slicers which record the options selected per slicer.</li>
+    </ul>
+
+  <h2>Outcome</h2>
+
+    <p>All options require at least one DAX measure to capture slicer state.</p>
+
+    <table>
+      <tr>
+        <th style="width: 19%">Option</th>
+        <th style="width: 31%">Mechanism</th>
+        <th style="width: 20%">Pros</th>
+        <th style="width: 20%">Cons</th>
+        <th style="width: 10%"> Implementation Effort (per report)</th>
+      </tr>
+      <tr>
+        <td>1: Dynamic DAX String</td>
+        <td>Dynamic DAX builds a text string based on slicer selection.</td>
+        <td>Already proven.<br><br>Highly customisable: many options exist as to how to add this to the reports</td>
+        <td>Can be long and ugly. <br><br>Requires real estate on each page of report.<br><br>Adds permanent "noise".</td>
+        <td style="text-align: center;"><b>Medium</b></td>
+      </tr>
+      <tr>
+        <td>2: Tooltip Page</td>
+        <td>Create a tooltip page per report. <br><br>Create a table / card and add a DAX measure to this (similar DAX to Option 1). <br><br>Then add a transparent card to each report page from which to action this tooltip.</td>
+        <td>Clean UI. <br><br>Information on demand only.</td>
+        <td>Information hidden by design. <br><br>Requires a deliberate hover action to be viewed. <br><br>Conflicts if user already hovering over a visual's tooltip. <br><br>Height of tooltip is fixed so needs to be large enough to include all potential selections.</td>
+        <td style="text-align: center;"><b>Medium</b></td>
+      </tr>
+      <tr>
+        <td>3: Button plus Visual Summary Panel</td>
+        <td>Dynamic DAX builds a text string or a table based on slicer selection. <br><br>Recorded on report page in a hidden panel which can be viewed by pressing a button.</td>
+        <td>No need for extra real estate. <br><br>Unlike tooltip option, selections can be seen even if cursor is moved.</td>
+        <td>Additional bookmark and associated maintenance. <br><br>More development required than the other two options.</td>
+        <td style="text-align: center;"><b>High</b>  </td>
+      </tr>
+    </table>
+    
+
+    <p>This screenshot below shows two versions of Option 1, a horizontal implementation and then a vertical implementation:</p>
+
+      <figure><img src='../blueprint_images/18-display-applied-filters-on-screen-or-on-demand-1.png' alt='Power BI report page showing two versions of the applied filters text' style='max-width:100%; height:auto'><figcaption>Bottom of report page shows horizontal implementation while the right hand side shows a vertical version.</figcaption></figure>
+
+
+    <p>This second screenshot shows an example of Option 2. The user has hovered over the logo and the tooltip appears detailing the filters "in play":</p>
+
+      <figure><img src='../blueprint_images/18-display-applied-filters-on-screen-or-on-demand-2.png' alt='Power BI report page showing filters selected when hovering over logo' style='max-width:100%; height:auto'><figcaption>User has hovered over the logo which has produced this tooltip showing the filters that have been made.</figcaption></figure>
+
+  <h2>Remaining Questions</h2>
+    <ol>
+      <li><b>Goal:</b> Is it more important to have the slicer selections <i>always visible</i> or to <i>maximise real estate for visuals</i>?</li>
+      <li><b>User Behaviour:</b> How often do users select multiple options? And how many different options do they usually select?</li>
+    </ol>
+    
+    <p>The user behaviour question influences whether Option 1 is genuinely feasible. If the number of options the user chooses is low, this will be a more attractive option as the "noise" will be low. It is also the only option that meets the requirement of having the information "on-screen".</p>
+    
+    <h2>Recommendation</h2>
+
+        <p>Option 2 is the safest way to proceed given current unknowns around user behaviour with Option 1 a better alternative if slicer selection is consistently low.</p>
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team went ahead with an improved version of option 2 (tooltip plus visual indicator on hover) where the tooltip was generated from the funnel icon button on the left hand side of the reports which is used to open the filter pane.</p>
+  
+  <p>A red circle was added to the funnel with a count showing how many active selections had been made being visible at all times. And then on hover, the list of slicers filtered (and their values) was shown to the user:</p>
+
+      <figure><img src='../blueprint_images/18-display-applied-filters-on-screen-or-on-demand-3.png' alt='Final version showing count of filters made and then hover over' style='max-width:100%; height:auto'><figcaption>Final version showing the count of selections made and then, on hover over, the detail of actual selections made.</figcaption></figure>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="17-self-service-reporting-in-PowerBI.html">← Previous: Self Service Reporting in Power BI</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
