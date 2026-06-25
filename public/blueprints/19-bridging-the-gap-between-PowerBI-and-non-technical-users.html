@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bridging the Gap Between Power BI and Non-Technical Users</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #410B13
+    }
+    h3 {
+      color: #ba1f33;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #ff87ab;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Bridging the Gap Between Power BI and Non-Technical Users</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Analytics architecture design, semantic modelling, Power BI limitations analysis, cognitive load assessment, stakeholder persona modelling, system design trade-off analysis, data product thinking.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Evaluated multiple architectural approaches for delivering self-service analytics to non-technical users. Concluded that a dual-interface strategy involving a lightweight application layer for guided consumption provides the most scalable long-term architecture while preserving a single semantic model as the source of truth.
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>We had recently done an investigation into potentially using a second semantic model to form the basis of a self-service Power BI report. The write up for that can be found <a href="17-self-service-reporting-in-PowerBI.html">here.</a></p>
+
+  <p>This investigation is a follow up to that and broadens the horizon: <i>"With a clean slate, how would you architect a self-service reporting solution?"</i> </p>
+
+  <p>Below is a write-up of the options investigated to achieve this:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 3 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Problem Statement</h2>
+
+    <p>The previous investigation <a href="17-self-service-reporting-in-PowerBI.html">2nd Model Considerations</a> explored the feasibility of introducing a second semantic model specifically for the Analytics Builder report.</p>
+
+    <p>The outcome of that investigation indicated that while <b>Perspectives</b> could meet some of the requirements, there are significant limitations around usability, optimisation and maintainability.</p>
+
+    <p>This follow up spike takes a clean slate approach:</p>
+
+    <b><i>If I was designing the architecture from scratch today, what is the best way to support intuitive, reliable analytics usage for a group of non-technical users to both passively consume some reports but also have the ability to self-serve in other reports while maintaining a manageable, scalable architecture for the development team?</i></b>
+
+    <p>The two core considerations for the self-serve aspect are:</p>
+
+    <ul>
+      <li>The report needs to be as simple and intuitive as possible for someone, who has low data literacy, to be able to use it.</li>
+      <li>This simplicity needs to be balanced against the added complexity of the regular release cycles and the level of general technical debt that could be incurred.</li>
+    </ul>
+
+  <h2>The Users</h2>
+
+    <p>There are three distinct groups of users who engage with our suite of reports:</p>
+
+    <table>
+      <tr>
+        <th>User Group</th>
+        <th>Characteristics</th>
+        <th>Primary Needs</th>
+        <th>Suitable Interface</th>
+      </tr>
+      <tr>
+        <td>Analysts / Power Users</td>
+        <td>Data literate, exploratory, hypothesis-driven</td>
+        <td>Full flexibility, access to the semantic model</td>
+        <td>Semantic Model (Power BI Desktop / Service)</td>
+      </tr>
+      <tr>
+        <td>Decision Makers</td>
+        <td>Time-limited, outcome-focused</td>
+        <td>Clear, curated insight aligned to strategy</td>
+        <td>Standard reporting</td>
+      </tr>
+      <tr>
+        <td>Operation / front-line users</td>
+        <td>Low data literacy, process focused</td>
+        <td>Guided user interfaces, limited choices, clear prompts</td>
+        <td>Purpose-built UI</td>
+      </tr>
+    </table>
+
+    <p>The Analytics Builder report is intended to be used primarily by front-line users i.e. the third group listed. However Power BI is a tool designed primarily for Analysts / Power Users, the first group in the above table.</p>
+
+    <p>Therefore this creates an unavoidable gap in cognitive load.</p>
+
+
+  <h2>Cognitive Load Problem</h2>
+
+    <p>Power BI requires users to:</p>
+
+    <ul>
+      <li>understand business logic in metric definitions (calculated columns, calculated tables, measures, field parameters)</li>
+      <li>navigate tabular structures and understand relationships between them</li>
+      <li>select the appropriate fields and filters</li>
+      <li>assemble meaningful visuals</li>
+      <li>avoid misinterpretation</li>
+    </ul>
+
+    <p>These tasks have a technical baseline and <b>assume a certain level of data literacy.</b></p>
+
+    <p>Changing object names, hiding tables or simplifying fields can reduce surface friction but it does not eliminate the need to understand dimensional modelling and the relationships between tables.</p>
+
+    <p>In other words, Power BI can be simplified but it cannot be a guided workflow tool without losing analytical value.</p>
+    
+  <h2>Architectural Options Reviewed</h2>
+
+    <p>The possible approaches are detailed in the below table:</p>
+
+    <table>
+      <tr>
+        <th>Approach</th>
+        <th>Benefits</th>
+        <th>Limitations</th>
+      </tr>
+      <tr>
+        <td>Single Model with Perspectives</td>
+        <td>No duplication, consistent logic, lowest overhead</td>
+        <td>Does not solve user experience (UX) challenges for non-analysts. Requires ongoing manual Perspective maintenance.</td>
+      </tr>
+      <tr>
+        <td>Second Semantic Model</td>
+        <td>Tailored model for simplicity</td>
+        <td>Doubles measure governance. High maintenance burden on development team. Release complexity increases.</td>
+      </tr>
+      <tr>
+        <td>Auto-generated model via scripting / REST API (as per previous investigation).</td>
+        <td>Reduces manual maintenance</td>
+        <td>Technically complex, still inherits the UX limitations of Power BI for non-analysts.</td>
+      </tr>
+      <tr>
+        <td>External app layer consuming the current semantic model.</td>
+        <td>Can present structured, intuitive UX for low data literacy users.</td>
+        <td>Requires software engineering skillset and product development effort. Higher initial cost, lower ongoing cost. Highest chance of adoption.</td>
+      </tr>
+    </table>
+
+  <h2>Proposed Direction</h2>
+
+    <h3>Short-Term</h3>
+
+      <p>Use the approach as detailed in the previous investigation to present a simplified, curated subset of the existing semantic model for Analytics Builder.</p>
+
+      <p>This has the following advantages:</p>
+
+      <ul>
+        <li>Maintains a single source of truth</li>
+        <li>Minimises technical debt</li>
+        <li>Keeps release cycle stable</li>
+        <li>Respects existing RLS</li>
+      </ul>
+    
+    <h3>Long-Term</h3>
+
+      <p>Build an application layer (a web app) on top of the semantic model that provides:</p>
+
+      <ul>
+        <li>Clear workflows with defined tasks</li>
+        <li>Structured prompts and guardrails</li>
+        <li>Limited and context-aware choices</li>
+        <li>A UX designed for non data literate personas.</li>
+      </ul>
+
+      <p>This would allow Analysts and Power Users to continue to interact through Power BI directly and non-analysts to interact through a web user interface. But both groups of users would be engaging with the same semantic model, the single source of truth.</p>
+
+      <p>This aligns with the requirements of this item:</p>
+
+      <ul>
+        <li>Reduced cognitive load / good UX for non-analysts</li>
+        <li>Governance and metric consistency</li>
+        <li>Avoids the technical debt of a dual model system</li>
+      </ul>
+
+    <h3>Why A Web Application?</h2>
+    
+      <p>In broad strokes, a web app's backend uses a mechanism to call measures or to execute DAX queries against the existing semantic model. The specific implementation (e.g. using the Power BI REST API) is a technical detail outside the scope of this investigation.</p>
+
+      <p>The critical point is that the logic for the measures etc. remains in one semantic model.</p>
+    
+      <p>The new work involved is creating a mapping layer which would map the limited choices offered to the user to the technically named objects in the semantic model. So for example creating the mapping so that when a user types or selects 'Show me the number of Active Customers', the semantic model returns the output of the measure [ActiveCustomerCount].</p>
+
+      <p>The key is that this is normal application code and any changes would be considered just a code change to a software development team. All in a day's work.</p>
+
+      <p>The web app doesn't contain any business logic. Instead it contains instructions on how to ask for it. Consequently it transforms the technical debt of logic and object duplication into the more manageable and usual debt of interface mapping.</p>
+    
+    <h2>Summary</h2>
+
+      <p>Power BI is a data analysis tool not a simplified data consumption tool. We can, unfortunately only ever have, at most, two of the following three:</p>
+
+      <ol>
+        <li>A simple, intuitive user experience.</li>
+        <li>Low technical debt and maintenance.</li>
+        <li>A Power BI-centric solution.</li>
+      </ol>
+
+      <p>If we had a clean slate, this should not be done inside of Power BI. The user experience goal cannot be met without significant compromise. Any solution within Power BI will force us to sacrifice the user experience and/or our long-term technical health.</p>
+
+      <p>A purpose-built web application on top of the existing semantic model appears to offer the best path to simplicity, intuitiveness and low-to-no technical debt.</p>
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team accepted the recommendation of the investigation and are currently implementing the short-term approach while building and prototyping a simple web application in the background.</p>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="18-display-active-slicer-selection-onscreen-or-ondemand.html">← Previous: Display Active Slicer Selection On-Screen or On-Demand</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
