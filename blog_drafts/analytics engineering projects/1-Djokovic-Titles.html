@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Djokovic Titles Analytics Projects</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>End-to-End Analytics Engineering Project: Novak Djokovic ATP Titles</h1>
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h2>Objective</h2>
+    
+    <p>The objective of this project was to design and build a complete analytics engineering workflow using modern tooling.</p>
+    
+    <p>Rather than focusing solely on reporting, the aim was to model data correctly, apply engineering practices such as testing and documentation and deliver a dimension model suitable for analytics.</p>
+  
+  <h2>Source Data</h2>
+
+    <p>The source data was a Google Sheet I created containing details of every ATP (Association of Tennis Professionals) title won by Novak Djokovic during his illustrious career.</p>
+
+  <h2>Architecture</h2>
+  
+    <p>The architecture was layered from source to ingestion to presentation in the following manner:</p>
+
+    Google Sheets
+    
+        |
+        |       
+        V
+    
+    BigQuery (raw)   
+
+        |
+        |       
+        v
+
+    dbt Staging Models
+
+        |
+        |
+        V
+
+    dbt Dimensions and Facts
+    
+        |
+        |
+        V
+
+    Power BI semantic model
+
+        |
+        |
+        V
+    
+    Power BI analytic report
+
+    <h4>Data Warehouse</h4>
+
+    BigQuery screenshot
+
+    <h4>Transformation Layer</h4>
+
+    dbt lineage screenshot
+
+    <h4>Presentation Layer</h4>
+
+    Power BI x2 pages screenshots
+
+  <h2>Key Elements</h2>
+  
+    <ul>
+      <li>Source data ingested from Google Sheets into BigQuery.</li>
+      <li>Raw data standardised through dbt staging models.</li>
+      <li>Star schema designed with dimensional attributes and a central fact table.</li>
+      <li>Surrogate keys generated for all dimensions.</li>
+      <li>dbt tests implemented to validate data quality.</li>
+      <li>Documentation generated directly from the dbt project.</li>
+      <li>Final dimensional model consumed by Power BI.</li>
+      <li>Development followed a Git-based workflow with the dbt project maintained in GitHub.</li>
+    </ul>  
+
+Power BI screenshot (2 pages)
+
+  
+  <h2>Technologies</h2>
+
+    <p>The technologies used were as follows:</p>
+
+    <ul>
+      <li>BigQuery</li>
+      <li>dbt core</li>
+      <li>SQL</li>
+      <li>Git</li>
+      <li>Visual Studio Code</li>
+      <li>Power BI</li>
+    </ul>
+
+  <h2>Engineering Concepts Used</h2>
+    
+  <p>The following concepts were either used or explored during the course of the project:</p>  
+  
+  <ul>
+    <li>Dimensional modelling</li>
+    <li>Automated ingestion pipelines via scheduled query</li>
+    <li>Surrogate key generation</li>
+    <li>Data quality testing</li>
+    <li>Documentation generation</li>
+    <li>Transformation layering</li>
+    <li>Analytics engineering workflow</li>
+  </ul>
+
+  <h2>Challenges</h2>
+
+    <ul>
+      <li>Designing a dimensional model from scratch.</li>
+      <li>Choosing where certain transformations belonged in the pipeline.</li>
+      <li>Understanding dbt views and tables.</li>
+      <li>Managing BigQuery sandbox limitations.</li>
+      <li>Deciding where testing should occur.</li>
+      <li>Generating surrogate keys.</li>
+      <li>Building reusable dimensions.</li>
+      <li>Learning the BigQuery SQL dialect.</li>
+    </ul>
+
+  <h2>What I Learned</h2>
+  
+    <p>Prior to this project the bulk of my experience was in Power BI semantic modelling. Building an analytics engineering pipeline demonstrated that reliable reporting begins much earlier that the reporting layer.</p>
+
+    <p>Data ingestion, dimensional modelling, automated testing, documentation and version control all contribute to a maintainable analytics engineering pipeline.</p>
+
+  <h2>Key Skills Demonstrated</h2>
+
+``<table>
+  <tr>
+    <th>Area</th>
+    <th>Skills</th>
+  </tr>
+  <tr>
+    <td>Data Warehousing</td>
+    <td>Kimball dimensional modelling</td>
+  </tr>
+  <tr>
+    <td>SQL</td>
+    <td>BigQuery SQL</td>
+  </tr>
+  <tr>
+    <td>Analytics Engineering</td>
+    <td>dbt Core</td>
+  </tr>
+  <tr>
+    <td>Data Quality</td>
+    <td>Source and model tests</td>
+  </tr>
+  <tr>
+    <td>Documentation</td>
+    <td>dbt Docs</td>
+  </tr>
+  <tr>
+    <td>Version Control</td>
+    <td>Git / GitHub</td>
+  </tr>
+  <tr>
+    <td>Reporting & Visualisation</td>
+    <td>Power BI</td>
+  </tr>
+  <tr>
+    <td>Development</td>
+    <td>VS Code</td>
+  </tr>
+</table>
+
+   <div style="text-align: center; margin: 2rem 0;">
+      <a href="https://github.com/SurnmHanes/dbt_tennis_titles/blob/main/README.md" style="background: #f9c73c; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px;">
+    Read Full Technical Write-Up →
+     </a>
+    </div>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <!-- <a href="the-bone-specialist.html">← Previous: The Bone Specialist</a> -->
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <a href="2-approach-to-switching-fee-model.html">Next: An Approach To Switching Fee Model →</a>
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forecasting At The Wrong Grain</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #410B13
+    }
+    h3 {
+      color: #ba1f33;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+    .archival-document h4 {
+      color: #ff87ab;
+      font-size: 18px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Forecasting At The Wrong Grain</h1>
+    <!-- #113700 -->
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Data modelling analysis, grain mismatch identification, dimensional modelling trade-off analysis, Power BI semantic layer reasoning.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Identified that candidate-level de-duplication is not achievable through simple semantic-layer changes without introducing modelling risk. Recommended a warehouse-level redesign approach with explicit business rule definition and a follow up design spike prior to implementation.
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>We have a forecast report which is based on vacancies. Therefore a candidate could be shortlisted for a number of vacancies. And therefore each shortlisting would have a weighted profit value associated. However the candidate can only accept one job and so the weighted profit would be being over-estimated.</a></p>
+
+  <p>The suggestion therefore is that if the candidate is shortlisted for multiple vacancies we only count the vacancy for which most progress has been made by the candidate.</p>
+
+  <p>Below is a write-up of the options investigated to achieve this:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Executive Summary</h2>
+
+    <p>The Forecast Report <b>can</b> be changed to include candidates once only who currently appear more than once because they are involved in multiple shortlists.</p>
+
+    <p>However to do this requires <b>significant structural changes</b> to both the data model and the various forecast calculations.</p>
+
+    <p>The effort is <b>justified if forecast accuracy is a priority</b> and will mean the report aligns with customer expectations but it is <b>not a quick fix.</b></p>
+
+  <h2>1. Objective</h2>
+    
+    <h3>1.1 Background</h3>
+
+      <p>We currently have a report which displays the forecasted gross profit expected from our vacancies and placements, based on their start date.</p>
+
+      <p>The main page has a stacked column chart with month on the x axis. With each stack representing a different type of vacancy or placement.</p>
+
+      <p>We also have the flexibility in the report to set the weighting for each stack i.e. the probability that the vacancy / placement will happen based on the stage that the candidate has been shortlisted at. The report user can apply a percentage from -100% to 100% based on the effective likelihood of receiving this forecasted gross profit.</p>
+
+    <h3>1.2 The Ask</h3>
+    
+      <p>An external customer has mentioned that the same candidate could be shortlisted for multiple vacancies but can only ever accept one. And the Forecast report doesn't make allowances for this "candidate-vacancy" duplication.</p>
+
+      <p>This spike is to explore if it is possible for the Forecast report to be enhanced to only include one vacancy / placement per candidate. And to address the following specifically:</p>
+
+      <ul>
+        <li>What would be involved?</li>
+        <li>Any further impacts/considerations?</li>
+      </ul>
+
+  <h2>2. Investigation</h2>
+
+    <p>The main page of the Forecast report consists of a stacked column chart, a donut and 6 headline cards.</p>
+
+    <h3>2.1 Stacked Column Chart</h3>
+
+      <p>This stacked chart is made up of up to 8 different stacks, showing the gross profit (GP) associated to vacancies and placements with each column representing a different month. The 8 stacks represent:</p>
+
+      <ol>
+        <li><b>GP (likely to be) earned from:</b>
+          <ol>
+            <li>Permanent vacancies.</li>
+            <li>Contract / temporary vacancies.</li>
+            <li>Placement extensions.</li>
+            <li>Existing contract / temporary placements.</li>
+            <li>Existing permanent placements.</li>
+          </ol>
+        </li>
+        <li><b>GP (likely to be) lost from:</b>
+          <ol>
+            <li>Placement extensions unlikely to extend.</li>
+            <li>Contract / temporary vacancies ending.</li>
+            <li>Permanent vacancies ending.</li>
+          </ol>
+        </li>
+      </ol>
+    
+    <h3>2.2 Headline Cards</h3>
+
+      <p>The headline cards display various aggregations:</p>
+
+      <ul>
+        <li>Above the line total (i.e. GP earned)</li>
+        <li>Placement above the line total</li>
+        <li>Placement below the line total</li>
+        <li>Vacancy above the line total</li>
+        <li>Vacancy below the line total</li>
+        <li>Below the line total (i.e. GP lost)</li>
+      </ul>
+    
+    <h3>2.3 Current Problem</h3>
+
+      <p>This current approach over-forecasts because <b>it counts the same candidate multiple times</b>: once for every vacancy they're linked to. A candidate can only ever accept one vacancy but our report makes no allowances for this real-world behaviour.</p>
+
+      <p>We are currently aggregating over vacancy and placement records and we don't take account of the identity of the candidates involved. Indeed the only fact table which includes a reference to candidate is the OpenPlacements table.</p>
+
+      <p>In basic terms the fix requires adding CandidateContactKey to all relevant fact tables, however this has other repercussions which makes this unfeasible. The main problem being that there is not a one to one mapping between candidate and vacancy / placement.</p>
+
+      <p>So every vacancy / placement could have multiple candidates associated with it. Adding in candidates to the fact tables will increase the number of rows in the tables (since every record relates to multiple candidates i.e. one row in the existing table becomes multiple rows once the CandidateContactKey is added) and will therefore impact measures which aggregate over the table.</p>
+
+      <i><p>For example, a vacancy which appeared once might now appear twice in the table and therefore its gross profit will be double-counted. Meaning any measures aggregating profit from this table will return different values than previously.</p></i>
+
+      <p>An obvious alternative would be to use FctShortlist since this already has the relationship between candidate and vacancy. However it has missing data such as the gross profit value and number of positions which are both stored in FctVacancy.</p>
+    
+    <h3>2.4 The Grain Problem</h3>
+      
+      <p>The fundamental issue is that the forecast is currently built at <b>vacancy grain</b>. But the customer's requirement is at <b>candidate grain</b>. These are incompatible without a significant remodelling effort.</p>
+
+      <p>A single vacancy can have multiple candidates and a single candidate can be linked to multiple vacancies. This creates a many-to-many forecasting problem which cannot be resolved simply.</p>
+
+  <h2>3. Feasibility</h2>
+  
+    <p>Candidate-level de-duplication is feasible. But it requires shifting from vacancy-level to candidate-level aggregation. The work required includes:</p>
+    <ul>
+      <li>Grouping vacancies by candidate</li>
+      <li>Ranking these vacancies per candidate by shortlist stage</li>
+      <li>Using tie-breaking logic where one candidate is at the same shortlist stage for multiple vacancies</li>
+      <li>Exclude the non-selected vacancies from aggregation ensuring each candidate is linked to at most one vacancy</li>
+    </ul>
+
+  <h2>4. Options And Their Trade-offs</h2>
+
+    <table>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Advantages</th>
+        <th>Disadvantages</th>
+      </tr>
+      <tr>
+        <td>A: Enrich Existing Tables</td>
+        <td>Add CandidateKey to FctVacancy, FctPlacement etc.</td>
+        <td>Uses existing structure.</td>
+        <td>Changes grain. Will impact existing measures potentially <b>across whole report suite</b>.</td>
+      </tr>
+      <tr>
+        <td>B: Build New Candidate-Level Fact Tables</td>
+        <td>Create new tables at candidate-vacancy grain in the warehouse.</td>
+        <td>Clean design, no impact on existing reports.</td>
+        <td>More ETL work, new objects in warehouse and semantic model to maintain. Increases size of database and semantic model.</td>
+      </tr>
+      <tr>
+        <td>C: Create new candidate level measures</td>
+        <td>Write new DAX measures in Power BI to replicate the existing measures but at candidate-vacancy grain.</td>
+        <td>No upstream changes required.</td>
+        <td>Complex as aggregating across fact tables. Invisible, error-prone and carries performance risk on large datasets.</td>
+      </tr>
+    </table>
+
+  <h2>5. Outstanding Questions</h2>
+
+    <p>If a candidate has multiple vacancies when duplicating what is the deciding factor:</p>
+
+    <ul>
+      <li>The vacancy where the candidate has reached the furthest shortlist stage?</li>
+      <li>The vacancy with the highest GP?</li>
+      <li>The vacancy with the earliest start date?</li>
+      <li>The vacancy with the most-recent associated activity?</li>
+      <li>Another factor?</li>
+    </ul>
+
+    <p>If furthest shortlist stage is the deciding factor, what happens if one candidate has two or more vacancies at this latest stage?</p>
+
+    <p>What is the priority of this work against other initiatives? More than likely this will take multiple sprints.</p>
+
+    <p>How much desire across the customer base is there for such a candidate forecast report?</p>
+
+  <h2>6. Recommendation</h2>
+
+    <p>I would <b>recommend option B</b>.While it requires most up-front work, it avoids the risks to the whole reporting suite of changing grain described in option A.</p>
+
+    <p>Option B is more visible and more robust than option C and also doesn't carry the performance risks of that option.</p>
+
+    <p>Depending on the direction of travel, option B also has a potential strategic upside of creating a clean foundation on which to build data infrastructure for future candidate-centric reporting. This makes it an infrastructure investment rather than just a fix.</p>
+
+    <p>I would also recommend that it should be preceded by a 1-2 week design spike to agree how these changes can be implemented in the data warehouse.</p>
+
+    <p>As part of option B, it may be possible to re-purpose or enhance the existing FctShortlist table however this also <b>carries the risk</b> of altering existing reports and measures that are dependent upon the table in its existing state.</p>
+
+  <h2>7. Conclusion</h2>
+
+    <p>In conclusion, candidate-level de-duplication is achievable but it's a significant change. It requires:</p>
+
+    <ul>
+      <li>Clarification for basis of de-duplication of vacancies per candidate.</li>
+      <li>Business rule for a tie-break for candidates with multiple vacancies / placement extensions at the same stage (if stage is used as basis for de-duplication).</li>
+      <li>Creation of new candidate fact tables in the data warehouse.</li>
+      <li>A full rewrite of all the forecast measures (minimum 18 measures).</li>
+      <li>Full or partial rebuild of Forecast report taking a candidate-centric approach rather than a vacancy-centric approach.</li>
+    </ul>
+
+    <p>This is not a small change but it is achievable over time. And the investment will lead to a forecast report which is both more accurate and also meets the customer's expectation.</p>
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team has decided not to proceed with this change at the present time due to competing priorities and the work involved.</p>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="19-bridging-the-gap-between-PowerBI-and-non-technical-users.html">← Previous: Bridging the Gap Between Power BI and Non Technical Users</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
