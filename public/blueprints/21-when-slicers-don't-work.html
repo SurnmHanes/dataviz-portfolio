@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>When Slicers Don't Work</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #0a5757
+    }
+    h3 {
+      color: #008080;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+
+    .archival-document h4 {
+      color: #00a8a5;
+      font-size: 16px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+    blockquote {
+      background-color: #fff1c7 ;
+      border-left: 3px solid #e0a600;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../analyticalengineeringprojects.html">Analytics Engineering Projects</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Diagnosing Filter Propagation in Power BI</h1>
+    <!-- #115859 -->
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Semantic modelling, systems thinking, root cause analysis, stakeholder communication and technical trade-off analysis.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Demonstrated that several requested report interactions were constrained by the existing semantic model rather than the report itself. Identified where filter propagation broke down, evaluated implementation options and provided a decision framework balancing user experience, engineering effort and modelling complexity.
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+  <p>We have a multi-fact report (internally known as 'Team Leaderboard') with various slicers which have been added on an ad hoc basis as feedback has been received from stakeholders over time. As a result the report user interface was out of sync with the rest of the reports in the suite.</p>
+
+  <p>The Product Owner wished to align this report with the other reports and posed the question whether it was possible to add a filter panel with slicers in an almost identical manner to how it is done in other reports.</p>
+
+  <p>In particular there were historical modelling reasons why this report was built differently and the investigation was to discover whether these limitations were still current.</p>
+
+  <p>Below is a write-up of the options investigated to achieve this:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Executive Summary</h2>
+
+    <p>It is possible to introduce a filter panel  to the Team Leaderboard for both basic and advanced slicers so the report looks consistent with the other reports in the suite.</p>
+
+    <p>However certain slicers in the proposed list will not affect the values due to no relationship being present.</p>
+
+    <p>Prior to implementation a decision needs to be made whether this behaviour is acceptable or whether additional data modelling work needs to be explored and implemented to create the required relationships.</p>
+
+  <h2>1. Objective</h2>
+    
+    <h3>1.1 Background</h3>
+
+      <p>Most of the reports in the analytics suite have a panel at the top of each page containing a set of "basic" slicers to allow the user to filter the visuals and KPIs shown to a subgroup of the data, e.g. their own team</p>
+
+      <p>Via a button / bookmark combination it is also possible for the user to navigate from the "basic" slicers to further "advanced" slicers. All of this interactivity allows the user to view the visuals by the exact categories and subgroups they desire.</p>
+
+    <figure><img src='../blueprint_images/21-1.png' alt='existing basic filter panel' style='max-width:100%; height:auto'><figcaption>An example of the basic filter panel</figcaption></figure>
+
+    <figure><img src='../blueprint_images/21-2.png' alt='existing advanced filter panel' style='max-width:100%; height:auto'><figcaption>An example of the advanced filter panel</figcaption></figure>
+
+    <h3>1.2 The Ask</h3>
+    
+      <p>The Team Leaderboard report does not contain this panel of basic and advanced slicers. The report is made up of two pages (Recruitment Activity and Business Development Activities) and a number of drillthrough pages from these two.</p>
+
+      <p>This item is to look into the feasibility of adding this functionality into the two pages of the report to increase UI consistency across all reports in the suite. In particular, there were 4 questions posed:</p>
+
+      <ol>
+        <li>Can a single Type slicer be used like in other reports in place of the two separate 'Placement Type' and 'Vacancy Type' slicers in the report?</li>
+        <li>Can the current New/Existing button slicers be replaced with a dropdown slicer?</li>
+        <li>Could the existing 'Appointment Purpose' and 'Phonecall Purpose' be merged into one general 'Purpose'?
+          <ul>
+            <li>If so, what would be the implications / limitations?</li>
+            <li>Would it be sensible to treat them as separate slicers?</li>
+          </ul>
+        </li>
+        <li>Can we ensure that the existing drill through functionality is maintained.</li>
+      </ol>
+
+  <h2>2. Investigation</h2>
+
+    <p>The Recruitment Activity page on the Team Leaderboard is made up of one bar chart visual with 6 navigation tabs on the right hand side.</p>
+
+    <p>The y-axis will either display at Consultant level or Team level (this is user-configured) and the x-axis displays a measure which returns a count or a sum. The metric displayed varies depending on the tab the user is on. The different options are:</p>
+
+      <ol>
+        <li>Gross Profit</li>
+        <li>Placements</li>
+        <li>Offers Made</li>
+        <li>1st Interviews</li>
+        <li>CVs Submitted</li>
+        <li>Vacancies</li>
+      </ol>
+    
+    <figure><img src='../blueprint_images/21-3.png' alt='recruitment activity page of Team Leaderboard report' style='max-width:100%; height:auto'><figcaption>Recruitment Activity page of Team Leaderboard</figcaption></figure>
+
+    <p>The Business Development Activities page has a similar pattern but the options available are:</p>
+
+    <ul>
+      <li>New Candidates</li>
+      <li>New Clients</li>
+      <li>New Client Contacts</li>
+      <li>Spec Sends</li>
+      <li>Phone Calls</li>
+      <li>Appointments</li>
+    </ul>
+
+    <figure><img src='../blueprint_images/21-4.png' alt='business development page of Team Leaderboard report' style='max-width:100%; height:auto'><figcaption>Business Development page of Team Leaderboard</figcaption></figure>
+
+    <h3>2.1 Will The Slicers Work?</h3>
+
+      <p>In Power BI, slicers affect the values in the visuals due to <b>filter propagation</b>.</p>
+
+      <p>So a selection made in the slicer then propagates from this dimension table via a relationship to the fact table filtering the fact records too. This ensures a subset of the original fact table records are returned.</p>
+
+      <p>The relevant measure then runs across this filtered subset to produce its answer. <b><i>Filter first, aggregate second.</i></b></p>
+
+      <blockquote><b>Key principle:</b> In Power BI, measures don't aggregate over the whole fact table. Instead they aggregate over whatever subset of rows remains after filter propagation through the semantic model. Understanding <i>which rows (are allowed to) participate in the aggregation</i> is the real puzzle.</blockquote>
+   
+    <figure><img src='../blueprint_images/21-5.png' alt='model diagram showing dimensions filter facts' style='max-width:100%; height:auto'><figcaption>Model diagram showing that a selection in DimActivityPurpose filters FctPhonecall and FctAppointment (note the filter direction arrows)</figcaption></figure>      
+
+    <p>So the <b>key</b> to knowing whether a slicer in the panel will achieve what we need is to identify whether there are relationships in play between:</p>
+
+    <p>(a) the dimensions the filter values come from and: </p>
+    <p>(b) the fact tables which are responsible for the measures in the visuals.</p>
+
+    <b><i>The effectiveness of the slicer is completely dependent upon the relationship between the dimension table and the fact table in the semantic model.</i></b>
+
+
+    <p>Where no relationship exists, the slicer will appear to function but will not affect the measure and therefore the underlying numbers won't change.</p>
+
+    <h3>2.2 Table Relationships</h3>
+
+    <p>In the following diagram, down the left hand side we have included all the dimension tables used to create the slicers.</p>
+
+    <p>Across the top are all the fact tables which are responsible for the numbers in the various visuals in the Team Leaderboard report.</p>
+
+    <table>
+      <tr>
+        <th>Slicer Dimension / Fact Table</th>
+        <th>FctPlacement</th>
+        <th>FctShortlist</th>
+        <th>FctVacancy</th>
+        <th>FctContact</th>
+        <th>FctClient</th>
+        <th>FctSpeculativeSend</th>
+        <th>FctPhonecall</th>
+        <th>FctAppointment</th>
+      </tr>
+      <tr>
+        <td>DimUser</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+      </tr>
+      <tr>
+        <td>DimClient*</th>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+      </tr>
+      <tr>
+        <td>SpecVacancySelector</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+      </tr>
+      <tr>
+        <td>DimType</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+      </tr>
+      <tr>
+        <td>DimFeeBasedOn</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#10004</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+        <td>&#x274c</td>
+      </tr>
+      <tr>
+        <td>DimActivityPurpose**</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+        <td>&#x2796;</td>
+      </tr>
+    </table>
+
+    <p style="font-size:12px"><i>*via DimClientContact</i></p>
+    <p style="font-size:12px"><i>**proposed dimension (replacing the existing two purposes)</i></p>
+
+    <p>A checked box in the diagram confirms there is a relationship between the relevant dimension and fact tables. And therefore that the slicer will filter the data correctly.</p>
+
+    <p>The table tells us the following:</p>
+
+    <ol>
+      <li>The <b>client</b> slicer won't filter the phone call or appointments visuals.</li>
+      <li><b>Exclude Spec Vacancies</b> slicer won't filter on the Business Development Activities page.</li>
+      <li><b>Contingent / Staged</b> slicer won't filter on the Business Development Activities page.</li>
+      <li><b>Currency</b> slicer won't filter on the Business Development Activities page.</li>
+    </ol>
+
+
+  <h2>3. Addressing The Questions Posed</h2>
+
+    <h3>3.1 Can a single type slicer be used?</h3>
+      <p>Yes. As the backend work to unify both sorts of type was completed after this report was created, it could not be done at the time but is a simple implementation now.</p>
+
+      <p>The existing slicers can both be replaced with the type slicer originating from the relatively new DimType table.</p>
+    
+    <h3>3.2 Can the New / Extensions button slicer be a dropdown?</h3>
+      <p>Yes, these options, as they exist, are non-overlapping. A given placement can <b>either</b> be a new placement <b>or</b> an extension (of a previous) placement. Given this, the options can be presented in a dropdown slicer.</p>
+
+      <p>There are two possible options to implement this:</p>
+
+        <ul>
+          <li>a multi-select slicer with 'New' and 'Extension' as the two options. The user would then need to select either both or neither to view all placements.</li>
+          <li>a slicer with three options where 'Select all' is the third option.</li>
+        </ul>
+    
+    <h3>3.3 Can the Appointment purpose and phonecall purpose slicers be combined into one dropdown?</h3>
+      <p>Yes. The appointment and phone call purposes are derived from the same table in the data warehouse: staging.ActivityPurpose.</p>
+
+      <p>This is itself derived from one table in Core.</p>
+
+      <p>So we can instead use this source table as our source for purpose globally i.e. whether it's appointment or phonecall.</p>
+
+      <p>In order to do this I would suggest perhaps a re-purpose of the existing DimActivityPurpose (which is created currently from the staging.ActivityPurpose).</p>
+
+      <p>We would need to at least add the activityID column into the view that serves Power BI and then create relationships to FactPhonecall and FactAppointment in Power BI using this ID column as the key.</p>
+
+      <p>However if we were to take this approach there are a couple of considerations:</p>
+    
+      <h4>3.3.1 User Experience</h4>
+      
+        <p>There may be options in the dropdown that do not apply to appointments and conversely some that do not apply to phonecalls. Is this going to be confusing to the end user?</p>
+
+        <p>This can be somewhat mitigated against because within that DimActivityPurpose table there are columns called IsPhonecall and IsAppointment. We could theoretically use these (set to True) on the relevant pages/bookmarks so only context-relevant options appear in this proposed purpose dropdown.</p>
+      
+      <h4>3.3.2 Changes in Multiple Places</h4>
+        
+        <p>Using a single purpose filter will mean that both Phonecalls and Appointment total numbers on the headline cards on the right hand side will change at the same time.</p>
+
+        <p>Even by using IsPhonecall / IsAppointment in a way as described in 3.3.1 above will not prevent this as there are some purposes common to both.</p>
+
+        <p>Technically it's not wrong but it may be a bit off-putting to the user?</p>
+
+      <h4>3.3.3 Deliberate Isolation of Purposes</h4>
+
+        <p>I feel like elsewhere in the reporting suite we have consciously decided to treat appointment purposes and phonecall purposes separately from one another.</p>
+
+        <p>This proposed change (in particular creating the relationships) may impact those areas.</p>
+   
+    <h3>3.4 Do any of the proposed changes affect the drillthrough behaviour?</h3>
+
+        <p>The drillthrough functionality is controlled by the measures used in the visuals. Since we are not changing the visuals materially <i>only allowing the user to limit the amount of data which flows to the visuals</i>, this functionality will remain intact.</p>
+
+  <h2>4. Outstanding Questions</h2>
+
+    <p>Why do this? Is the end result worth the effort involved? Although not complicated there is a non-trivial amount of work involved in this:</p>
+
+      <ul>
+        <li>SQL development (~0.5 days)</li>
+        <li>Power BI modelling changes (~0.5 days)</li>
+        <li>Power BI UI changes (~2 days)
+          <ul>
+            <li>removal of existing slicers (placement type, new / extension, vacancy type, team, phone call and appointment purpose)</li>
+            <li>introduction of basic / advanced slicer panels including filter iconography and buttons</li>
+            <li>introduction of bookmarks for navigation and resetting slicers</li>
+          </ul>
+        </li>
+      </ul>
+
+    <p>If we go ahead with these changes, do we want to add headline cards? After these changes have been implemented, when initially opening the report, the headline panel will be blank with just a funnel icon to the left.</p>
+
+  <h2>5. Options</h2>
+
+    <p>Depending on the questions posed in section 4, there are 3 options on how to take this forward:</p>
+
+      <table>
+        <tr>
+          <th>Option</th>
+          <th>Detail</th>
+          <th>Advantages</th>
+          <th>Disadvantages</th>
+        </tr>
+        <tr>
+          <td>A: Implement fully now</td>
+          <td>Add basic and advanced slicers to both pages of the report.</td>
+          <td>Report user experience is enhanced as more able to slice and dice data.</td>
+          <td>As per the checkboxes above, some slicers will have no effect on certain visuals.</td>
+        </tr>
+        <tr>
+          <td>B: Implement partially now</td>
+          <td>Implement basic and advanced slicers to both pages but be selective about when certain slicers are visible to be used.</td>
+          <td>User experience is enhanced. User only gets to filter the data using relevant slicers.</td>
+          <td>Slicers disappear and re-appear depending on navigation. Not a satisfactory user experience.</td>
+        </tr>
+        <tr>
+          <td>C: Leave report as is</td>
+          <td>Make no changes to the report.</td>
+          <td>No work required.</td>
+          <td>Report will have different functionality to the rest of the reporting suite.</td>
+        </tr>
+        <tr>
+          <td>D: Redesign model</td>
+          <td>Redesign the semantic model so that all the proposed slicers work across all visuals at all times.</td>
+          <td>Clean semantic model where all slicers behave consistently across all visuals.</td>
+          <td>Significant engineering effort. Potentially disproportionate to the UI consistency goal. Will impact all reports (i.e. large blast radius).</td>
+        </tr>
+      </table>
+
+  <h2>6. Recommendation</h2>
+
+    <p>I would <b>tentatively recommend</b> we go ahead with <b>option A</b>. Not just so the report is consistent with rest of the suite but because it also allows the user to be able to interact more and gain even more insight and decision-making power from the report.</p>   
+
+    <p>The reason I'm tentative is because I have concerns involving the four questions posed at the end of section 2 and the three points made at the end of section 3.3 above.</p>
+
+ </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>The team is currently considering prototypes for both Option A and a hybrid approach close to Option B where the basic and advanced slicers are introduced but the existing slicers in the report remain.</p>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="20-forecasting-at-the-wrong-grain.html">← Previous: Forecasting at the Wrong Grain</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
