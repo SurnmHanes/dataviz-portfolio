@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Removing a Redundant Fact Table</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #524c87;
+    }
+    h3 {
+      color: #6a68b3;
+      font-size: 20px;
+      /* font-style: italic; */
+    }
+
+    .archival-document h4 {
+      color: #878dd4;
+      font-size: 16px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-style: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+    blockquote {
+      background-color: #fff1c7 ;
+      border-left: 3px solid #e0a600;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../analyticalengineeringprojects.html">Analytics Engineering Projects</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Removing a Redundant Fact Table From a Power BI Semantic Model</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Semantic model dependency analysis, DAX impact assessment, root-cause investigation, technical debt analysis, Power BI tooling and evaluation of modelling trade-offs.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Established that the redundant fact table could be removed with minimal impact on the existing reports. A small proof of concept was created to validate the approach. 
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+    <p>We have a couple of reports which had elements associated with actual vs target KPIs. These were initially built using the relevant fact table. However requirements subsequently evolved and snapshot comparison was needed which meant a new snapshot table was created. This allowed us to reference the snapshot data and view the KPIs across different time periods.</p>
+
+    <p>However this additional table introduced complexity and redundancy into the semantic model. It was believed that the original fact table could be completely replaced. This investigation aimed to determine the feasibility of this.</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 6 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+  <h2>Executive Summary</h2>
+
+    <p>We can remove the dependency on the target fact table from the work done for the two reports.</p>
+
+    <p>The work required is limited and involves:</p>
+
+    <ul>
+      <li>Altering 10 DAX measures in the semantic model</li>
+      <li>Replacing the source for the Target Frequency slicer in the Team View page of one of the reports</li>
+    </ul>
+
+  <h2>1. Objective</h2>
+    
+    <h3>1.1 Background</h3>
+
+      <p>Originally two of the reports in the suite were built referencing one specific fact table known as FctTarget.</p>
+
+      <p>After original implementation, requirements were introduced which needed snapshot comparison. A new fact table was created called FctTargetSnapshot to include snapshot data to allow us to compare and view across different time periods.</p>
+
+      <p>It became clear that there was significant overlap between FctTarget and FctTargetSnapshot. FctTarget was essentially superseded and so the question was raised as to whether we can safely remove it from the model or not.</p>
+
+    <h3>1.2 The Ask</h3>
+    
+      <p>This investigation aims to identify what work would be required to remove any dependency on FctTarget and instead reference FctTargetSnapshot. In particular:</p>
+
+      <ul>
+        <li>What aspects of the current reports use FctTarget?</li>
+        <li>What specifically do we need to do to meet the aspiration of removing it?</li>
+      </ul>
+
+    <figure><img src='../blueprint_images/22-1.png' alt='The Teams Page of one of the reports' style='max-width:100%; height:auto'><figcaption>The Teams page for one of the reports</figcaption></figure>
+
+    <h2>2. Investigation</h2>
+
+      <p>The starting point for the investigation was Measure Killer.</p>
+
+      <p>We used it to identify where in the solution we made use of FctTarget. Once we understood this scope we could then investigate each of these uses and see if it was possible to remove the FctTarget reference.</p>
+
+   <h3>2.1 FctTarget Usage</h3>
+      
+    <p>Measure Killer identified 7 artifacts across the solution that use FctTarget. In addition 4 of its columns are in use and there is one measure whose Home Table is FctTarget.</p>
+
+    <figure><img src='../blueprint_images/22-2.png' alt='Measure Killer report showing FctTarget usage' style='max-width:100%; height:auto'><figcaption>Measure Killer Report showing FctTarget usage</figcaption></figure>
+
+    <h4>2.1.1 Used in Artifacts</h4>
+
+      <p>From the above screenshot we can see that the target table is used in 7 different artifacts, all of which are measures.</p>
+
+      <p>So the possibility remains that we can re-write these measures to remove this dependency and instead reference the snapshot table only.</p>
+
+      <p>Measure Killer was able to indicate where in the solution these measures were used and that is shown in the below screenshot. Report 1 has two affected pages, Team and Individual. Report 2 has one affected page called Main.</p>
+
+      <figure><img src='../blueprint_images/22-3.png' alt='Measure usage across the two reports' style='max-width:100%; height:auto'><figcaption>Measure usage across the two reports</figcaption></figure>
+
+      <p>There are 10 measures in total because the 7 measures identified by Measure Killer were themselves dependent on a futher 3 measures.</p>
+  
+    <h4>2.1.2 Current Mechanism</h4>
+
+      <p>As we can see, the majority of the usage is in the Team page of Report 1. Which makes sense since this page has a target frequency button slicer which is populated using the frequency column from the FctTarget table. This slicer was not actually related to any fact tables and was being used solely as a user selection layer.</p>
+
+      <p>This user selection is then used in various measures in both the dials and the bar charts on the page to return the correct metric based on the selected frequency.</p>
+
+      <p>For instance, here is one measure:</p>
+
+      <figure><img src='../blueprint_images/22-4.png' alt='DAX code for the KPI Current Period Actual Value (team) measure' style='max-width:100%; height:auto'><figcaption>KPI Current Period Actual Value (team) definition showing the dependence on the frequency selector</figcaption></figure>
+
+     <h4>2.1.3 Proposed Mechanism</h4>
+
+      <p>We can change the source of the slicer to be the frequency column from the FactTargetSnapshot table.</p>
+
+      <p>The downstream measures can then be amended to reference this new selection in the UI:</p>
+
+      <figure><img src='../blueprint_images/22-5.png' alt='Proposed DAX code for the KPI Current Period Actual Value (team) measure' style='max-width:100%; height:auto'><figcaption>Proposed DAX code for KPI Current Period Actual Value (team) removing the reference to FctTarget</figcaption></figure>
+
+      <p>All 10 measures can be altered like this.</p>
+
+   <h3>2.2 FctTarget Columns</h3>
+      
+      <p>Four columns of the table were marked as in use in the solution and so we needed to understand where and how these columns were being used.</p>
+
+      <h4>2.2.1 FctTarget[Frequency]</h4>
+
+        <p>This was being used in the aforementioned slicer and then in the downstream measures. 2.1.3 suggests a way to remove this dependency.</p>
+
+      <h4>2.2.2 FctTarget[UserKey]</h4>
+
+        <p>This is used solely to create a relationship between FctTarget and DimUser (for RLS). This can be safely ignored if we remove any need for FctTarget.</p>
+
+        <figure><img src='../blueprint_images/22-6.png' alt='UserKey solely used to create a relationship between FctTarget and DimUser' style='max-width:100%; height:auto'><figcaption>UserKey solely used to create a relationship between FctTarget and DimUser</figcaption></figure>
+
+      <h4>2.2.3 FctTarget[CreatedOnDateKey]</h4>
+
+        <p>This is used solely to create a relationship between FctTarget and DimDate. This can be safely ignored if we remove any need for FctTarget.</p>
+
+      <h4>2.2.4 FctTarget[DisplayOrder]</h4>
+
+        <p>This is used to sort the order that the various frequencies appear in the tile slicer in the user interface for the Team View page of Report 1. Again this can be safely ignored.</p>
+
+    <h3>2.3 FctTarget Measures</h3>
+
+        <p>There is one measure in the solution which lives as part of FctTarget. <i>(Technically measures are table-agnostic since they operate outside the framework of a table however they must be assigned a Home Table)</i> </p>
+
+        <p>The one measure with a Home Table of FctTarget is <b>KPI Name (Managers)</b> which is used in both the Performance over Time pages in Report 1 and Report 2.</p>
+
+        <figure><img src='../blueprint_images/22-7.png' alt='KPI Name (Managers) usage' style='max-width:100%; height:auto'><figcaption>KPI Name (Managers) usage</figcaption></figure>
+
+        <p>However the measure isn't actually referencing <b>ANY</b> columns from FctTarget.</p>
+
+        <figure><img src='../blueprint_images/22-8.png' alt='KPI Name (Managers) DAX code' style='max-width:100%; height:auto'><figcaption>KPI Name (Managers) DAX code</figcaption></figure>
+
+        <p>And we can easily assign it a different Home Table before deleting FctTarget by choosing a different table from the dropdown list</p>
+
+  <h2>3. Summary</h2>
+
+      <p>FctTarget is used as a slicer in Report 1 and consequently downstream in measures which drive the metrics displayed in the dial visuals and the bar chart visuals.</p>
+
+      <p>There is also usage for another three of its columns however two of those are to create relationships and one is for the sort order of values on the slicer.</p>
+
+      <p><b>The dependency on FctTarget can be removed </b>by doing the following</p>
+
+      <ul>
+        <li>Replace FctTarget[Frequency] with FctTargetSnapshot[Frequency] in the slicer</li>
+        <li>Replace the reference to FctTarget[Frequency] with FctTargetSnapshot[Frequency] in the following measures:
+          <ul>
+            <li>Actual Tooltip Selection</li>
+            <li>Fill to 100% (team)</li>
+            <li>KPI Current Period Actual Value (team)</li>
+            <li>KPI Current Period Actual vs Target % (team)</li>
+            <li>KPI Current Period Target Value (team)</li>
+            <li>KPI Dial Actual Label (team)</li>
+            <li>KPI Dial Subtitle (team)</li>
+            <li>KPI Value (Last Month)</li>
+            <li>Last Period Card Title</li>
+            <li>Target Tooltip Selection</li>
+          </ul>
+        </li>
+        <li>Change the Home Table for KPI Name (Managers) to a different table</li>
+      </ul>
+
+  <h2>4. Final Thoughts</h2>
+
+      <h3>4.1 Proof of Concept</h3>
+      
+        <p>A small proof of concept was created to validate the proposed changes, and the results were promising.</p>
+      
+      <h3>4.2 Using a Fact Table in a Slicer</h3>
+
+      <p>Usually I would not advocate for this approach, however there are two reasons why I think it is fine to use here:</p>
+
+        <h4>1. Dimensions usually filter Facts</h4>
+
+          <p>Traditionally a user makes a selection in a dimension table which (because of the relationship between the two tables) propagates to the fact table. This then leads to the fact table being filtered. A measure is then aggregated over this subset of fact table records.</p>
+
+          <p>So we would normally seek to use a dimension table to do the filtering.</p>
+
+          <p>In this particular scenario we are <b>not</b> using the slicer to filter a fact table. Instead we are using it to capture user desired frequency only.</p>
+
+          <p>The measures themselves then use this selection and do the filtering over the whole fact table (ALL( FctTargetSnapshot )) themselves before then aggregating over the subset of data remaining.</p>
+
+        <h4>2. No Frequency Dimension</h4>
+
+          <p>We do not have a frequency dimension in the model. Longer term this may be something we could look into. And then use this and filter propagation to "properly" filter the fact table.</p>
+
+          <p>However this would require a spike to investigate as it would require work in the backend warehouse and a further change to the report UI and measure definitions for these measures. And potentially for those measures on the individual page (which we haven't needed to look at for this piece of work).</p>
+ 
+  </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>Other priorities subsequently took the team's attention away from this work so the proposed changes have not yet been implemented. Nevertheless the investigation established that the dependency on FctTarget can be removed with minimal impact. It has also documented the changes required and validated the approach through a proof of concept. The development item remains on the backlog and will be brought into sprint when time allows.</p>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="21-when-slicers-don't-work.html">← Previous: When Slicers Don't Work</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <!-- <a href="#top">Back to top of page</a> -->
+      </div>
+
+      <div class="nav-next">
+        <a href="#top">Back to top of page</a>
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
