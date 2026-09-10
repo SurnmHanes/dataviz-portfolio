@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using Power BI Drill-Through to Explore KPI Trends</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #29601a;
+    }
+    h3 {
+      color: #8eb767;
+      font-size: 18px;
+    }
+
+    .archival-document h4 {
+      color: #878dd4;
+      font-size: 16px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+    blockquote {
+      background-color: #fff1c7 ;
+      border-left: 3px solid #e0a600;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../analyticalengineeringprojects.html">Analytics Engineering Projects</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Using Power BI Drill-Through to Explore KPI Trends</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: Power BI drill-through design, semantic model filtering, UX evaluation, edge-case investigation, visualisation trade-off analysis and proof-of-concept development.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Confirmed that Power BI drill-through could provide the required ad hoc KPI trend analysis. A proof of concept was created, the user experience trade-offs were evaluated and the approach was implemented using column charts to handle intermittent KPI data more effectively.
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+    <p>We have an existing report which contains a standard table visual. The rows represent client contacts and the columns represent different KPIs.</p>
+
+    <p>The question was raised whether it was possible to drill through on one of the rows of the table to view more granular information, namely the performance for each of these KPIs over time for the given client contact.</p>
+
+    <p>The following is a write-up of the investigation:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 3 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+ 
+  <h2>1. Problem</h2>
+    
+    <p>The current iteration of the report gives us the current aggregates only for each of the KPIs. There is no way to view trends over time.</p>
+
+    <p>The idea is to add drill-through functionality to the table visual on the Client Contact page to enable the user to drill through on a specific client contact (the table rows are per client contact) to navigate the user to a page showing how each KPI has changed over time for that client contact. The specific ask is whether the previous 12 complete months can be displayed for the following KPIs:</p>
+      
+      <ul>
+        <li>Vacancies</li>
+        <li>Submissions</li>
+        <li>Interviews</li>
+        <li>Offers</li>
+        <li>Placements and Gross Profit (one chart displaying both metrics)</li>
+        <li>Calls & Appointments (one chart displaying both metrics)</li>
+      </ul>
+
+      <p>The investigation needs to answer whether this can technically be done and what needs to be taken into account before committing to this.</p>
+
+  <h2>2. Outcome</h2>
+
+    <p>This is achievable but it comes with some technical and UX considerations.</p>
+      
+    <p>The approach taken to prove the concept was to add a drill through page to the report with the DimClientContact[FullName] column as the drill-through key. As with all drill throughs, the filters applied on the source page are replicated on the target page.</p>
+
+    <h3>2.1 Tooltip</h3>
+      
+      <p>Currently the table visual in the source page does not have a tooltip. The advantage of a tooltip is that the user can hover and drill through using the menu which appears as part of a tooltip. This is, however, not critical because we can still drill through by right-clicking on the table visual in the relevant row.</p>
+
+      <p>The drill-through can be initiated from any column in the table visual so we do not need to hover over the client contact name. If we hover anywhere over a given row, Power BI understands that we have implicitly filtered down to the one client contact we wish to see in the drill through page.</p>
+
+    <h3>2.2 Blank KPIs</h3>
+      
+      <p>It could be the case that for a given client contact, one or more of the KPIs may not have data available for the selected time period. This will result in a visual which would be blank. Would we be happy with this outcome?</p>
+    
+      <figure><img src='../blueprint_images/23-1.png' alt='Drillthrough page with 6 visuals showing one blank chart' style='max-width:100%; height:auto'><figcaption>Drillthrough page highlighting one blank chart</figcaption></figure>
+
+    <h3>2.3 Line vs Column vs Another Type </h3>
+    
+      <p>From a UX point of view would columns be better than lines in the drill through visuals? By definition these are not the client contacts with the best numbers so there is a high chance that for some of the months, there might not be any data for some of the KPIs. This means some of the lines stop / start and so have gaps and look "broken" or disjointed.</p>
+
+      <p>Another solution might be to use measures which equate to zero so we guarantee values for all months and the lines would be continuous. And for the dual metric visuals we could use a combo chart.</p>
+
+      <figure><img src='../blueprint_images/23-2.png' alt='Original visualisation approach using line charts' style='max-width:100%; height:auto'><figcaption>Original visualisation approach using line charts (but with data which has missing values)</figcaption></figure>
+
+      <figure><img src='../blueprint_images/23-3.png' alt='Original visualisation approach using line charts forcing missing values to be zero' style='max-width:100%; height:auto'><figcaption>Original visualisation approach using line charts forcing missing values to be zero</figcaption></figure>
+
+      <figure><img src='../blueprint_images/23-4.png' alt='Visualisation approach using column charts' style='max-width:100%; height:auto'><figcaption>Visualisation approach using column charts</figcaption></figure>
+
+      <p>The column chart approach provides the clearest representation because months with no activity are represented by an absence of columns. A line chart on the other hand can make missing periods appear as breaks in otherwise continuous data.</p>
+  
+    <h3>2.4 Use Case</h3>
+
+      <p>We need to potentially weigh up the use case for this drill through functionality. The table visual has several rows and works fine in the scenario that you want to check certain client contact KPIs on an ad hoc basis. You can scroll down the table visual to find the relevant person and then drill through to view the more detailed visuals.</p>
+
+      <p>The key point though is that when you return to the original table visual, the table will "reset" and will render with the scroll bar at the top and the first row visible, <i>not the row from which you drilled through.</i></p>
+
+      <p>So if the use case is for some sort of auditing purpose where the user <i>must</i> go into client contacts row by row, I would not recommend this as the approach. Instead perhaps a new page with the same visuals but with a client contact selector (e.g. a dropdown slicer) on it would provide better UX.</p>
+
+ 
+  </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>This drill through functionality was implemented since the use case would be ad hoc analysis. Column charts were used in the drill through because the missing values made more sense in these charts.</p>
+  
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="22-removing-a-redundant-fact-table.html">← Previous: Removing a Redundant Fact Table From a Power BI Semantic Model</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
