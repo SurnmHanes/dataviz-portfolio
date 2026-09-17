@@ -118,7 +118,7 @@ h1 {
 
 .post-date {
   margin-top: 0rem;
-  font-style: italic;
+  /* font-style: italic; */
   font-size: 13px;
   font-weight: 600;
   /* display: block; */
@@ -286,4 +286,27 @@ p:has(+ .tight-list) {
 
 header h1 {
   margin-bottom: 0.5rem;
+}
+
+.post-card {
+  margin-bottom: 1.4rem;
+  padding-bottom: 0.5rem;
+  background-color: #f8f4ea;
+}
+
+.post-card .post-date {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+  opacity: 0.7;
+}
+
+.post-card > a {
+  display: block;
+  font-size: 1.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.post-card .post-list {
+  margin-top: 0;
 }

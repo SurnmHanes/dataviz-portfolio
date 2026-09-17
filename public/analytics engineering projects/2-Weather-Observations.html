@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Observations Analytics Project</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    table, th, td {
+      border: 1px solid rgb(194, 193, 193);
+      border-collapse: collapse;
+      width: 650px;
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../analyticalengineeringprojects.html">Analytics Engineering Projects</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>End-to-End Analytics Engineering Project: Weather Observations</h1>
+  </header>
+<main>
+      
+  <h2>1. Objective</h2>
+    
+    <p>The objective was to design and build an end-to-end analytical data pipeline, starting with a public API and ending with a dimensional model suitable for reporting and analysis.</p>
+    
+    <p>The project was deliberately designed to explore the engineering decisions involved in creating a reliable analytical data pipeline. Decisions such as where data should be validated, how transformations should be layered, how the model should be structured and evolve, how testing, documentation and version control contribute to maintainability and data trustworthiness.</p>
+  
+  <h2>2. Source Data</h2>
+
+    <p>The source data was the public Open-Meteo API containing details of weather observations from various locations.</p>
+
+  <h2>3. Architecture</h2>
+  
+    <p>The architecture was layered from source to ingestion to presentation in the following manner:</p>
+
+    <figure><img src='../ae_images/2-1.png' alt='sketch showing basic data lineage' style='max-width:100%; height:auto'><figcaption>From API to analytical product</figcaption></figure>
+
+    <h4>3.1 Data Warehouse</h4>
+
+    The data warehouse was set up in DuckDB, a file-based analytical database. The architecture was designed to have a raw layer, a staging layer and a dimensional model layer.
+
+    <h4>3.2 Transformation Layer</h4>
+
+    <figure><img src='../ae_images/2-3.png' alt='dbt Core lineage graph' style='max-width:100%; height:auto'><figcaption>dbt Core lineage graph</figcaption></figure> 
+
+    <h4>3.3 Presentation Layer</h4>
+
+    <figure><img src='../ae_images/2-4.png' alt='Power BI Temperature page' style='max-width:100%; height:auto'><figcaption>Power BI Report - Temperature page</figcaption></figure>
+
+    <figure><img src='../ae_images/2-5.png' alt='Power BI Precipitation page' style='max-width:100%; height:auto'><figcaption>Power BI Report - Precipitation page</figcaption></figure>
+
+    <figure><img src='../ae_images/2-6.png' alt='Power BI Wind Speed page' style='max-width:100%; height:auto'><figcaption>Power BI Report - Wind Speed page</figcaption></figure>
+
+  <h2>4. Key Elements</h2>
+  
+    <ul>
+      <li>Raw weather observations obtained via a public API (Open-Meteo).</li>
+      <li>Python scripts control the API request.</li>
+      <li>API JSON responses are converted into a tabular Pandas DataFrame.</li>
+      <li>Validation is performed in Python prior to loading to identify unexpected or invalid data.</li>
+      <li>Validated data loaded into DuckDB as the weather_raw source table.</li>
+      <li>Raw data transformed and loaded into the dimensional model using dbt models.</li>
+      <li>Star schema designed with dimensional attributes and a central fact table.</li>
+      <li>Surrogate keys are generated for all dimensions.</li>
+      <li>dbt tests implemented to validate data quality.</li>
+      <li>Final dimensional model consumed by Power BI.</li>
+      <li>Development followed a Git-based workflow with the dbt project maintained in GitHub.</li>
+    </ul>  
+
+  
+  <h2>5. Technologies</h2>
+
+    <p>The technologies used were as follows:</p>
+
+    <ul>
+      <li>Python / Pandas: API ingestion and validation</li>
+      <li>DuckDB: Analytical database</li>
+      <li>dbt Core: transformation, testing and documentation</li>
+      <li>SQL: transformation and modelling</li>
+      <li>Git / GitHub: version control</li>
+      <li>Visual Studio Code: development environment</li>
+      <li>Power BI: semantic model and visualisation</li>
+    </ul>
+
+
+  <h2>6. Challenges</h2>
+
+  <p>The project raised a number of engineering questions around validation, transformation, dimensional modelling, surrogate keys and analytical requirements. The most significant decisions are summarised below.</p>
+
+
+    <h3>Why validate before loading?</h3>
+
+      <p>To prevent unexpected API responses from entering the raw data warehouse layer.</p>
+
+    <h3>Why separate staging from dimension models?</h3>
+    
+      <p>To isolate raw data from business logic and provide a clean interface between the two layers.</p>
+
+    <h3>Where should transformations occur?</h3>
+
+      <p>Transformations were implemented in the dbt layer, separating data extraction and transformation logic from the final analytical model.</p>
+    
+    <h3>How should dimension keys be generated?</h3>
+
+      <p>Deterministic surrogate keys were chosen rather than volatile row-number-based keys so that certain attribute values retain the same surrogate key value across all loads. </p>
+
+    <h3>Why use dbt?</h3>
+
+      <p>To make transformation logic explicit and inspectable, version controlled, testable and documented.</p>
+    
+    <h3>Why Power BI only at the end?</h3>
+
+      <p>To show that reporting consumes the analytical model rather than containing the transformation logic.</p>
+
+    <h3>How did analytical requirements affect the model?</h3>
+
+      <p>The dimensional model evolved iteratively as I used it to build the Power BI analysis.</p>
+      
+      <p>For example, analysis by month of year and time of day exposed requirements that weren't initially apparent, resulting in new attributes such as <code>month_year</code>, <code>month_year_sort</code> and <code>observation_time</code> being added to the model.</p>
+
+      <p>This meant the reporting requirements influenced the analytical model rather than being solved through logic in the Power BI reporting layer.</p>
+
+
+  <h2>7. What I Learned</h2>
+  
+    <p>The biggest learning from the project was that the difficult part of analytics engineering isn't writing the SQL. It's deciding where the transformations belong, what each layer should do and how the resulting model should behave for its downstream consumers.</p>
+
+    <p>The project deliberately used a lightweight, code-first approach so that the ingestion, transformation and modelling decisions remained visible and inspectable.</p>
+
+  <h2>8. Key Skills Demonstrated</h2>
+
+<table>
+  <tr>
+    <th>Area</th>
+    <th>Skills</th>
+  </tr>
+  <tr>
+    <td>Data Ingestion</td>
+    <td>Python API requests, Pandas DataFrames</td>
+  </tr>
+  <tr>
+    <td>Data Warehousing</td>
+    <td>Kimball dimensional modelling</td>
+  </tr>
+  <tr>
+    <td>SQL</td>
+    <td>DuckDB SQL</td>
+  </tr>
+  <tr>
+    <td>Analytics Engineering</td>
+    <td>dbt Core</td>
+  </tr>
+  <tr>
+    <td>Data Quality</td>
+    <td>Source and model tests</td>
+  </tr>
+  <tr>
+    <td>Documentation</td>
+    <td>dbt Docs</td>
+  </tr>
+  <tr>
+    <td>Version Control</td>
+    <td>Git / GitHub</td>
+  </tr>
+  <tr>
+    <td>Reporting & Visualisation</td>
+    <td>Power BI</td>
+  </tr>
+  <tr>
+    <td>Development</td>
+    <td>VS Code</td>
+  </tr>
+</table>
+
+   <div style="text-align: center; margin: 2rem 0;">
+      <a href="https://github.com/SurnmHanes/weather_analytics_engineering/blob/main/README.md" style="background: #f9c73c; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px;">
+    Read Full Technical Write-Up →
+     </a>
+    </div>
+
+
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="1-Djokovic-Titles.html">← Previous: Djokovic Titles</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <!-- <a href="2-approach-to-switching-fee-model.html">Next: An Approach To Switching Fee Model →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
