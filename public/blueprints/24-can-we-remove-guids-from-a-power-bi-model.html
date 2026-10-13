@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Can We Remove GUIDs From a Power BI Model?</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+
+    h2 {
+      color: #092e86;
+    }
+    h3 {
+      color: #5f7de2;
+      font-size: 18px;
+    }
+
+    .archival-document h4 {
+      color: #878dd4;
+      font-size: 16px
+    }
+    h5 {
+      margin-bottom: 0.1em;
+      margin-top: 1em;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    table, th, td {
+      border: 1px solid rgb(226, 226, 226);
+      border-collapse: collapse;
+      padding: 5px;
+    }
+
+    td {
+      padding: 10px;
+      text-align: center
+    }
+
+    .note {
+      font-size: 10px;
+    }
+
+    blockquote {
+      background-color: #fff1c7 ;
+      border-left: 3px solid #e0a600;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html">Home</a> |
+      <a href="../blueprints.html">Investigations & Case Studies</a> |
+      <a href="../analyticalengineeringprojects.html">Analytics Engineering Projects</a> |
+      <a href="../about.html">About</a> |
+      <a href="../how-i-work.html">How I Work</a> |
+      <a href="../operating-manual.html">Operating Manual</a> |
+      <a href="../blog.html">Blog</a> |
+      <a href="../fun.html">Just For Fun</a>
+    </nav>
+    <h1>Can We Remove GUIDs From a Power BI Model?</h1>
+
+    <h4 class="case-study-meta">
+        Skills demonstrated: SQL URL generation, data modeling, unique identifier management, dependency analysis and performance optimisation.
+    </h4>
+
+    <p class="case-study-outcome">
+      Outcome: Identified opportunities to reduce GUID storage in the Power BI model by moving URL generation into SQL. A proof of concept confirmed that SQL could generate the required URLs. Futher investigation was needed to establish which GUIDs could be safely removed and validate the impact of any changes. 
+    </p>
+
+  </header>
+<main>
+  <!-- <h2>Star Schema Proposal</h2> -->
+      
+  <h4 class="case-study">Context</h4>
+
+    <p>We had an overarching requirement to improve the performance of our model and reports. One area identified that could potentially be optimised was around GUIDs. We ingested a number of different GUID columns into Power BI and there was doubt as to whether all of them served a purpose.</p>
+
+    <p>So an investigation was initiated to understand their purpose and to determine if they could be safely removed from Power BI, thereby making the model and downstream queries leaner and more efficient</p>
+
+    <p>The following is a write-up of the investigation:</p>
+
+  <div class="archival-document">
+
+  <span class="document-label"> Original Spike - 3 min read
+  <span class="document-label-minor-text"> (Edited for clarity and minor redactions. Core structure remains faithful to the original.)</span></span>
+  
+ 
+  <h2>1. Problem</h2>
+    
+    <p>While looking generally at the area of performance improvements for our model and reports, it was mentioned that we take a number of GUID columns into Power BI.</p>
+
+    <p>This item was to consider this and to understand why these are taken into Power BI (with the main suspect being in order to create Core URLs) and whether that reasoning could be abstracted away into the SQL database. If not, could we amend the data types for these columns in order to reduce the storage size.</p>
+
+  <h2>2. Outcome</h2>
+
+    <p>Using Measure Killer, I identified three main uses of these GUIDs once they are in the Power BI model:</p>
+    
+    <ul>
+      <li>They are mainly used in DAX measures to create dynamic URLs in the drillthrough tables. These URLs navigate the user from Power BI to the specific record in the core system.</li>
+      <li>A number of them have a secondary use in these drillthrough tables as a hidden column in the table. This is in order to ensure the tables display the correct subset of data and by adding a unique identifier in this way, this achieves that.</li>
+      <li>Some of them are used in relationships. For example, DimClient and DimClientContact are related using ClientId which is a GUID.</li>
+    </ul>
+
+    <p>In addition, Power BI does not have the GUID data type like SQL and so these values are represented as text. Given the high cardinality of GUIDs, retaining them in the model can therefore have a meaningful storage impact.</p>
+   
+
+  <h2>3. Proposed Next Steps</h2>
+
+    <p>Because these URLs are used for different purposes, it's not quite as simple as removing all the GUID columns from Power BI. However I think there is scope to make in-roads here. I would propose the following next steps:</p>
+
+    <ol>
+      <li>Identify all GUIDs that are <b>only</b> used for the creation of URLs.</li>
+      <li>Identify all GUIDs that are also used as hidden columns or filters in drillthrough tables.
+        <ul>
+          <li>Spike to see if this functionality / output can be achieved without using these GUIDs.</li>
+          <li>If they can be replaced in this manner, it will result in additional dev and test.</li>
+        </ul>
+      </li>
+      <li>The two identification exercises above will give us the scope of all GUIDs that could be removed from Power BI.</li>
+      <li>Can then, in theory, do the necessary dev to refactor the method for creating URLs:
+        <ul>
+          <li>SQL dev to add all the URLs into SQL views.</li>
+          <li>Power BI dev to hook up the existing measures to use these new URL columns in the views.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>3.1 Can the URLs be created in SQL?</h3>
+
+    <p>Yes this can be done. Because they are dynamic URLs it requires a little bit of work.</p>
+    
+    <p>The base URL is stored in a table in the SQL data warehouse. It can therefore be easily accessed in the definitions of each of the views.</p>
+    
+    <p>The middle part of the URLs is static data (stating which entity to navigate to) with the end part being the GUID which already exists in the view.</p>
+    
+    <p>It would be straightforward to create a derived column which is the concatenation of these 3 parts.</p>
+
+    <p>As a proof of concept, the following is a screenshot showing an abridged version of a SQL view with a new URL column:</p>
+
+    <figure><img src='../blueprint_images/24-1.png' alt='SSMS screenshot showing derived URL column' style='max-width:100%; height:auto'><figcaption>SSMS screenshot showing SQL view output with derived URL column</figcaption></figure>
+
+    <h3>3.2 If they must stay in Power BI</h3>
+      
+      <p>This section assumes that we have to keep some GUID columns in Power BI.</p>
+      
+      <p>If that is the case, there is scope to replace them with integer type columns either in the SQL view or in Power Query.</p>
+      
+      <p>The rationale behind doing this conversion is that, in the two scenarios above, the GUIDs are not being used for their GUID characteristics. What is important is their uniqueness per row.</p>
+      
+      <p>This uniqueness requirement could potentially be covered with an integer column instead. This would at least then reduce their size in Power BI and therefore the overall storage size. This would need to be validated through a further spike and regression testing.</p>
+    
+    <h2>4. Summary</h2>
+
+    <p>The investigation identified that the GUIDs could not simply be removed as a single optimisation exercise, because they served three distinct purposes within the Power BI model.</p> 
+      
+    <p>Their downstream uses needed to be understood in more detail before the scope of any changes could be established safely.</p>
+
+  </div>
+ 
+  <h4 class="case-study">What Happened Next?</h4>
+
+  <p>A further spike was raised to identify the different uses of the GUID columns and establish the scope of the changes required.</p>
+
+  <p>The SQL proof of concept confirmed that URL generation could be moved upstream, but the wider optimisation still required further investigation before implementation.</p>
+  
+  <br>
+    <hr class="section-divider">
+
+    <div class="blog-navigation">
+    
+      <div class="nav-previous">
+        <a href="23-using-power-bi-drillthrough-to-explore-kpi-trends.html">← Previous: Using Power BI Drill-Through to Explore KPI Trends</a>
+      </div>
+    
+      <div class="nav-back-to-top">
+        <a href="#top">Back to top of page</a>
+      </div>
+
+      <div class="nav-next">
+        <!-- <a href="#top">Back to top of page</a> -->
+        <!-- <a href="the-importance-of-dev-testing.html">Next: The Importance Of Dev Testing →</a> -->
+      </div>
+      
+    </div>
+    <hr class="section-divider">
+
+
+  </main>
+    
+  <footer>
+    <p>Personal site. Views my own. Hand-coded, with love</p>
+  </footer>
+  </body>
+
+</html>
